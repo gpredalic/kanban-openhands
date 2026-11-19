@@ -124,10 +124,10 @@ test("activate(host) registers the board page and renders the React tree", async
   const html = container.innerHTML;
   assert.ok(html.length > 0, "container must contain rendered markup");
   assert.match(html, /Project Board/, "page title must render");
-  assert.match(html, /Total Tasks/, "Total Tasks stat card must render");
-  assert.match(html, /In Progress/, "In Progress stat card must render");
-  assert.match(html, /Review/, "Review stat card must render");
-  assert.match(html, /Completed/, "Completed stat card must render");
+  assert.match(html, /Total Tasks/, "Total Tasks metric must render");
+  assert.match(html, /In Progress/, "In Progress metric must render");
+  assert.match(html, /Review/, "Review metric must render");
+  assert.match(html, /Completed/, "Completed metric must render");
   assert.match(html, /Create Task/, "create button must render");
   assert.match(html, /Design the onboarding flow/, "todo task card must render");
   assert.match(html, /Implement auth middleware/, "in-progress task card must render");
@@ -135,10 +135,18 @@ test("activate(host) registers the board page and renders the React tree", async
   assert.match(html, /Ship v2\.0 release notes/, "done task card must render");
   assert.match(html, /Add Task/, "add-task button must render");
 
+  // The header must render the Kanban AI icon (the same asset the manifest
+  // references), not the old placeholder square. The SVG is inlined as a
+  // data URL by Vite, so the <img> carries a data:image/svg src and the
+  // "Kanban AI" alt text.
+  const headerImg = container.querySelector("header img[alt='Kanban AI']");
+  assert.ok(headerImg, "header must render the Kanban AI icon");
+  assert.match(String(headerImg?.getAttribute("src")), /^data:image\/svg/, "icon must be an inlined SVG data URL");
+
   // The inlined Tailwind CSS must be present in the document head.
   const styleTag = document.head.querySelector("style");
   assert.ok(styleTag, "inlined <style> tag must exist");
-  assert.match(String(styleTag?.textContent), /rounded-2xl/, "Tailwind utilities must be inlined");
+  assert.match(String(styleTag?.textContent), /rounded-lg/, "Tailwind utilities must be inlined");
 
   cleanup();
   container.remove();

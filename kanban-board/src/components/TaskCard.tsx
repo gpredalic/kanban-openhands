@@ -1,13 +1,14 @@
 /**
- * TaskCard — a premium glassmorphism task card.
+ * TaskCard — a premium glass task card.
  *
- * Shows: priority badge, title, description, tags, progress bar, due date,
- * and assignee avatar. Draggable via dnd-kit. Hover lift + glow.
+ * Shows: priority badge, title, description, tags, progress indicator, due
+ * date, blocked state, and assignee avatar. Draggable via dnd-kit. Glass
+ * surface with a hover lift (scale 1.02) and a soft indigo glow.
  */
 
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { Calendar, Tag, AlertTriangle } from "lucide-react";
+import { Calendar, AlertTriangle } from "lucide-react";
 import type { Task, TaskPriority } from "../types/task";
 import { dueState } from "../lib/date";
 
@@ -16,19 +17,19 @@ interface TaskCardProps {
   isDragging: boolean;
 }
 
-const PRIORITY_STYLES: Record<TaskPriority, { label: string; cls: string }> = {
-  low: { label: "Low", cls: "bg-emerald-500/15 text-emerald-400 ring-emerald-400/25" },
-  medium: { label: "Medium", cls: "bg-amber-500/15 text-amber-400 ring-amber-400/25" },
-  high: { label: "High", cls: "bg-rose-500/15 text-rose-400 ring-rose-400/25" },
+const PRIORITY_STYLES: Record<TaskPriority, { label: string; cls: string; dot: string }> = {
+  low: { label: "Low", cls: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20", dot: "bg-emerald-400" },
+  medium: { label: "Medium", cls: "bg-amber-500/10 text-amber-400 ring-amber-500/20", dot: "bg-amber-400" },
+  high: { label: "High", cls: "bg-rose-500/10 text-rose-400 ring-rose-500/20", dot: "bg-rose-400" },
 };
 
 const AVATAR_COLORS = [
-  "from-blue-500 to-indigo-500",
-  "from-violet-500 to-purple-500",
-  "from-pink-500 to-rose-500",
-  "from-emerald-500 to-teal-500",
-  "from-amber-500 to-orange-500",
-  "from-cyan-500 to-blue-500",
+  "bg-gradient-to-br from-blue-500 to-indigo-600",
+  "bg-gradient-to-br from-violet-500 to-purple-600",
+  "bg-gradient-to-br from-pink-500 to-rose-600",
+  "bg-gradient-to-br from-emerald-500 to-teal-600",
+  "bg-gradient-to-br from-amber-500 to-orange-600",
+  "bg-gradient-to-br from-cyan-500 to-sky-600",
 ];
 
 function avatarColor(name: string): string {
@@ -78,16 +79,17 @@ export function TaskCard({ task, isDragging }: TaskCardProps) {
         isDragging ? "kb-dragging" : ""
       }`}
     >
-      {/* Top row: priority + blocked + tags */}
+      {/* Top row: priority badge + blocked + tags */}
       <div className="mb-2.5 flex flex-wrap items-center gap-1.5">
         <span
-          className={`rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ${pStyle.cls}`}
+          className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ring-1 ${pStyle.cls}`}
         >
+          <span className={`h-1.5 w-1.5 rounded-full ${pStyle.dot}`} />
           {pStyle.label}
         </span>
         {task.waitingOn && task.waitingOn.length > 0 && (
           <span
-            className="flex items-center gap-1 rounded-md bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-400 ring-1 ring-rose-400/20"
+            className="flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-400 ring-1 ring-rose-500/20"
             title={`Waiting on ${task.waitingOn.length} task(s)`}
           >
             <AlertTriangle className="h-3 w-3" />
@@ -97,9 +99,8 @@ export function TaskCard({ task, isDragging }: TaskCardProps) {
         {(task.tags ?? []).slice(0, 3).map((tag) => (
           <span
             key={tag}
-            className="flex items-center gap-1 rounded-md bg-slate-500/10 px-2 py-0.5 text-[11px] font-medium text-slate-400 ring-1 ring-slate-400/15"
+            className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-medium text-slate-400 ring-1 ring-white/10"
           >
-            <Tag className="h-2.5 w-2.5" />
             {tag}
           </span>
         ))}
@@ -112,7 +113,7 @@ export function TaskCard({ task, isDragging }: TaskCardProps) {
 
       {/* Description */}
       {task.description && (
-        <p className="mb-3 text-xs leading-relaxed text-slate-400 line-clamp-2">
+        <p className="mb-3 text-xs leading-relaxed text-slate-500 line-clamp-2">
           {task.description}
         </p>
       )}
@@ -120,13 +121,13 @@ export function TaskCard({ task, isDragging }: TaskCardProps) {
       {/* Progress bar */}
       {progress > 0 && (
         <div className="mb-3">
-          <div className="mb-1 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="mb-1.5 flex items-center justify-between text-[11px] text-slate-500">
             <span>Progress</span>
-            <span className="tabular-nums">{progress}%</span>
+            <span className="tabular-nums font-medium text-slate-400">{progress}%</span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-slate-700/50">
+          <div className="h-1.5 overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10">
             <div
-              className="kb-gradient h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -134,16 +135,16 @@ export function TaskCard({ task, isDragging }: TaskCardProps) {
       )}
 
       {/* Bottom row: due date + avatar */}
-      <div className="mt-3 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {task.dueDate && (
             <span
-              className={`flex items-center gap-1 text-[11px] font-medium ${
+              className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${
                 due === "overdue"
-                  ? "text-rose-400"
+                  ? "bg-rose-500/10 text-rose-400 ring-rose-500/20"
                   : due === "soon"
-                    ? "text-amber-400"
-                    : "text-slate-500"
+                    ? "bg-amber-500/10 text-amber-400 ring-amber-500/20"
+                    : "bg-white/5 text-slate-500 ring-white/10"
               }`}
             >
               <Calendar className="h-3 w-3" />
@@ -153,7 +154,7 @@ export function TaskCard({ task, isDragging }: TaskCardProps) {
         </div>
         {task.assignee && (
           <div
-            className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ring-2 ring-[#1e293b] ${avatarColor(task.assignee)}`}
+            className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-md ring-2 ring-white/10 ${avatarColor(task.assignee)}`}
             title={task.assignee}
           >
             {initials(task.assignee)}

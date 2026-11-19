@@ -4,7 +4,7 @@
   "display_name": "Kanban Board",
   "version": "0.1.0",
   "description": "A Kanban board UI for Agent Canvas (tasks & columns).",
-  "icon": "kanban.svg",
+  "icon": "icons/kanban-ai-128.svg",
   "entrypoint": "extension.js",
   "contributes": {
     "pages": [

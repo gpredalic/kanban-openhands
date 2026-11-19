@@ -1,9 +1,9 @@
 /**
  * KanbanColumn — a single board column.
  *
- * Semi-transparent glass background, blur backdrop, subtle border, colored
- * status indicator, task counter badge, and a column shadow. Drop target for
- * drag-and-drop moves.
+ * Semi-transparent glass surface with a backdrop blur, a subtle border, a
+ * colored status indicator, a task counter badge, and a column shadow.
+ * Drop target for drag-and-drop moves. Resembles Linear / Jira Cloud.
  */
 
 import { useDroppable } from "@dnd-kit/core";
@@ -18,35 +18,33 @@ interface KanbanColumnProps {
   onCreate: (title: string, status: TaskStatus) => void;
 }
 
-const STATUS_COLORS: Record<TaskStatus, { dot: string; glow: string }> = {
-  todo: { dot: "bg-slate-400", glow: "shadow-slate-400/30" },
-  in_progress: { dot: "bg-blue-500", glow: "shadow-blue-500/40" },
-  review: { dot: "bg-amber-500", glow: "shadow-amber-500/40" },
-  done: { dot: "bg-emerald-500", glow: "shadow-emerald-500/40" },
+const STATUS_COLORS: Record<TaskStatus, string> = {
+  todo: "bg-slate-400",
+  in_progress: "bg-blue-500",
+  review: "bg-amber-500",
+  done: "bg-emerald-500",
 };
 
 export function KanbanColumn({ column, activeTaskId, onCreate }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
-  const color = STATUS_COLORS[column.status];
+  const dot = STATUS_COLORS[column.status];
 
   return (
     <div
       ref={setNodeRef}
-      className={`kb-glass flex flex-col rounded-3xl p-3 transition-all duration-200 ${
+      className={`kb-glass flex flex-col rounded-2xl p-3 transition-all duration-200 ${
         isOver ? "kb-drop-target" : ""
       }`}
     >
       {/* Column header */}
       <div className="mb-3 flex items-center justify-between px-1.5">
         <div className="flex items-center gap-2.5">
-          <span
-            className={`h-2.5 w-2.5 rounded-full ${color.dot} shadow-lg ${color.glow}`}
-          />
-          <h3 className="text-sm font-semibold tracking-tight text-slate-100">
+          <span className={`h-2.5 w-2.5 rounded-full ${dot} shadow-[0_0_10px_rgba(99,102,241,0.55)]`} />
+          <h3 className="text-sm font-semibold tracking-tight text-slate-200">
             {column.title}
           </h3>
         </div>
-        <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-700/50 px-2 text-xs font-semibold tabular-nums text-slate-300 ring-1 ring-slate-600/30">
+        <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400 ring-1 ring-white/10">
           {column.tasks.length}
         </span>
       </div>

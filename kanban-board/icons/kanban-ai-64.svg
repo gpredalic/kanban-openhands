@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 16 16" fill="none" role="img" aria-label="Kanban AI">
+  <defs>
+    <linearGradient id="kb-grad" x1="0" y1="0" x2="16" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="0.5" stop-color="#6366f1"/>
+      <stop offset="1" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="kb-node" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#a5b4fc"/>
+    </linearGradient>
+  </defs>
+  <g stroke="url(#kb-node)" stroke-width="0.9" stroke-linecap="round" opacity="0.92">
+    <line x1="3" y1="5" x2="8" y2="2.6"/>
+    <line x1="8" y1="2.6" x2="13" y2="5"/>
+    <line x1="3" y1="5" x2="13" y2="5"/>
+    <line x1="3" y1="5" x2="3" y2="7.5"/>
+    <line x1="8" y1="2.6" x2="8" y2="7.5"/>
+    <line x1="13" y1="5" x2="13" y2="7.5"/>
+  </g>
+  <g fill="url(#kb-grad)">
+    <rect x="1.3" y="7.5" width="3.4" height="7" rx="1.4"/>
+    <rect x="6.3" y="7.5" width="3.4" height="7" rx="1.4"/>
+    <rect x="11.3" y="7.5" width="3.4" height="7" rx="1.4"/>
+  </g>
+  <g fill="url(#kb-node)">
+    <circle cx="3" cy="5" r="1.4"/>
+    <circle cx="8" cy="2.6" r="1.6"/>
+    <circle cx="13" cy="5" r="1.4"/>
+  </g>
+</svg>
