@@ -1,6 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./src/**/*.{ts,tsx}"],
+  // Scope every generated utility under the extension root so the bundle never
+  // restyles the host application. `important` prepends the selector, turning
+  // `.rounded-2xl` into `#kanban-extension-root .rounded-2xl`.
+  important: "#kanban-extension-root",
+  corePlugins: {
+    // Preflight is a global CSS reset (html/body/button/input/h1-h6/ul/ol/a/img).
+    // Disabling it stops the extension from altering host element defaults.
+    preflight: false,
+  },
   theme: {
     extend: {
       colors: {

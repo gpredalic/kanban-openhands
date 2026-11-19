@@ -27,6 +27,10 @@ export function activate(host: Host): () => void {
   let root: Root | null = null;
 
   const unregisterPage = host.registerPage("board", (ctx) => {
+    // Mount under a dedicated root id so every scoped rule (Tailwind utilities
+    // and the design-system CSS) applies only inside the extension and never
+    // leaks into the host application.
+    ctx.container.id = "kanban-extension-root";
     root = createRoot(ctx.container);
     root.render(<KanbanBoard host={host} />);
   });

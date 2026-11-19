@@ -1,12 +1,16 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ------------------------------------------------------------------ *
  * Kanban Board — premium dark glassmorphism design system
+ *
+ * Every rule below is scoped to #kanban-extension-root so the bundle never
+ * restyles the host application. Tailwind Preflight is disabled globally
+ * (see tailwind.config.js); the scoped reset that follows normalizes only
+ * the elements inside the extension.
  * ------------------------------------------------------------------ */
 
-:root {
+#kanban-extension-root {
   --kb-bg-900: #0f172a;
   --kb-bg-800: #111827;
   --kb-bg-700: #1e293b;
@@ -18,15 +22,8 @@
   --kb-status-review: #f59e0b;
   --kb-status-done: #22c55e;
   --kb-radius: 1.25rem;
-}
-
-html,
-body,
-#root {
-  height: 100%;
-}
-
-body {
+  /* Self-contained height floor (does not depend on the host height chain). */
+  min-height: 100vh;
   margin: 0;
   background: var(--kb-bg-900);
   color: #e2e8f0;
@@ -35,6 +32,64 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* Scoped box-sizing reset. */
+#kanban-extension-root *,
+#kanban-extension-root *::before,
+#kanban-extension-root *::after {
+  box-sizing: border-box;
+}
+
+/* Scoped element normalization (Preflight is disabled globally). */
+#kanban-extension-root h1,
+#kanban-extension-root h2,
+#kanban-extension-root h3,
+#kanban-extension-root h4,
+#kanban-extension-root h5,
+#kanban-extension-root h6 {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+#kanban-extension-root p {
+  margin: 0;
+}
+
+#kanban-extension-root ul,
+#kanban-extension-root ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#kanban-extension-root button {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+#kanban-extension-root input,
+#kanban-extension-root textarea,
+#kanban-extension-root select {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}
+
+#kanban-extension-root a {
+  color: inherit;
+  text-decoration: none;
+}
+
+#kanban-extension-root img {
+  display: block;
+  max-width: 100%;
 }
 
 /* Radial gradient background + floating blur blobs */
