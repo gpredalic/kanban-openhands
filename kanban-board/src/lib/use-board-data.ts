@@ -257,7 +257,17 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
       if (t.dueDate !== undefined) patch.dueDate = t.dueDate;
       if (patch.tags !== undefined || patch.dueDate !== undefined) setTaskOverlay(t.id, patch);
       if (!existingIds.has(t.id)) {
-        await createTask(host, t.title, t.status, t.assignee, t.projectId);
+        const created = await createTask(host, t.title, t.status, t.assignee, t.projectId);
+        if (created) {
+          void syncBoardAction(host, "created", created.id, {
+            title: t.title,
+            status: t.status,
+            assignee: t.assignee,
+            projectId: t.projectId,
+          }).catch((error: unknown) => {
+            console.error("[kanban-board] OpenHands import create sync failed:", error);
+          });
+        }
       }
     }
     await load();
