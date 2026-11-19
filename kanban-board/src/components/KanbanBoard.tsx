@@ -170,6 +170,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
         <WorkflowView aiState={aiState} tasks={enrichedTasks} />
       ) : view === "command" ? (
         <OpenHandsView
+          host={host}
           state={openHandsState}
           tasks={enrichedTasks}
           agents={aiState.config.agents}

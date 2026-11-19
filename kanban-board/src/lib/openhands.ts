@@ -275,6 +275,182 @@ export interface OpenHandsCommandInput {
   scheduledAt?: string;
 }
 
+export interface AgentProfile {
+  id: string;
+  name: string;
+}
+
+export interface RelayHop {
+  agent: string;
+  question: string;
+  response: string;
+  status: "running" | "succeeded" | "failed";
+  childConversationId?: string;
+  error?: string;
+}
+
+export interface RelayInput {
+  seed: string;
+  agentNames: string[];
+  maxHops: number;
+  workspaceId?: string;
+  useChildConversations?: boolean;
+  delayMs?: number;
+}
+
+export interface RelayHandle {
+  conversationId: string;
+  stop: () => Promise<void>;
+}
+
+export async function fetchAgentProfiles(host: Host): Promise<AgentProfile[]> {
+  try {
+    const response = await host.agentServer.request({ method: "GET", path: "/api/agent-profiles" });
+    const object = asObject(response);
+    if (!object || !Array.isArray(object.profiles)) return [];
+    return object.profiles
+      .filter((item): item is Record<string, unknown> => !!asObject(item))
+      .map((profile) => ({
+        id: asString(profile.id) ?? "",
+        name: asString(profile.name) ?? asString(profile.profile_name) ?? "",
+      }))
+      .filter((profile) => profile.id && profile.name);
+  } catch {
+    return [];
+  }
+}
+
+export async function startAgentRelay(
+  host: Host,
+  input: RelayInput,
+  onHop: (hop: RelayHop, index: number, running: boolean) => void,
+): Promise<RelayHandle | null> {
+  const seed = input.seed.trim();
+  const agentNames = input.agentNames.map((name) => name.trim()).filter(Boolean);
+  if (!seed || agentNames.length === 0) return null;
+
+  let conversationId = "";
+  try {
+    const response = await host.agentServer.request({
+      method: "POST",
+      path: "/api/conversations",
+      body: {
+        workspace: { type: "local", id: input.workspaceId ?? "workspace/project" },
+        initial_message: { message: seed },
+        agent_profile_id: await getAgentProfileId(host, agentNames[0]),
+        autotitle: true,
+        tags: { relay: "true" },
+      },
+    });
+    const conversation = asObject(response);
+    conversationId = conversation ? asString(conversation.id) ?? "" : "";
+  } catch (error) {
+    onHop({
+      agent: agentNames[0],
+      question: seed,
+      response: "",
+      status: "failed",
+      error: error instanceof Error ? error.message : "Could not create relay conversation",
+    }, 0, false);
+    return null;
+  }
+  if (!conversationId) {
+    onHop({
+      agent: agentNames[0],
+      question: seed,
+      response: "",
+      status: "failed",
+      error: "Relay conversation has no id",
+    }, 0, false);
+    return null;
+  }
+
+  let stopped = false;
+  let previousResponse = seed;
+  const hopLimit = Math.max(1, Math.min(input.maxHops, agentNames.length));
+
+  const stop = async (): Promise<void> => {
+    stopped = true;
+    try {
+      await host.agentServer.request({
+        method: "POST",
+        path: `/api/conversations/${encodeURIComponent(conversationId)}/interrupt`,
+      });
+    } catch {
+      // Stopping is best-effort; the local loop is stopped regardless.
+    }
+  };
+
+  void (async () => {
+    for (let index = 0; index < hopLimit && !stopped; index += 1) {
+      const agent = agentNames[index];
+      const question = previousResponse;
+      onHop({ agent, question, response: "", status: "running" }, index, true);
+
+      try {
+        await host.agentServer.request({
+          method: "POST",
+          path: `/api/conversations/${encodeURIComponent(conversationId)}/switch_profile`,
+          body: { profile_name: agent },
+        });
+
+        if (input.useChildConversations) {
+          const childResponse = await host.agentServer.request({
+            method: "POST",
+            path: `/api/conversations/${encodeURIComponent(conversationId)}/children`,
+            body: { task: question },
+          });
+          const child = asObject(childResponse);
+          const childConversationId = child ? asString(child.conversation_id) : undefined;
+          const status = child ? asString(child.status) : undefined;
+          const response = childConversationId
+            ? `Child conversation ${childConversationId} started${status ? ` (${status})` : ""}.`
+            : "Child conversation started.";
+          previousResponse = response;
+          onHop({
+            agent,
+            question,
+            response,
+            status: "succeeded",
+            childConversationId,
+          }, index, index < hopLimit - 1 && !stopped);
+        } else {
+          const answerResponse = await host.agentServer.request({
+            method: "POST",
+            path: `/api/conversations/${encodeURIComponent(conversationId)}/ask_agent`,
+            body: { question },
+          });
+          const answer = asObject(answerResponse);
+          const response = answer ? asString(answer.response) ?? "" : "";
+          if (!response) throw new Error("Agent returned an empty response");
+          previousResponse = response;
+          onHop({
+            agent,
+            question,
+            response,
+            status: "succeeded",
+          }, index, index < hopLimit - 1 && !stopped);
+        }
+      } catch (error) {
+        onHop({
+          agent,
+          question,
+          response: "",
+          status: "failed",
+          error: error instanceof Error ? error.message : "Relay hop failed",
+        }, index, false);
+        break;
+      }
+
+      if (index < hopLimit - 1 && !stopped) {
+        await new Promise((resolve) => setTimeout(resolve, input.delayMs ?? 650));
+      }
+    }
+  })();
+
+  return { conversationId, stop };
+}
+
 async function getAgentProfileId(host: Host, requestedId?: string): Promise<string | undefined> {
   try {
     const response = await host.agentServer.request({ method: "GET", path: "/api/agent-profiles" });
