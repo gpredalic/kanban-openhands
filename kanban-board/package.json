@@ -1,0 +1,17 @@
+{
+  "name": "kanban-board",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A Kanban board UI for Agent Canvas (tasks & columns).",
+  "scripts": {
+    "build": "esbuild src/entry.ts --bundle --format=esm --target=es2022 --outfile=extension.js",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import ./test/register.mjs --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "happy-dom": "^21.0.4",
+    "typescript": "^5.6.0"
+  }
+}

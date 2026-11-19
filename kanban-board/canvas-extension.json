@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "kanban-board",
+  "display_name": "Kanban Board",
+  "version": "0.1.0",
+  "description": "A Kanban board UI for Agent Canvas (tasks & columns).",
+  "icon": "kanban.svg",
+  "entrypoint": "extension.js",
+  "contributes": {
+    "pages": [
+      {
+        "id": "board",
+        "title": "Kanban Board",
+        "path": "/kanban-board",
+        "nav_label": "Kanban"
+      }
+    ]
+  }
+}
