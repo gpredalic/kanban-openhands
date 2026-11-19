@@ -15,85 +15,10 @@ import { applyOverlay, loadOverlay, setTaskOverlay, clearTaskOverlay, type TaskO
 import { buildExport, downloadExport, importFromFile, type ImportResult } from "./import-export";
 import type { Host, Task, TaskStatus, BoardUiState } from "../types/task";
 import { syncBoardAction } from "./openhands";
+import { fetchTasks, moveTask, updateTask, deleteTask, createTask } from "./task-store";
 
 /** Poll interval for reconciling with the live backend (ms). */
 const POLL_INTERVAL_MS = 15_000;
-
-/**
- * Fetch all tasks from the host backend.
- *
- * The response is expected to be either a bare array of tasks or an object
- * with a `tasks` array. Both shapes are handled defensively.
- */
-export async function fetchTasks(host: Host): Promise<Task[]> {
-  const res = await host.agentServer.request({ method: "GET", path: "/api/agent/tasks" });
-  if (Array.isArray(res)) return res as Task[];
-  if (res && typeof res === "object" && Array.isArray((res as { tasks?: Task[] }).tasks)) {
-    return (res as { tasks: Task[] }).tasks;
-  }
-  return [];
-}
-
-/**
- * Move a task to a new status (drag-and-drop).
- *
- * Optimistic: the caller updates the UI immediately, then awaits this call.
- * On failure the caller re-fetches to reconcile.
- */
-export async function moveTask(host: Host, taskId: string, status: TaskStatus): Promise<void> {
-  await host.agentServer.request({
-    method: "POST",
-    path: `/api/agent/tasks/${encodeURIComponent(taskId)}`,
-    body: { status },
-  });
-}
-
-/**
- * Update a task's title or assignee (spec §4.1 PATCH).
- */
-export async function updateTask(
-  host: Host,
-  taskId: string,
-  patch: { title?: string; assignee?: string | null },
-): Promise<void> {
-  await host.agentServer.request({
-    method: "PATCH",
-    path: `/api/agent/tasks/${encodeURIComponent(taskId)}`,
-    body: patch,
-  });
-}
-
-/**
- * Delete a task (spec §4.1 DELETE).
- */
-export async function deleteTask(host: Host, taskId: string): Promise<void> {
-  await host.agentServer.request({
-    method: "DELETE",
-    path: `/api/agent/tasks/${encodeURIComponent(taskId)}`,
-  });
-}
-
-/**
- * Create a new task in a given column (spec §3 add-task input).
- */
-export async function createTask(
-  host: Host,
-  title: string,
-  status: TaskStatus,
-  assignee?: string | null,
-  projectId?: string,
-): Promise<Task | null> {
-  const body: Record<string, unknown> = { title, status };
-  if (assignee !== undefined) body.assignee = assignee;
-  if (projectId !== undefined) body.projectId = projectId;
-  const res = await host.agentServer.request({
-    method: "POST",
-    path: "/api/agent/tasks",
-    body,
-  });
-  if (res && typeof res === "object" && "id" in (res as object)) return res as Task;
-  return null;
-}
 
 /**
  * The board data controller. Owns the fetch/reconcile lifecycle and the

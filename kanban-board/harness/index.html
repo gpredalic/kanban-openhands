@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kanban Product Audit Harness</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0f172a; }
+  #audit-bar {
+    position: sticky; top: 0; z-index: 9999; display: flex; gap: 8px; align-items: center;
+    padding: 8px 12px; background: #1e293b; border-bottom: 1px solid #334155;
+    font: 12px/1.4 ui-monospace, monospace; color: #e2e8f0;
+  }
+  #audit-bar button { background: #3b82f6; color: #fff; border: 0; border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+  #audit-bar button.warn { background: #f59e0b; }
+  #audit-bar button.danger { background: #ef4444; }
+  #audit-bar .stat { color: #94a3b8; }
+  #audit-log {
+    position: fixed; right: 0; bottom: 0; width: 460px; max-height: 40vh; overflow: auto;
+    background: #0b1220; border-left: 1px solid #334155; border-top: 1px solid #334155;
+    font: 11px/1.5 ui-monospace, monospace; color: #cbd5e1; padding: 8px; z-index: 9998;
+  }
+  #audit-log .row { border-bottom: 1px solid #1e293b; padding: 3px 0; }
+  #audit-log .ok { color: #22c55e; } #audit-log .err { color: #ef4444; }
+  #audit-log .method { color: #6366f1; font-weight: 700; }
+  #mount { height: 100%; }
+</style>
+</head>
+<body>
+<div id="audit-bar">
+  <strong>Product Audit Harness</strong>
+  <span class="stat" id="stat">loading…</span>
+  <button id="btn-reload">Reload board</button>
+  <button id="btn-log" class="warn">Toggle log</button>
+  <button id="btn-clear" class="danger">Clear log</button>
+</div>
+<div id="mount"></div>
+<div id="audit-log" hidden></div>
+
+<script type="module">
+// ---- Replicate exactly what real Agent Canvas provides ---------------------
+// The extension never holds credentials; it calls host.agentServer.request and
+// the host injects the session token. We do the same: forward to the live agent
+// server at :18000 with the X-Session-API-Key header, and log every call.
+const AGENT = "http://localhost:18000";
+const TOKEN = "__TOKEN__"; // injected by the server at serve time
+
+window.__auditLog = [];
+function log(entry) {
+  window.__auditLog.push(entry);
+  const el = document.getElementById("audit-log");
+  if (el && !el.hidden) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<span class="${entry.ok ? "ok" : "err"}">${entry.ok ? "✓" : "✗"}</span> ` +
+      `<span class="method">${entry.method}</span> ${entry.path} ` +
+      `<span class="stat">${entry.status ?? ""}</span> ${entry.note ?? ""}`;
+    el.appendChild(row);
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
+const host = {
+  apiVersion: "1",
+  registerPage(id, render) {
+    // Mount immediately into #mount (the harness has one page).
+    const container = document.getElementById("mount");
+    render({ container, path: "/kanban-board" });
+    return () => { container.innerHTML = ""; };
+  },
+  agentServer: {
+    async request({ method, path, body }) {
+      const headers = { "X-Session-API-Key": TOKEN };
+      let payload;
+      if (body instanceof FormData) {
+        // Multipart upload (file API) — let the browser set the boundary.
+        payload = body;
+      } else if (body !== undefined) {
+        headers["content-type"] = "application/json";
+        payload = JSON.stringify(body);
+      }
+      let res;
+      try {
+        res = await fetch(AGENT + path, { method, headers, body: payload });
+      } catch (e) {
+        log({ method, path, ok: false, note: "network: " + e.message });
+        throw e;
+      }
+      const status = res.status;
+      let data = null;
+      try { data = await res.json(); } catch { /* non-JSON */ }
+      log({ method, path, ok: status < 400, status, note: status >= 400 ? JSON.stringify(data).slice(0, 120) : "" });
+      if (!res.ok) {
+        const err = new Error(`${method} ${path} -> ${status}`);
+        err.status = status;
+        err.data = data;
+        throw err;
+      }
+      return data;
+    },
+  },
+};
+
+// ---- Load the real extension bundle and activate it ------------------------
+const mod = await import("/extension.js");
+const cleanup = mod.activate(host);
+window.__auditCleanup = cleanup;
+document.getElementById("stat").textContent = "extension mounted";
+
+// ---- Audit controls --------------------------------------------------------
+document.getElementById("btn-reload").onclick = () => {
+  cleanup();
+  const c2 = mod.activate(host);
+  window.__auditCleanup = c2;
+};
+document.getElementById("btn-log").onclick = () => {
+  const el = document.getElementById("audit-log");
+  el.hidden = !el.hidden;
+};
+document.getElementById("btn-clear").onclick = () => {
+  window.__auditLog = [];
+  document.getElementById("audit-log").innerHTML = "";
+};
+</script>
+</body>
+</html>
