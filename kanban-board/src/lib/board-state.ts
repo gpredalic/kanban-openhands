@@ -7,7 +7,7 @@
  * reflects the live store (and picks up edits from the native board).
  */
 
-import type { BoardState, BoardUiState, BoardStats, Column, Swimlane, Task, TaskStatus } from "./types";
+import type { BoardState, BoardUiState, BoardStats, Column, Swimlane, Task, TaskStatus } from "../types/task";
 import { addDays, parseISODate, startOfToday } from "./date";
 
 type Listener = () => void;
@@ -130,12 +130,8 @@ export class BoardStateStore {
       columns: groupTasksByStatus([]),
       uiState: {
         filter: "all",
-        selectedColumn: null,
-        lastLoadedAt: 0,
         search: "",
-        tagFilter: null,
-        view: "board",
-        wipLimits: {},
+        lastLoadedAt: 0,
       },
     };
   }

@@ -1,0 +1,246 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ *
+ * Kanban Board — premium dark glassmorphism design system
+ * ------------------------------------------------------------------ */
+
+:root {
+  --kb-bg-900: #0f172a;
+  --kb-bg-800: #111827;
+  --kb-bg-700: #1e293b;
+  --kb-accent-blue: #3b82f6;
+  --kb-accent-indigo: #6366f1;
+  --kb-accent-violet: #8b5cf6;
+  --kb-status-todo: #64748b;
+  --kb-status-progress: #3b82f6;
+  --kb-status-review: #f59e0b;
+  --kb-status-done: #22c55e;
+  --kb-radius: 1.25rem;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--kb-bg-900);
+  color: #e2e8f0;
+  font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Radial gradient background + floating blur blobs */
+.kb-app {
+  position: relative;
+  min-height: 100%;
+  background:
+    radial-gradient(1200px 600px at 12% -8%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(1000px 520px at 92% 4%, rgba(139, 92, 246, 0.14), transparent 55%),
+    radial-gradient(900px 700px at 50% 110%, rgba(59, 130, 246, 0.1), transparent 60%),
+    linear-gradient(180deg, var(--kb-bg-900) 0%, var(--kb-bg-800) 55%, var(--kb-bg-900) 100%);
+  overflow-x: hidden;
+}
+
+.kb-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+.kb-blob--tl {
+  top: -120px;
+  left: -120px;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.55), transparent 70%);
+  animation: kb-blob-float 16s ease-in-out infinite;
+}
+.kb-blob--tr {
+  top: -80px;
+  right: -100px;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.5), transparent 70%);
+  animation: kb-blob-float 19s ease-in-out infinite reverse;
+}
+.kb-blob--br {
+  bottom: -140px;
+  right: -80px;
+  width: 460px;
+  height: 460px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.45), transparent 70%);
+  animation: kb-blob-float 22s ease-in-out infinite;
+}
+
+@keyframes kb-blob-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(24px, -32px) scale(1.08);
+  }
+}
+
+/* Glassmorphism surface */
+.kb-glass {
+  background: rgba(30, 41, 59, 0.55);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.kb-glass-sm {
+  background: rgba(30, 41, 59, 0.45);
+  backdrop-filter: blur(12px) saturate(130%);
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Gradient accent (Create Task button, active filter) */
+.kb-gradient {
+  background-image: linear-gradient(
+    135deg,
+    var(--kb-accent-blue) 0%,
+    var(--kb-accent-indigo) 50%,
+    var(--kb-accent-violet) 100%
+  );
+}
+
+.kb-gradient-text {
+  background-image: linear-gradient(
+    135deg,
+    #93c5fd 0%,
+    #a5b4fc 45%,
+    #c4b5fd 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Card hover lift + glow */
+.kb-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  will-change: transform;
+}
+.kb-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.55), 0 0 24px 0 rgba(99, 102, 241, 0.28);
+  border-color: rgba(129, 140, 248, 0.4);
+}
+
+/* Button hover glow */
+.kb-btn-glow {
+  transition: box-shadow 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+}
+.kb-btn-glow:hover {
+  box-shadow: 0 0 28px 0 rgba(99, 102, 241, 0.5);
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+/* Dashed add-task button */
+.kb-add {
+  border: 1.5px dashed rgba(148, 163, 184, 0.3);
+  background: rgba(148, 163, 184, 0.04);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.kb-add:hover {
+  border-color: rgba(129, 140, 248, 0.6);
+  background: rgba(99, 102, 241, 0.08);
+  box-shadow: 0 0 20px -4px rgba(99, 102, 241, 0.4);
+}
+
+/* Filter pill */
+.kb-pill {
+  transition: background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
+}
+.kb-pill--active {
+  background-image: linear-gradient(
+    135deg,
+    var(--kb-accent-blue) 0%,
+    var(--kb-accent-indigo) 55%,
+    var(--kb-accent-violet) 100%
+  );
+  box-shadow: 0 4px 18px -4px rgba(99, 102, 241, 0.6);
+  color: #fff;
+}
+
+/* Dragging card */
+.kb-dragging {
+  opacity: 0.55;
+  transform: scale(1.03) rotate(1.5deg);
+  box-shadow: 0 18px 50px -10px rgba(0, 0, 0, 0.7), 0 0 30px 0 rgba(99, 102, 241, 0.4);
+}
+
+/* Drop target highlight */
+.kb-drop-target {
+  border-color: rgba(129, 140, 248, 0.55) !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.4), 0 0 30px -6px rgba(99, 102, 241, 0.5);
+}
+
+/* Fade-in for cards */
+@keyframes kb-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.kb-fade-in {
+  animation: kb-fade-in 0.25s ease-out both;
+}
+
+/* Loading skeleton shimmer */
+@keyframes kb-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.kb-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.08) 25%,
+    rgba(148, 163, 184, 0.18) 37%,
+    rgba(148, 163, 184, 0.08) 63%
+  );
+  background-size: 200% 100%;
+  animation: kb-shimmer 1.6s linear infinite;
+}
+
+/* Thin custom scrollbar */
+.kb-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.kb-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.kb-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+.kb-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4);
+}

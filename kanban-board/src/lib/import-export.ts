@@ -11,7 +11,7 @@
  * a human-readable error rather than throwing.
  */
 
-import type { Task, TaskStatus } from "./types";
+import type { Task, TaskStatus } from "../types/task";
 import { COLUMN_ORDER } from "./board-state";
 
 /** Bump when the export document shape changes incompatibly. */

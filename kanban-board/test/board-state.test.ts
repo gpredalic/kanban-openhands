@@ -8,8 +8,8 @@ import {
   computeStats,
   wipExceeded,
   BoardStateStore,
-} from "../src/board-state";
-import type { Task } from "../src/types";
+} from "../src/lib/board-state";
+import type { Task } from "../src/types/task";
 
 function task(over: Partial<Task> & { id: string }): Task {
   return {

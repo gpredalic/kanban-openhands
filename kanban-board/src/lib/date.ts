@@ -6,7 +6,7 @@
  * normal so the UI can colour-code cards and the stats bar can count them.
  */
 
-import type { TaskStatus } from "./types";
+import type { TaskStatus } from "../types/task";
 
 /** Parse a YYYY-MM-DD string into a local Date, or null if malformed. */
 export function parseISODate(s: string): Date | null {

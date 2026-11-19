@@ -12,7 +12,7 @@
  * legacy data and API responses remain valid.
  */
 
-import type { Task } from "./types";
+import type { Task } from "../types/task";
 
 /** The overlay storage key. Namespaced to avoid collisions with other extensions. */
 const OVERLAY_KEY = "kanban-board.task-overlay.v1";

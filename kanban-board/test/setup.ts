@@ -22,7 +22,14 @@ g.URL = window.URL;
 g.HTMLElement = window.HTMLElement;
 g.HTMLButtonElement = window.HTMLButtonElement;
 g.DragEvent = window.DragEvent;
-g.navigator = window.navigator;
+// Node 24 exposes a read-only `navigator` global (getter only). Guard the
+// assignment so the happy-dom navigator is used only when it can be set.
+try {
+  g.navigator = window.navigator;
+} catch {
+  // Leave Node's built-in navigator in place; the board UI does not rely on
+  // happy-dom's navigator for the paths exercised here.
+}
 g.requestAnimationFrame = (cb: FrameRequestCallback) => setTimeout(() => cb(Date.now()), 0);
 g.cancelAnimationFrame = (id: number) => clearTimeout(id);
 

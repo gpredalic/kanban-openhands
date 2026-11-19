@@ -10,10 +10,10 @@
  * never constructs backend URLs or holds credentials (spec §5.1).
  */
 
-import { BoardStateStore, groupTasksByStatus, wipExceeded } from "./board-state";
+import { BoardStateStore, groupTasksByStatus } from "./board-state";
 import { applyOverlay, loadOverlay, setTaskOverlay, clearTaskOverlay, type TaskOverlayEntry } from "./task-overlay";
 import { buildExport, downloadExport, importFromFile, type ImportResult } from "./import-export";
-import type { Host, Task, TaskStatus } from "./types";
+import type { Host, Task, TaskStatus, BoardUiState } from "../types/task";
 
 /** Poll interval for reconciling with the live backend (ms). */
 const POLL_INTERVAL_MS = 15_000;
@@ -109,6 +109,8 @@ export interface BoardDataController {
   remove: (taskId: string) => Promise<void>;
   /** Create a task in a column. Returns false if blocked by a WIP limit. */
   create: (title: string, status: TaskStatus, assignee?: string | null, projectId?: string) => Promise<boolean>;
+  /** Update ephemeral UI state (filter, search). */
+  setUiState: (patch: Partial<BoardUiState>) => void;
   /** Phase 2: set a task's tags (overlay-backed). */
   setTags: (taskId: string, tags: string[]) => void;
   /** Phase 2: set a task's due date (overlay-backed). null clears it. */
@@ -147,12 +149,6 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
 
   async function move(taskId: string, status: TaskStatus): Promise<boolean> {
     if (disposed) return false;
-    // Phase 2: enforce the WIP limit on the target column (soft block).
-    const allTasks = store.get().columns.flatMap((c) => c.tasks);
-    if (wipExceeded(allTasks, status, store.get().uiState.wipLimits)) {
-      console.warn(`[kanban-board] WIP limit reached for "${status}"; move blocked.`);
-      return false;
-    }
     // Optimistic update: move the task in the local store immediately.
     const columns = store.get().columns.map((col) => ({
       ...col,
@@ -204,12 +200,6 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     projectId?: string,
   ): Promise<boolean> {
     if (disposed) return false;
-    // Phase 2: enforce the WIP limit on the target column (soft block).
-    const allTasks = store.get().columns.flatMap((c) => c.tasks);
-    if (wipExceeded(allTasks, status, store.get().uiState.wipLimits)) {
-      console.warn(`[kanban-board] WIP limit reached for "${status}"; create blocked.`);
-      return false;
-    }
     try {
       await createTask(host, title, status, assignee, projectId);
       await load();
@@ -217,6 +207,11 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
       console.error("[kanban-board] create failed:", err);
     }
     return true;
+  }
+
+  function setUiState(patch: Partial<BoardUiState>): void {
+    if (disposed) return;
+    store.setUiState(patch);
   }
 
   function setTags(taskId: string, tags: string[]): void {
@@ -271,6 +266,7 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     update,
     remove,
     create,
+    setUiState,
     setTags,
     setDueDate,
     exportBoard,

@@ -1,17 +1,20 @@
 /**
- * types.ts — Task, Column, Status unions (spec §4.1, §3).
+ * task.ts — Task, Column, Status, Priority unions and board state types.
  *
  * The backend data model mirrors the native Task model. Columns are derived
  * from the status enum — there is no separate column vocabulary.
  *
- * Phase 2 adds optional, backward-compatible fields to Task (tags, dueDate)
- * and extends the ephemeral UI state with search, tag filter, view mode, and
- * WIP limits. All new fields are optional so existing persisted data and API
- * responses remain valid.
+ * The redesign adds optional, backward-compatible fields to Task
+ * (description, priority, progress) and extends the ephemeral UI state with
+ * search and a richer filter set. All new fields are optional so existing
+ * persisted data and API responses remain valid.
  */
 
 /** Task status values. Each value maps to exactly one board column. */
 export type TaskStatus = "todo" | "in_progress" | "review" | "done";
+
+/** Task priority levels, each with its own accent colour. */
+export type TaskPriority = "low" | "medium" | "high";
 
 /** A single task as returned by the host backend. */
 export interface Task {
@@ -22,10 +25,16 @@ export interface Task {
   projectId: string;
   /** Inherited from the native Task model — a non-empty list means the task is blocked. */
   waitingOn: string[] | null;
-  /** Phase 2: free-form tags. Optional — absent on legacy data. */
+  /** Free-form tags. Optional — absent on legacy data. */
   tags?: string[];
-  /** Phase 2: due date as an ISO date string (YYYY-MM-DD). Optional. */
+  /** Due date as an ISO date string (YYYY-MM-DD). Optional. */
   dueDate?: string | null;
+  /** Short description shown on the card. Optional — absent on legacy data. */
+  description?: string;
+  /** Priority level. Optional — defaults to "medium" in the UI when absent. */
+  priority?: TaskPriority;
+  /** Completion percentage 0–100. Optional — defaults to 0 when absent. */
+  progress?: number;
 }
 
 /** A board column: a status value plus the tasks currently in that status. */
@@ -35,10 +44,7 @@ export interface Column {
   tasks: Task[];
 }
 
-/**
- * Phase 2: a swimlane groups columns by project. Each lane carries the
- * project id, a display name, and the columns (with that project's tasks).
- */
+/** A swimlane groups columns by project. */
 export interface Swimlane {
   projectId: string;
   title: string;
@@ -47,7 +53,7 @@ export interface Swimlane {
   columns: Column[];
 }
 
-/** Phase 2: computed board statistics (derived, never persisted). */
+/** Computed board statistics (derived, never persisted). */
 export interface BoardStats {
   total: number;
   byStatus: Record<TaskStatus, number>;
@@ -58,19 +64,15 @@ export interface BoardStats {
   byProject: Record<string, number>;
 }
 
-/** Ephemeral UI state — lives only in the browser, never persisted (spec §4.2). */
+/** Filter pills shown in the FilterBar. */
+export type BoardFilter = "all" | "active" | "assigned" | "review" | "completed";
+
+/** Ephemeral UI state — lives only in the browser, never persisted. */
 export interface BoardUiState {
-  filter: "all" | "active" | "assigned";
-  selectedColumn: string | null;
-  lastLoadedAt: number;
-  /** Phase 2: free-text search query (matches title, assignee, tags). */
+  filter: BoardFilter;
+  /** Free-text search query (matches title, assignee, tags). */
   search: string;
-  /** Phase 2: active tag filter (null = no tag filter). */
-  tagFilter: string | null;
-  /** Phase 2: board view mode. */
-  view: "board" | "swimlane";
-  /** Phase 2: WIP limits per status (absent = unlimited). */
-  wipLimits: Partial<Record<TaskStatus, number>>;
+  lastLoadedAt: number;
 }
 
 /** The full board state: persisted data + ephemeral UI state. */
@@ -79,7 +81,7 @@ export interface BoardState {
   uiState: BoardUiState;
 }
 
-/** The host API surface injected by Agent Canvas (spec §5.1). */
+/** The host API surface injected by Agent Canvas. */
 export interface HostApi {
   apiVersion: string;
   agentServer: {

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseISODate, startOfToday, addDays, dueState } from "../src/date";
+import { parseISODate, startOfToday, addDays, dueState } from "../src/lib/date";
 
 test("parseISODate parses a valid YYYY-MM-DD into a local Date", () => {
   const d = parseISODate("2026-11-18");
