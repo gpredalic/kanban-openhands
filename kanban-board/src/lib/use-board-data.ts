@@ -14,6 +14,7 @@ import { BoardStateStore, groupTasksByStatus } from "./board-state";
 import { applyOverlay, loadOverlay, setTaskOverlay, clearTaskOverlay, type TaskOverlayEntry } from "./task-overlay";
 import { buildExport, downloadExport, importFromFile, type ImportResult } from "./import-export";
 import type { Host, Task, TaskStatus, BoardUiState } from "../types/task";
+import { syncBoardAction } from "./openhands";
 
 /** Poll interval for reconciling with the live backend (ms). */
 const POLL_INTERVAL_MS = 15_000;
@@ -162,6 +163,9 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     store.setColumns(columns);
     try {
       await moveTask(host, taskId, status);
+      void syncBoardAction(host, "moved", taskId, { status }).catch((error: unknown) => {
+        console.error("[kanban-board] OpenHands move sync failed:", error);
+      });
     } catch (err) {
       console.error("[kanban-board] move failed, reconciling:", err);
       await load();
@@ -176,6 +180,9 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     if (disposed) return;
     try {
       await updateTask(host, taskId, patch);
+      void syncBoardAction(host, "updated", taskId, patch).catch((error: unknown) => {
+        console.error("[kanban-board] OpenHands update sync failed:", error);
+      });
       await load();
     } catch (err) {
       console.error("[kanban-board] update failed:", err);
@@ -186,6 +193,9 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     if (disposed) return;
     try {
       await deleteTask(host, taskId);
+      void syncBoardAction(host, "deleted", taskId).catch((error: unknown) => {
+        console.error("[kanban-board] OpenHands delete sync failed:", error);
+      });
       clearTaskOverlay(taskId);
       await load();
     } catch (err) {
@@ -201,7 +211,12 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
   ): Promise<boolean> {
     if (disposed) return false;
     try {
-      await createTask(host, title, status, assignee, projectId);
+      const created = await createTask(host, title, status, assignee, projectId);
+      if (created) {
+        void syncBoardAction(host, "created", created.id, { title, status, assignee, projectId }).catch((error: unknown) => {
+          console.error("[kanban-board] OpenHands create sync failed:", error);
+        });
+      }
       await load();
     } catch (err) {
       console.error("[kanban-board] create failed:", err);

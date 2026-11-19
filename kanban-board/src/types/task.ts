@@ -86,7 +86,7 @@ export interface BoardState {
  * the Kanban board; the other four are AI views (workflow DAG, agent roster,
  * execution history, token/cost analytics).
  */
-export type ViewId = "board" | "workflow" | "agents" | "history" | "analytics";
+export type ViewId = "board" | "command" | "workflow" | "agents" | "history" | "analytics";
 
 /** The host API surface injected by Agent Canvas. */
 export interface HostApi {

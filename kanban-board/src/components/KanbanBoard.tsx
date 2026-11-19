@@ -17,12 +17,15 @@ import { WorkflowView } from "./WorkflowView";
 import { AgentRoster } from "./AgentRoster";
 import { ExecutionHistory } from "./ExecutionHistory";
 import { AnalyticsView } from "./AnalyticsView";
+import { OpenHandsView } from "./OpenHandsView";
 import { useBoardState } from "../hooks/useBoardState";
 import { useDragDrop } from "../hooks/useDragDrop";
 import { useAiState } from "../lib/ai-store";
 import { applyAiOverlay, resetAiConfig } from "../lib/ai-overlay";
 import { computeStats } from "../lib/board-state";
 import type { Host, Task, BoardFilter } from "../types/task";
+import { commandExecution, useOpenHandsState } from "../lib/openhands";
+import { resolveExecution } from "../lib/ai-engine";
 
 interface KanbanBoardProps {
   host: Host;
@@ -61,6 +64,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     },
   );
   const { state: aiState, store: aiStore } = useAiState();
+  const openHandsState = useOpenHandsState(host);
   const [view, setView] = useState<ViewId>("board");
 
   const allTasks = useMemo(
@@ -95,12 +99,37 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
   };
 
   const handleToggleOrchestration = () => {
-    if (aiState.execution.running) aiStore.stop();
-    else aiStore.start();
+    if (aiState.execution.running) {
+      aiStore.stop();
+      for (const run of openHandsState.snapshot.executions.filter((item) => item.status === "running")) {
+        void commandExecution(host, "stop", { executionId: run.id }).catch((error: unknown) => {
+          console.error("[kanban-board] OpenHands stop failed:", error);
+        });
+      }
+      return;
+    }
+    for (const task of enrichedTasks.filter((item) => item.status === "in_progress")) {
+      const { agent, model } = resolveExecution(task, aiState.config);
+      void commandExecution(host, "start", {
+        taskId: task.id,
+        title: task.title,
+        agentId: agent?.id,
+        modelId: model?.id,
+      }).catch((error: unknown) => {
+        console.error("[kanban-board] OpenHands start failed:", error);
+      });
+    }
+    aiStore.start();
   };
 
   const handleResetAiConfig = () => {
     aiStore.setConfig(resetAiConfig());
+  };
+
+  const handleOpenHandsCommand = (command: "start" | "stop" | "retry", executionId: string) => {
+    void commandExecution(host, command, { executionId }).catch((error: unknown) => {
+      console.error("[kanban-board] OpenHands command failed:", error);
+    });
   };
 
   return (
@@ -139,6 +168,13 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
         </>
       ) : view === "workflow" ? (
         <WorkflowView aiState={aiState} tasks={enrichedTasks} />
+      ) : view === "command" ? (
+        <OpenHandsView
+          state={openHandsState}
+          tasks={enrichedTasks}
+          agents={aiState.config.agents}
+          onCommand={handleOpenHandsCommand}
+        />
       ) : view === "agents" ? (
         <AgentRoster aiState={aiState} onReset={handleResetAiConfig} />
       ) : view === "history" ? (
