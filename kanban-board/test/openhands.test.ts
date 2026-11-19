@@ -36,7 +36,7 @@ test("normalizeSnapshot parses real conversation search responses and metrics", 
       created_at: "2026-11-19T09:55:40.103414",
       updated_at: "2026-11-19T10:00:00Z",
       current_model_id: "qwen",
-      tags: { task_id: "task-1", agent_profile_id: "profile-1" },
+      tags: { taskid: "task-1", agentprofileid: "profile-1" },
       stats: {
         usage_to_metrics: {
           default: {
@@ -96,7 +96,7 @@ test("conversation and relay command builders match OpenHands request schemas", 
     content: [{ type: "text", text: "Implement\n\nDetails" }],
     run: false,
   });
-  assert.deepEqual(conversation.tags, { task_id: "task-1", task_title: "Implement" });
+  assert.deepEqual(conversation.tags, { taskid: "task-1", tasktitle: "Implement" });
 });
 
 test("relay hop question carries the prior answer forward", () => {
@@ -142,7 +142,7 @@ test("fetchOpenHandsSnapshot uses search and event search with real response sha
   const host = hostWith(async (opts) => {
     calls.push(opts);
     if (opts.path.startsWith("/api/conversations/search")) {
-      return { items: [{ id: conversationId, title: "Live", execution_status: "running", tags: { task_id: "task-1" }, created_at: "2026-11-19T09:55:40Z" }] };
+      return { items: [{ id: conversationId, title: "Live", execution_status: "running", tags: { taskid: "task-1" }, created_at: "2026-11-19T09:55:40Z" }] };
     }
     if (opts.path.includes("/events/search")) {
       return { items: [{ id: "event-1", kind: "ActionEvent", timestamp: "2026-11-19T10:00:00Z", action: "terminal" }] };
@@ -176,7 +176,7 @@ test("commandExecution stop and retry hit real interrupt/run/conversation endpoi
   const host = hostWith(async (opts) => {
     calls.push(opts);
     if (opts.path === "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC") return { items: [] };
-    if (opts.path === `/api/conversations/${id}`) return { id, title: "Original", tags: { task_id: "task-1" } };
+    if (opts.path === `/api/conversations/${id}`) return { id, title: "Original", tags: { taskid: "task-1" } };
     if (opts.path === "/api/agent-profiles") return { profiles: [], active_agent_profile_id: null };
     if (opts.path === "/api/conversations") return { id };
     return {};
@@ -193,7 +193,7 @@ test("syncBoardAction records CRUD and updates/deletes matching conversations", 
   const host = hostWith(async (opts) => {
     calls.push(opts);
     if (opts.path.startsWith("/api/conversations/search")) {
-      return { items: [{ id, title: "Old", tags: { task_id: "task-1" } }] };
+      return { items: [{ id, title: "Old", tags: { taskid: "task-1" } }] };
     }
     return {};
   });

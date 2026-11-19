@@ -152,10 +152,10 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
     const launchedProfile = asObject(conversation.launched_agent_profile);
     return {
       id: asString(conversation.id) ?? "",
-      taskId: tags.task_id,
-      title: asString(conversation.title) ?? tags.task_title ?? "OpenHands conversation",
+      taskId: tags.taskid,
+      title: asString(conversation.title) ?? tags.tasktitle ?? "OpenHands conversation",
       status,
-      agentId: tags.agent_profile_id ?? tags.agent_id
+      agentId: tags.agentprofileid ?? tags.agentid
         ?? asString(conversation.agent_profile_id)
         ?? asString(launchedProfile?.agent_profile_id),
       modelId: asString(conversation.current_model_id),
@@ -233,9 +233,9 @@ export async function fetchOpenHandsSnapshot(host: Host): Promise<OpenHandsSnaps
           detail: eventDetail(event),
           status: mapStatus(conversation.execution_status),
           at: timestamp(event.timestamp, timestamp(conversation.created_at)),
-          taskId: tags.task_id,
+          taskId: tags.taskid,
           executionId: conversationId,
-          agentId: tags.agent_profile_id ?? tags.agent_id,
+          agentId: tags.agentprofileid ?? tags.agentid,
           modelId: asString(conversation.current_model_id),
         });
       }
@@ -528,9 +528,9 @@ export function buildConversationRequest(input: OpenHandsCommandInput): Record<s
     },
     autotitle: true,
     tags: {
-      task_id: input.taskId ?? "",
-      task_title: taskTitle,
-      ...(input.agentId ? { agent_id: input.agentId } : {}),
+      taskid: input.taskId ?? "",
+      tasktitle: taskTitle,
+      ...(input.agentId ? { agentid: input.agentId } : {}),
     },
   };
   return body;
@@ -541,7 +541,7 @@ async function createConversation(host: Host, input: OpenHandsCommandInput): Pro
   const agentProfileId = await getAgentProfileId(host, input.agentId);
   if (agentProfileId) body.agent_profile_id = agentProfileId;
   const conversationTags = asObject(body.tags) ?? {};
-  if (agentProfileId) conversationTags.agent_profile_id = agentProfileId;
+  if (agentProfileId) conversationTags.agentprofileid = agentProfileId;
   body.tags = conversationTags;
   if (agentProfileId) body.agent_profile_id = agentProfileId;
 
@@ -588,9 +588,9 @@ export async function commandExecution(
           const tags = getConversationTags(conversation);
           retryInput = {
             ...retryInput,
-            taskId: tags.task_id,
-            title: asString(conversation.title) ?? tags.task_title,
-            agentId: tags.agent_profile_id ?? tags.agent_id,
+            taskId: tags.taskid,
+            title: asString(conversation.title) ?? tags.tasktitle,
+            agentId: tags.agentprofileid ?? tags.agentid,
           };
         }
       } catch {
@@ -651,7 +651,7 @@ export async function syncBoardAction(
     });
     for (const conversation of conversationArray(response)) {
       const tags = getConversationTags(conversation);
-      if (tags.task_id !== taskId) continue;
+      if (tags.taskid !== taskId) continue;
       const conversationId = asString(conversation.id);
       if (!conversationId) continue;
       if (action === "deleted") {
@@ -668,8 +668,8 @@ export async function syncBoardAction(
           title: asString(details?.title) ?? asString(conversation.title),
           tags: {
             ...tags,
-            task_id: taskId,
-            ...(details?.status ? { board_status: asString(details.status) } : {}),
+            taskid: taskId,
+            ...(details?.status ? { boardstatus: asString(details.status) } : {}),
             ...(details?.assignee ? { assignee: asString(details.assignee) ?? "" } : {}),
           },
         },
