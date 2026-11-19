@@ -78,15 +78,30 @@ function conversationMetrics(conversation: Record<string, unknown>): { tokensIn:
   const stats = asObject(conversation.stats) ?? {};
   const metrics = asObject(conversation.metrics) ?? {};
   const accumulated = asObject(metrics.accumulated_token_usage);
+  const usageToMetrics = asObject(stats.usage_to_metrics) ?? {};
+  let realUsageTokensIn = 0;
+  let realUsageTokensOut = 0;
+  let realCost = 0;
+  for (const value of Object.values(usageToMetrics)) {
+    const metric = asObject(value);
+    if (!metric) continue;
+    realCost += asNumber(metric.accumulated_cost);
+    const usage = asObject(metric.accumulated_token_usage);
+    realUsageTokensIn += asNumber(usage?.prompt_tokens);
+    realUsageTokensOut += asNumber(usage?.completion_tokens);
+  }
   const cost = asNumber(metrics.accumulated_cost)
+    || realCost
     || asNumber(stats.cost)
     || asNumber(stats.total_cost)
     || asNumber(stats.accumulated_cost);
   const tokensIn = asNumber(accumulated?.prompt_tokens)
+    || realUsageTokensIn
     || asNumber(stats.prompt_tokens)
     || asNumber(stats.tokens_in)
     || asNumber(stats.input_tokens);
   const tokensOut = asNumber(accumulated?.completion_tokens)
+    || realUsageTokensOut
     || asNumber(stats.completion_tokens)
     || asNumber(stats.tokens_out)
     || asNumber(stats.output_tokens);
@@ -104,7 +119,7 @@ function eventType(kind: string): OpenHandsEvent["type"] {
 }
 
 function eventDetail(event: Record<string, unknown>): string | undefined {
-  for (const key of ["detail", "message", "content", "text", "observation", "action"]) {
+  for (const key of ["detail", "message", "content", "text", "observation", "action", "key"]) {
     const value = event[key];
     if (typeof value === "string") return value;
   }
@@ -134,12 +149,15 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
     const status = mapStatus(conversation.execution_status);
     const createdAt = timestamp(conversation.created_at);
     const updatedAt = timestamp(conversation.updated_at, createdAt);
+    const launchedProfile = asObject(conversation.launched_agent_profile);
     return {
       id: asString(conversation.id) ?? "",
       taskId: tags.task_id,
       title: asString(conversation.title) ?? tags.task_title ?? "OpenHands conversation",
       status,
-      agentId: tags.agent_profile_id ?? tags.agent_id ?? asString(conversation.agent_profile_id),
+      agentId: tags.agent_profile_id ?? tags.agent_id
+        ?? asString(conversation.agent_profile_id)
+        ?? asString(launchedProfile?.agent_profile_id),
       modelId: asString(conversation.current_model_id),
       repository: tags.repository,
       startedAt: createdAt,
@@ -186,19 +204,10 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
 }
 
 export async function fetchOpenHandsSnapshot(host: Host): Promise<OpenHandsSnapshot> {
-  let response: unknown;
-  try {
-    response = await host.agentServer.request({ method: "GET", path: "/api/conversations" });
-  } catch (error) {
-    try {
-      response = await host.agentServer.request({
-        method: "GET",
-        path: "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC",
-      });
-    } catch {
-      throw error;
-    }
-  }
+  const response = await host.agentServer.request({
+    method: "GET",
+    path: "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC",
+  });
 
   const snapshot = normalizeSnapshot(response);
   const conversationMap = conversationArray(response);
@@ -214,12 +223,13 @@ export async function fetchOpenHandsSnapshot(host: Host): Promise<OpenHandsSnaps
       });
       const tags = getConversationTags(conversation);
       for (const event of eventArray(eventResponse)) {
-        const kind = asString(event.kind) ?? asString(event.type) ?? "execution";
+        const kind = asString(event.kind) ?? asString(event.type) ?? asString(event.key) ?? "execution";
+        const source = asString(event.source);
         const eventId = asString(event.id) ?? asString(event.event_id) ?? `${conversationId}-${kind}-${timestamp(event.timestamp)}`;
         events.push({
           id: eventId,
-          type: eventType(kind),
-          title: asString(event.title) ?? kind,
+          type: eventType(source ? `${source}-${kind}` : kind),
+          title: asString(event.title) ?? asString(event.key) ?? kind,
           detail: eventDetail(event),
           status: mapStatus(conversation.execution_status),
           at: timestamp(event.timestamp, timestamp(conversation.created_at)),
@@ -320,6 +330,37 @@ export async function fetchAgentProfiles(host: Host): Promise<AgentProfile[]> {
   }
 }
 
+export function buildRelayConversationRequest(
+  seed: string,
+  workspaceId: string,
+  agentProfileId: string | undefined,
+): Record<string, unknown> {
+  const body: Record<string, unknown> = {
+    workspace: { working_dir: workspaceId, kind: "LocalWorkspace" },
+    initial_message: { role: "user", content: [{ type: "text", text: seed }], run: false },
+    autotitle: true,
+    tags: { relay: "true" },
+  };
+  if (agentProfileId) body.agent_profile_id = agentProfileId;
+  return body;
+}
+
+export function buildSwitchProfileRequest(profileName: string): { profile_name: string } {
+  return { profile_name: profileName };
+}
+
+export function buildAskAgentRequest(question: string): { question: string } {
+  return { question };
+}
+
+export function buildChildConversationRequest(task: string): { task: string } {
+  return { task };
+}
+
+export function relayHopQuestion(previousResponse: string, index: number): string {
+  return index === 0 ? previousResponse : previousResponse;
+}
+
 export async function startAgentRelay(
   host: Host,
   input: RelayInput,
@@ -334,13 +375,11 @@ export async function startAgentRelay(
     const response = await host.agentServer.request({
       method: "POST",
       path: "/api/conversations",
-      body: {
-        workspace: { type: "local", id: input.workspaceId ?? "workspace/project" },
-        initial_message: { message: seed },
-        agent_profile_id: await getAgentProfileId(host, agentNames[0]),
-        autotitle: true,
-        tags: { relay: "true" },
-      },
+      body: buildRelayConversationRequest(
+        seed,
+        input.workspaceId ?? "workspace/project",
+        await getAgentProfileId(host, agentNames[0]),
+      ),
     });
     const conversation = asObject(response);
     conversationId = conversation ? asString(conversation.id) ?? "" : "";
@@ -391,14 +430,14 @@ export async function startAgentRelay(
         await host.agentServer.request({
           method: "POST",
           path: `/api/conversations/${encodeURIComponent(conversationId)}/switch_profile`,
-          body: { profile_name: agent },
+          body: buildSwitchProfileRequest(agent),
         });
 
         if (input.useChildConversations) {
           const childResponse = await host.agentServer.request({
             method: "POST",
             path: `/api/conversations/${encodeURIComponent(conversationId)}/children`,
-            body: { task: question },
+            body: buildChildConversationRequest(question),
           });
           const child = asObject(childResponse);
           const childConversationId = child ? asString(child.conversation_id) : undefined;
@@ -418,7 +457,7 @@ export async function startAgentRelay(
           const answerResponse = await host.agentServer.request({
             method: "POST",
             path: `/api/conversations/${encodeURIComponent(conversationId)}/ask_agent`,
-            body: { question },
+            body: buildAskAgentRequest(question),
           });
           const answer = asObject(answerResponse);
           const response = answer ? asString(answer.response) ?? "" : "";
@@ -451,7 +490,7 @@ export async function startAgentRelay(
   return { conversationId, stop };
 }
 
-async function getAgentProfileId(host: Host, requestedId?: string): Promise<string | undefined> {
+export async function getAgentProfileId(host: Host, requestedId?: string): Promise<string | undefined> {
   try {
     const response = await host.agentServer.request({ method: "GET", path: "/api/agent-profiles" });
     const object = asObject(response);
@@ -473,20 +512,16 @@ async function getAgentProfileId(host: Host, requestedId?: string): Promise<stri
   }
 }
 
-async function createConversation(host: Host, input: OpenHandsCommandInput): Promise<Record<string, unknown>> {
+export function buildConversationRequest(input: OpenHandsCommandInput): Record<string, unknown> {
   const taskTitle = input.title ?? "Board task";
   const taskText = input.description ? `${taskTitle}\n\n${input.description}` : taskTitle;
   const workspacePath = input.workspaceId ?? "workspace/project";
-  const agentProfileId = await getAgentProfileId(host, input.agentId);
   const body: Record<string, unknown> = {
     workspace: {
-      type: "local",
-      id: workspacePath,
-      kind: "LocalWorkspace",
       working_dir: workspacePath,
+      kind: "LocalWorkspace",
     },
     initial_message: {
-      message: taskText,
       role: "user",
       content: [{ type: "text", text: taskText }],
       run: false,
@@ -496,9 +531,18 @@ async function createConversation(host: Host, input: OpenHandsCommandInput): Pro
       task_id: input.taskId ?? "",
       task_title: taskTitle,
       ...(input.agentId ? { agent_id: input.agentId } : {}),
-      ...(agentProfileId ? { agent_profile_id: agentProfileId } : {}),
     },
   };
+  return body;
+}
+
+async function createConversation(host: Host, input: OpenHandsCommandInput): Promise<Record<string, unknown>> {
+  const body = buildConversationRequest(input);
+  const agentProfileId = await getAgentProfileId(host, input.agentId);
+  if (agentProfileId) body.agent_profile_id = agentProfileId;
+  const conversationTags = asObject(body.tags) ?? {};
+  if (agentProfileId) conversationTags.agent_profile_id = agentProfileId;
+  body.tags = conversationTags;
   if (agentProfileId) body.agent_profile_id = agentProfileId;
 
   const response = await host.agentServer.request({
@@ -600,7 +644,6 @@ export async function syncBoardAction(
     // Local activity is best-effort and must never block board CRUD.
   }
 
-  if (action === "deleted") return;
   try {
     const response = await host.agentServer.request({
       method: "GET",
@@ -611,6 +654,13 @@ export async function syncBoardAction(
       if (tags.task_id !== taskId) continue;
       const conversationId = asString(conversation.id);
       if (!conversationId) continue;
+      if (action === "deleted") {
+        await host.agentServer.request({
+          method: "DELETE",
+          path: `/api/conversations/${encodeURIComponent(conversationId)}`,
+        }).catch(() => undefined);
+        continue;
+      }
       await host.agentServer.request({
         method: "PATCH",
         path: `/api/conversations/${encodeURIComponent(conversationId)}`,
@@ -635,8 +685,10 @@ export class OpenHandsStateStore {
   private listeners = new Set<() => void>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private disposed = false;
+  private readonly host: Host;
 
-  constructor(private readonly host: Host) {
+  constructor(host: Host) {
+    this.host = host;
     void this.refresh();
     this.timer = setInterval(() => void this.refresh(), POLL_INTERVAL_MS);
   }
