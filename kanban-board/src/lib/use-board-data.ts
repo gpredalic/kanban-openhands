@@ -13,7 +13,7 @@
 import { BoardStateStore, groupTasksByStatus } from "./board-state";
 import { applyOverlay, loadOverlay, setTaskOverlay, clearTaskOverlay, type TaskOverlayEntry } from "./task-overlay";
 import { buildExport, downloadExport, importFromFile, type ImportResult } from "./import-export";
-import type { Host, Task, TaskStatus, BoardUiState } from "../types/task";
+import type { Host, TaskStatus, BoardUiState } from "../types/task";
 import { syncBoardAction } from "./openhands";
 import { fetchTasks, moveTask, updateTask, deleteTask, createTask } from "./task-store";
 

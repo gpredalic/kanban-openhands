@@ -76,7 +76,10 @@ function makeHost() {
     },
     agentServer: {
       request: async (opts: { method: string; path: string; body?: unknown }) => {
-        if (opts.method === "GET" && opts.path === "/api/agent/tasks") {
+        // The board persists tasks via the agent-server file API (see
+        // task-store.ts). Serve the demo tasks from the download endpoint so
+        // the headless render test exercises the real data path.
+        if (opts.method === "GET" && opts.path.startsWith("/api/file/download")) {
           return tasks;
         }
         return {};
