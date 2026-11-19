@@ -21,6 +21,7 @@ const OVERLAY_KEY = "kanban-board.task-overlay.v1";
 export interface TaskOverlayEntry {
   tags?: string[];
   dueDate?: string | null;
+  scheduledAt?: string | null;
 }
 
 /** The full overlay: task id → overlay entry. */
@@ -65,6 +66,7 @@ export function applyOverlay(tasks: Task[], overlay: TaskOverlay): Task[] {
     const merged: Task = { ...task };
     if (entry.tags !== undefined) merged.tags = entry.tags;
     if (entry.dueDate !== undefined) merged.dueDate = entry.dueDate;
+    if (entry.scheduledAt !== undefined) merged.scheduledAt = entry.scheduledAt;
     return merged;
   });
 }
@@ -79,6 +81,7 @@ export function setTaskOverlay(taskId: string, patch: TaskOverlayEntry): TaskOve
   const next: TaskOverlayEntry = { ...existing };
   if (patch.tags !== undefined) next.tags = patch.tags;
   if (patch.dueDate !== undefined) next.dueDate = patch.dueDate;
+  if (patch.scheduledAt !== undefined) next.scheduledAt = patch.scheduledAt;
   overlay[taskId] = next;
   saveOverlay(overlay);
   return overlay;

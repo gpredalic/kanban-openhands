@@ -23,6 +23,8 @@ export interface Task {
   status: TaskStatus;
   assignee: string | null;
   projectId: string;
+  /** Local schedule time for OpenHands work; no server cron is required. */
+  scheduledAt?: string | null;
   /** Inherited from the native Task model — a non-empty list means the task is blocked. */
   waitingOn: string[] | null;
   /** Free-form tags. Optional — absent on legacy data. */
