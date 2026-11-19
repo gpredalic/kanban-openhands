@@ -321,7 +321,7 @@ export async function fetchAgentProfiles(host: Host): Promise<AgentProfile[]> {
     return object.profiles
       .filter((item): item is Record<string, unknown> => !!asObject(item))
       .map((profile) => ({
-        id: asString(profile.id) ?? "",
+        id: asString(profile.id) ?? asString(profile.name) ?? asString(profile.profile_name) ?? "",
         name: asString(profile.name) ?? asString(profile.profile_name) ?? "",
       }))
       .filter((profile) => profile.id && profile.name);

@@ -132,6 +132,7 @@ test("fetchAgentProfiles maps the real profile response and rejects malformed pr
   }));
   assert.deepEqual(await fetchAgentProfiles(host), [
     { id: "11111111-1111-1111-1111-111111111111", name: "default" },
+    { id: "missing-id", name: "missing-id" },
   ]);
 });
 

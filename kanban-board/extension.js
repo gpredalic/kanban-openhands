@@ -10158,7 +10158,7 @@ async function Jv(e) {
   try {
     const t = await e.agentServer.request({ method: "GET", path: "/api/agent-profiles" }), n = H(t);
     return !n || !Array.isArray(n.profiles) ? [] : n.profiles.filter((r) => !!H(r)).map((r) => ({
-      id: O(r.id) ?? "",
+      id: O(r.id) ?? O(r.name) ?? O(r.profile_name) ?? "",
       name: O(r.name) ?? O(r.profile_name) ?? ""
     })).filter((r) => r.id && r.name);
   } catch {
