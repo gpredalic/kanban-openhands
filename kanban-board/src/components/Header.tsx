@@ -15,6 +15,9 @@ interface HeaderProps {
   orchestrationRunning: boolean;
   /** Toggle the AI orchestration loop on/off. */
   onToggleOrchestration: () => void;
+  notifications: Array<{ id: string; title: string; detail: string; at: number; read: boolean }>;
+  notificationsOpen: boolean;
+  onToggleNotifications: () => void;
 }
 
 export function Header({
@@ -23,7 +26,11 @@ export function Header({
   onCreate,
   orchestrationRunning,
   onToggleOrchestration,
+  notifications,
+  notificationsOpen,
+  onToggleNotifications,
 }: HeaderProps) {
+  const unread = notifications.filter((item) => !item.read).length;
   return (
     <header className="relative z-10 flex flex-col gap-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -65,10 +72,16 @@ export function Header({
           <button
             type="button"
             aria-label="Notifications"
+            data-notifications-open={notificationsOpen ? "true" : "false"}
+            onClick={onToggleNotifications}
             className="kb-glass-sm kb-btn-glow relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 hover:text-slate-200"
           >
             <Bell className="h-[18px] w-[18px]" strokeWidth={1.75} />
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#111827]" />
+            {unread > 0 && (
+              <span className="absolute right-1.5 top-1.5 min-w-4 rounded-full bg-rose-500 px-1 text-[9px] font-bold leading-4 text-white ring-2 ring-[#111827]">
+                {unread}
+              </span>
+            )}
           </button>
 
           <div className="kb-glass flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold text-white">
@@ -105,6 +118,31 @@ export function Header({
           </button>
         </div>
       </div>
+      {notificationsOpen && (
+        <div
+          data-notifications-panel="open"
+          aria-label="Notification surface"
+          className="absolute right-32 top-16 z-[70] w-80 rounded-2xl bg-slate-950/95 p-3 shadow-2xl ring-1 ring-white/10 backdrop-blur-xl"
+        >
+          <div className="mb-2 flex items-center justify-between px-1">
+            <h3 className="text-sm font-semibold text-white">Notifications</h3>
+            <span className="text-[10px] text-slate-500">{notifications.length} items</span>
+          </div>
+          {notifications.length === 0 ? (
+            <p className="rounded-xl bg-white/5 px-3 py-6 text-center text-xs text-slate-500">No notifications</p>
+          ) : (
+            <div className="flex max-h-72 flex-col gap-1 overflow-y-auto">
+              {notifications.map((item) => (
+                <div key={item.id} className="rounded-xl px-3 py-2.5 hover:bg-white/5">
+                  <p className="text-xs font-semibold text-slate-200">{item.title}</p>
+                  <p className="mt-0.5 text-[11px] text-slate-400">{item.detail}</p>
+                  <p className="mt-1 text-[9px] text-slate-600">{new Date(item.at).toLocaleTimeString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Mobile search */}
       <div className="kb-glass-sm relative md:hidden">

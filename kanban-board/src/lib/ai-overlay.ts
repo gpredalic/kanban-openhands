@@ -24,11 +24,12 @@ import type {
   TaskAiOverlay,
   Workflow,
 } from "../types/ai";
-import type { Task } from "../types/task";
+import type { Host, Task } from "../types/task";
 
 /** Storage keys, namespaced to avoid collisions with other extensions. */
 const AI_OVERLAY_KEY = "kanban-board.ai-overlay.v1";
 const AI_CONFIG_KEY = "kanban-board.ai-config.v1";
+export const ROUTING_FILE_PATH = "/home/razvijalec/.kanban-board/routing-rules.json";
 
 /* ------------------------------------------------------------------ *
  * Seed data — a realistic multi-provider, multi-agent setup.
@@ -257,7 +258,10 @@ export function saveAiOverlay(overlay: Record<string, TaskAiOverlay>): void {
 export function applyAiOverlay(tasks: Task[], overlay: Record<string, TaskAiOverlay>): EnrichedTask[] {
   return tasks.map((task) => ({
     ...task,
-    ai: overlay[task.id] ?? {},
+    ai: {
+      ...(task.agentId ? { agentId: task.agentId } : {}),
+      ...(overlay[task.id] ?? {}),
+    },
   }));
 }
 
@@ -320,6 +324,47 @@ export function saveAiConfig(config: AiConfig): void {
   } catch {
     // ignore
   }
+}
+
+function isRoutingRule(value: unknown): value is RoutingRule {
+  if (!value || typeof value !== "object") return false;
+  const rule = value as Partial<RoutingRule>;
+  return typeof rule.id === "string"
+    && typeof rule.name === "string"
+    && typeof rule.priority === "number"
+    && !!rule.condition
+    && !!rule.target;
+}
+
+export async function fetchRoutingRules(host: Host): Promise<RoutingRule[]> {
+  try {
+    const response = await host.agentServer.request({
+      method: "GET",
+      path: `/api/file/download?path=${encodeURIComponent(ROUTING_FILE_PATH)}`,
+    });
+    if (Array.isArray(response)) return response.filter(isRoutingRule);
+    if (typeof response === "string") {
+      const parsed = JSON.parse(response);
+      if (Array.isArray(parsed)) return parsed.filter(isRoutingRule);
+      if (parsed && Array.isArray(parsed.rules)) return parsed.rules.filter(isRoutingRule);
+    }
+    if (response && typeof response === "object" && Array.isArray((response as { rules?: unknown[] }).rules)) {
+      return (response as { rules: unknown[] }).rules.filter(isRoutingRule);
+    }
+  } catch {
+    // File-backed rules fall back to the local configuration.
+  }
+  return [];
+}
+
+export async function saveRoutingRules(host: Host, rules: RoutingRule[]): Promise<void> {
+  const form = new FormData();
+  form.append("file", new Blob([JSON.stringify(rules, null, 2)], { type: "application/json" }), "routing-rules.json");
+  await host.agentServer.request({
+    method: "POST",
+    path: `/api/file/upload?path=${encodeURIComponent(ROUTING_FILE_PATH)}`,
+    body: form,
+  });
 }
 
 /** Reset the AI config to the seed (used by the "Reset" action). */

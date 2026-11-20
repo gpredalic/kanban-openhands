@@ -6,16 +6,18 @@
  *   - Per-agent breakdown (tokens + cost, with a proportional bar).
  *   - Per-model breakdown (tokens + cost, with a proportional bar).
  *
- * All numbers are derived from the execution history + active runs.
+ * All numbers are derived from the real OpenHands execution snapshot.
  */
 
 import { useMemo } from "react";
 import { BarChart3, Coins, Cpu, Bot, Activity } from "lucide-react";
 import type { AiState } from "../types/ai";
+import type { OpenHandsState } from "../types/openhands";
 import { formatCost, formatTokens } from "../lib/ai-engine";
 
 interface AnalyticsViewProps {
   aiState: AiState;
+  openHandsState: OpenHandsState;
 }
 
 interface Breakdown {
@@ -27,53 +29,63 @@ interface Breakdown {
   runs: number;
 }
 
-export function AnalyticsView({ aiState }: AnalyticsViewProps) {
-  const { execution, config } = aiState;
-  const allRuns = [...execution.activeRuns, ...execution.history];
+export function AnalyticsView({ aiState, openHandsState }: AnalyticsViewProps) {
+  const { config } = aiState;
+  const executions = openHandsState.snapshot.executions;
 
   const perAgent = useMemo(() => {
     const map = new Map<string, Breakdown>();
-    for (const run of allRuns) {
-      const agent = config.agents.find((a) => a.id === run.agentId);
-      if (!agent) continue;
-      const entry = map.get(agent.id) ?? {
-        id: agent.id,
-        name: agent.name,
+    for (const run of executions) {
+      const agentId = run.agentId ?? "unknown";
+      const agent = config.agents.find((a) => a.id === agentId);
+      const entry = map.get(agentId) ?? {
+        id: agentId,
+        name: agent?.name ?? agentId,
         tokensIn: 0,
         tokensOut: 0,
         cost: 0,
         runs: 0,
       };
-      entry.tokensIn += run.tokensIn;
-      entry.tokensOut += run.tokensOut;
-      entry.cost += run.cost;
+      if (run.tokensInReported !== false) entry.tokensIn += run.tokensIn;
+      if (run.tokensOutReported !== false) entry.tokensOut += run.tokensOut;
+      if (run.costReported !== false) entry.cost += run.cost;
       entry.runs += 1;
-      map.set(agent.id, entry);
+      map.set(agentId, entry);
     }
     return [...map.values()].sort((a, b) => b.cost - a.cost);
-  }, [allRuns, config.agents]);
+  }, [executions, config.agents]);
 
   const perModel = useMemo(() => {
     const map = new Map<string, Breakdown>();
-    for (const run of allRuns) {
-      const model = config.models.find((m) => m.id === run.modelId);
-      if (!model) continue;
-      const entry = map.get(model.id) ?? {
-        id: model.id,
-        name: model.name,
+    for (const run of executions) {
+      const modelId = run.modelId ?? "unknown";
+      const model = config.models.find((m) => m.id === modelId);
+      const entry = map.get(modelId) ?? {
+        id: modelId,
+        name: model?.name ?? modelId,
         tokensIn: 0,
         tokensOut: 0,
         cost: 0,
         runs: 0,
       };
-      entry.tokensIn += run.tokensIn;
-      entry.tokensOut += run.tokensOut;
-      entry.cost += run.cost;
+      if (run.tokensInReported !== false) entry.tokensIn += run.tokensIn;
+      if (run.tokensOutReported !== false) entry.tokensOut += run.tokensOut;
+      if (run.costReported !== false) entry.cost += run.cost;
       entry.runs += 1;
-      map.set(model.id, entry);
+      map.set(modelId, entry);
     }
     return [...map.values()].sort((a, b) => b.cost - a.cost);
-  }, [allRuns, config.models]);
+  }, [executions, config.models]);
+
+  const reportedTokenIn = executions.filter((e) => e.tokensInReported !== false);
+  const reportedTokenOut = executions.filter((e) => e.tokensOutReported !== false);
+  const reportedCost = executions.filter((e) => e.costReported !== false);
+  const totalTokensIn = reportedTokenIn.reduce((s, e) => s + e.tokensIn, 0);
+  const totalTokensOut = reportedTokenOut.reduce((s, e) => s + e.tokensOut, 0);
+  const totalCost = reportedCost.reduce((s, e) => s + e.cost, 0);
+  const completedRuns = executions.filter(
+    (e) => e.status === "completed" || e.status === "failed" || e.status === "cancelled",
+  ).length;
 
   const maxAgentCost = Math.max(...perAgent.map((a) => a.cost), 0.0001);
   const maxModelCost = Math.max(...perModel.map((m) => m.cost), 0.0001);
@@ -83,7 +95,7 @@ export function AnalyticsView({ aiState }: AnalyticsViewProps) {
       <div>
         <h2 className="text-lg font-semibold tracking-tight text-white">Analytics</h2>
         <p className="mt-0.5 text-xs text-slate-400">
-          Token & cost tracking across all executions
+          Token & cost tracking across all OpenHands executions
         </p>
       </div>
 
@@ -92,25 +104,25 @@ export function AnalyticsView({ aiState }: AnalyticsViewProps) {
         <TotalCard
           icon={Activity}
           label="Total Tokens In"
-          value={formatTokens(execution.totalTokensIn)}
+          value={reportedTokenIn.length ? formatTokens(totalTokensIn) : "Unavailable"}
           accent="from-blue-500 to-indigo-500"
         />
         <TotalCard
           icon={Activity}
           label="Total Tokens Out"
-          value={formatTokens(execution.totalTokensOut)}
+          value={reportedTokenOut.length ? formatTokens(totalTokensOut) : "Unavailable"}
           accent="from-violet-500 to-purple-500"
         />
         <TotalCard
           icon={Coins}
           label="Total Cost"
-          value={formatCost(execution.totalCost)}
+          value={reportedCost.length ? formatCost(totalCost) : "Unavailable"}
           accent="from-emerald-500 to-teal-500"
         />
         <TotalCard
           icon={BarChart3}
           label="Runs Completed"
-          value={String(execution.history.length)}
+          value={String(completedRuns)}
           accent="from-amber-500 to-orange-500"
         />
       </div>

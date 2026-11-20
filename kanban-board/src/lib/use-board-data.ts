@@ -14,8 +14,8 @@ import { BoardStateStore, groupTasksByStatus } from "./board-state";
 import { applyOverlay, loadOverlay, setTaskOverlay, clearTaskOverlay, type TaskOverlayEntry } from "./task-overlay";
 import { buildExport, downloadExport, importFromFile, type ImportResult } from "./import-export";
 import type { Host, TaskStatus, BoardUiState } from "../types/task";
-import { syncBoardAction } from "./openhands";
-import { fetchTasks, moveTask, updateTask, deleteTask, createTask } from "./task-store";
+import { syncBoardAction, syncInboundConversations, deleteConversation } from "./openhands";
+import { moveTask, updateTask, deleteTask, createTask, fetchTasks } from "./task-store";
 
 /** Poll interval for reconciling with the live backend (ms). */
 const POLL_INTERVAL_MS = 15_000;
@@ -30,11 +30,11 @@ export interface BoardDataController {
   /** Move a task (optimistic + reconcile). Returns false if blocked by a WIP limit. */
   move: (taskId: string, status: TaskStatus) => Promise<boolean>;
   /** Update a task field. */
-  update: (taskId: string, patch: { title?: string; assignee?: string | null }) => Promise<void>;
+  update: (taskId: string, patch: { title?: string; assignee?: string | null; agentId?: string | null; conversationId?: string | null }) => Promise<void>;
   /** Delete a task. */
   remove: (taskId: string) => Promise<void>;
   /** Create a task in a column. Returns false if blocked by a WIP limit. */
-  create: (title: string, status: TaskStatus, assignee?: string | null, projectId?: string) => Promise<boolean>;
+  create: (title: string, status: TaskStatus, assignee?: string | null, projectId?: string, agentId?: string | null) => Promise<boolean>;
   /** Update ephemeral UI state (filter, search). */
   setUiState: (patch: Partial<BoardUiState>) => void;
   /** Phase 2: set a task's tags (overlay-backed). */
@@ -56,7 +56,7 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
   async function load(): Promise<void> {
     if (disposed) return;
     try {
-      const tasks = await fetchTasks(host);
+      const tasks = await syncInboundConversations(host);
       // Phase 2: merge the localStorage overlay (tags/dueDate) onto fetched tasks.
       const overlaid = applyOverlay(tasks, loadOverlay());
       store.setColumns(groupTasksByStatus(overlaid));
@@ -100,7 +100,7 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
 
   async function update(
     taskId: string,
-    patch: { title?: string; assignee?: string | null },
+    patch: { title?: string; assignee?: string | null; agentId?: string | null; conversationId?: string | null },
   ): Promise<void> {
     if (disposed) return;
     try {
@@ -117,7 +117,18 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
   async function remove(taskId: string): Promise<void> {
     if (disposed) return;
     try {
+      // Capture the conversation id before the task is gone from disk, so we can
+      // delete the live OpenHands conversation that syncInboundConversations would
+      // otherwise resurrect on the next load(). The task's conversationId field
+      // holds the raw conversation id (no oh- prefix).
+      const tasks = await fetchTasks(host);
+      const conversationId = tasks.find((t) => t.id === taskId)?.conversationId ?? null;
       await deleteTask(host, taskId);
+      if (conversationId) {
+        await deleteConversation(host, conversationId).catch((error: unknown) => {
+          console.error("[kanban-board] OpenHands conversation delete failed:", error);
+        });
+      }
       void syncBoardAction(host, "deleted", taskId).catch((error: unknown) => {
         console.error("[kanban-board] OpenHands delete sync failed:", error);
       });
@@ -133,14 +144,22 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     status: TaskStatus,
     assignee?: string | null,
     projectId?: string,
+    agentId?: string | null,
   ): Promise<boolean> {
     if (disposed) return false;
     try {
-      const created = await createTask(host, title, status, assignee, projectId);
+      const created = await createTask(host, title, status, assignee, projectId, agentId);
       if (created) {
-        void syncBoardAction(host, "created", created.id, { title, status, assignee, projectId }).catch((error: unknown) => {
-          console.error("[kanban-board] OpenHands create sync failed:", error);
-        });
+        void syncBoardAction(host, "created", created.id, { title, status, assignee, projectId, agentId })
+          .then(async (conversationId) => {
+            if (conversationId) {
+              await updateTask(host, created.id, { conversationId });
+              await load();
+            }
+          })
+          .catch((error: unknown) => {
+            console.error("[kanban-board] OpenHands create sync failed:", error);
+          });
       }
       await load();
     } catch (err) {

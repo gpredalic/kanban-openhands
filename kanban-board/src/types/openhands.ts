@@ -15,7 +15,7 @@ export interface OpenHandsEvent {
   type: OpenHandsEventType;
   title: string;
   detail?: string;
-  status?: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+  status?: "queued" | "running" | "completed" | "failed" | "cancelled";
   at: number;
   taskId?: string;
   executionId?: string;
@@ -29,8 +29,9 @@ export interface OpenHandsExecution {
   id: string;
   taskId?: string;
   title: string;
-  status: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+  status: "queued" | "running" | "completed" | "failed" | "cancelled";
   agentId?: string;
+  profileId?: string;
   modelId?: string;
   repository?: string;
   startedAt?: number;
@@ -38,6 +39,10 @@ export interface OpenHandsExecution {
   tokensIn: number;
   tokensOut: number;
   cost: number;
+  tokensInReported?: boolean;
+  tokensOutReported?: boolean;
+  costReported?: boolean;
+  retries?: number;
   error?: string;
 }
 
@@ -58,4 +63,5 @@ export interface OpenHandsState {
   snapshot: OpenHandsSnapshot;
   loading: boolean;
   error: string | null;
+  lastSyncedAt: number | null;
 }

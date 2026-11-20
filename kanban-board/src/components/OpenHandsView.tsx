@@ -68,14 +68,19 @@ export function OpenHandsView({ host, state, tasks, agents, onCommand }: OpenHan
   const active = executions.filter((run) => run.status === "running").length;
   const queued = executions.filter((run) => run.status === "queued").length;
   const failed = executions.filter((run) => run.status === "failed").length;
-  const completed = executions.filter((run) => run.status === "succeeded").length;
+  const completed = executions.filter((run) => run.status === "completed").length;
   const taskNames = new Map(tasks.map((task) => [task.id, task.title]));
   const agentNames = new Map(agents.map((agent) => [agent.id, agent.name]));
 
   return (
     <div className="relative z-10 flex flex-col gap-6">
       <div>
-        <h2 className="text-lg font-semibold tracking-tight text-white">OpenHands Command Center</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold tracking-tight text-white">OpenHands Command Center</h2>
+          <span className="text-[11px] text-slate-500">
+            {state.lastSyncedAt === null ? "Not synced yet" : `Last synced ${Math.max(0, Math.floor((Date.now() - state.lastSyncedAt) / 1000))}s ago`}
+          </span>
+        </div>
         <p className="mt-0.5 text-xs text-slate-400">Live operations, execution control, and activity from OpenHands</p>
       </div>
       {state.error && <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{state.error}</div>}
@@ -200,7 +205,12 @@ export function OpenHandsView({ host, state, tasks, agents, onCommand }: OpenHan
                   <p className="truncate text-sm font-medium text-white">{run.title}</p>
                   <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? run.taskId : "OpenHands execution"} · {agentNames.get(run.agentId ?? "") ?? run.agentId ?? "unassigned"}</p>
                 </div>
-                <span className="text-right text-[11px] text-slate-400">{formatTokens(run.tokensIn + run.tokensOut)} tokens<br />{formatCost(run.cost)}</span>
+                <span className="text-right text-[11px] text-slate-400">
+                  {run.tokensInReported === false && run.tokensOutReported === false
+                    ? "Tokens unavailable"
+                    : `${formatTokens(run.tokensIn + run.tokensOut)} tokens reported`}<br />
+                  {run.costReported === false ? "Cost unavailable" : `${formatCost(run.cost)} reported`}
+                </span>
                 <div className="flex gap-1">
                   {run.status === "running" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Stop execution" onClick={() => onCommand("stop", run.id)}><Square className="h-3.5 w-3.5" /></button>}
                   {run.status === "failed" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Retry execution" onClick={() => onCommand("retry", run.id)}><RotateCcw className="h-3.5 w-3.5" /></button>}

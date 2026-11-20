@@ -7,7 +7,8 @@
  */
 
 import { useDroppable } from "@dnd-kit/core";
-import type { Column, TaskStatus } from "../types/task";
+import type { Column, Task, TaskStatus } from "../types/task";
+import type { Agent, EnrichedTask } from "../types/ai";
 import { TaskCard } from "./TaskCard";
 import { AddTaskCard } from "./AddTaskCard";
 import { EmptyState } from "./EmptyState";
@@ -15,7 +16,12 @@ import { EmptyState } from "./EmptyState";
 interface KanbanColumnProps {
   column: Column;
   activeTaskId: string | null;
+  agents?: Agent[];
   onCreate: (title: string, status: TaskStatus) => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (taskId: string) => void;
+  onTaskRun?: (task: EnrichedTask) => void;
+  onTaskStop?: (task: EnrichedTask) => void;
 }
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
@@ -25,13 +31,14 @@ const STATUS_COLORS: Record<TaskStatus, string> = {
   done: "bg-emerald-500",
 };
 
-export function KanbanColumn({ column, activeTaskId, onCreate }: KanbanColumnProps) {
+export function KanbanColumn({ column, activeTaskId, agents = [], onCreate, onEdit, onDelete, onTaskRun, onTaskStop }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
   const dot = STATUS_COLORS[column.status];
 
   return (
     <div
       ref={setNodeRef}
+      data-drop-status={column.status}
       className={`kb-glass flex flex-col rounded-2xl p-3 transition-all duration-200 ${
         isOver ? "kb-drop-target" : ""
       }`}
@@ -58,7 +65,12 @@ export function KanbanColumn({ column, activeTaskId, onCreate }: KanbanColumnPro
             <TaskCard
               key={task.id}
               task={task}
+              agents={agents}
               isDragging={activeTaskId === task.id}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onTaskRun={onTaskRun}
+              onTaskStop={onTaskStop}
             />
           ))
         )}

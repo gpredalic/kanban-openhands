@@ -26,11 +26,13 @@ import {
   Search,
 } from "lucide-react";
 import type { AiState, Agent, AgentTeam, LLMModel, RoutingRule } from "../types/ai";
+import { useMemo, useState } from "react";
 import { formatCost } from "../lib/ai-engine";
 
 interface AgentRosterProps {
   aiState: AiState;
   onReset: () => void;
+  onConfigChange?: (config: AiState["config"]) => void;
 }
 
 /** Map an agent role to an icon. */
@@ -51,8 +53,66 @@ function roleIcon(role: string) {
   }
 }
 
-export function AgentRoster({ aiState, onReset }: AgentRosterProps) {
+export function AgentRoster({ aiState, onReset, onConfigChange }: AgentRosterProps) {
   const { agents, teams, routingRules, models } = aiState.config;
+  const [editing, setEditing] = useState(false);
+  const [ruleName, setRuleName] = useState("");
+  const [priority, setPriority] = useState("100");
+  const [conditionType, setConditionType] = useState<"always" | "tag" | "priority" | "status">("always");
+  const [conditionValue, setConditionValue] = useState("");
+  const [targetType, setTargetType] = useState<"agent" | "model">("agent");
+  const [targetId, setTargetId] = useState(agents[0]?.id ?? "");
+  const [validationError, setValidationError] = useState("");
+  const preview = useMemo(() => {
+    const target = targetType === "agent"
+      ? agents.find((agent) => agent.id === targetId)?.name ?? "unresolved profile"
+      : models.find((model) => model.id === targetId)?.name ?? "unresolved model";
+    return `task -> ${target}${targetType === "agent" ? ` -> ${models.find((model) => model.id === agents.find((agent) => agent.id === targetId)?.modelId)?.name ?? "profile model"}` : ""}`;
+  }, [agents, models, targetId, targetType]);
+
+  const saveRule = () => {
+    if (!ruleName.trim()) {
+      setValidationError("Rule name is required.");
+      return;
+    }
+    const priorityNumber = Number(priority);
+    if (!Number.isInteger(priorityNumber) || priorityNumber < 0) {
+      setValidationError("Priority must be a non-negative integer.");
+      return;
+    }
+    if (!targetId) {
+      setValidationError("A route target is required.");
+      return;
+    }
+    if (conditionType === "tag" && !conditionValue.trim()) {
+      setValidationError("Tag condition is required.");
+      return;
+    }
+    if (conditionType === "priority" && !["low", "medium", "high"].includes(conditionValue)) {
+      setValidationError("Priority must be low, medium, or high.");
+      return;
+    }
+    if (conditionType === "status" && !["todo", "in_progress", "review", "done"].includes(conditionValue)) {
+      setValidationError("Status must be todo, in_progress, review, or done.");
+      return;
+    }
+    let condition: RoutingRule["condition"];
+    if (conditionType === "always") condition = { type: "always" };
+    else if (conditionType === "tag") condition = { type: "tag", tag: conditionValue.trim() };
+    else if (conditionType === "priority") condition = { type: "priority", priority: conditionValue as "low" | "medium" | "high" };
+    else condition = { type: "status", status: conditionValue as "todo" | "in_progress" | "review" | "done" };
+    const rule: RoutingRule = {
+      id: `rule-${Date.now()}`,
+      name: ruleName.trim(),
+      priority: priorityNumber,
+      condition,
+      target: targetType === "agent" ? { agentId: targetId } : { modelId: targetId },
+    };
+    onConfigChange?.({ ...aiState.config, routingRules: [...routingRules, rule] });
+    setValidationError("");
+    setEditing(false);
+    setRuleName("");
+  };
 
   return (
     <div className="relative z-10 flex flex-col gap-6">
@@ -99,6 +159,34 @@ export function AgentRoster({ aiState, onReset }: AgentRosterProps) {
       {/* Routing rules */}
       <section>
         <SectionTitle icon={Route} label="Routing Rules" />
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs text-slate-500">Persisted OpenHands routing configuration</p>
+          <button type="button" onClick={() => setEditing((value) => !value)} className="rounded-lg bg-indigo-500/20 px-3 py-2 text-xs font-semibold text-indigo-300">
+            {editing ? "Cancel" : "Add routing rule"}
+          </button>
+        </div>
+        {editing && (
+          <div className="kb-glass mb-3 rounded-2xl p-4">
+            <h3 className="mb-3 text-sm font-semibold text-white">Routing Rule Editor</h3>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <input aria-label="Rule name" value={ruleName} onChange={(event) => setRuleName(event.target.value)} placeholder="Rule name" className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white" />
+              <input aria-label="Rule priority" type="number" value={priority} onChange={(event) => setPriority(event.target.value)} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white" />
+              <select aria-label="Rule condition" value={conditionType} onChange={(event) => setConditionType(event.target.value as typeof conditionType)} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white">
+                <option value="always">Always</option><option value="tag">Tag</option><option value="priority">Priority</option><option value="status">Status</option>
+              </select>
+              {conditionType !== "always" && <input aria-label="Condition value" value={conditionValue} onChange={(event) => setConditionValue(event.target.value)} placeholder={conditionType} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white" />}
+              <select aria-label="Target type" value={targetType} onChange={(event) => { setTargetType(event.target.value as "agent" | "model"); setTargetId(event.target.value === "agent" ? agents[0]?.id ?? "" : models[0]?.id ?? ""); }} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white">
+                <option value="agent">Profile / agent</option><option value="model">Model</option>
+              </select>
+              <select aria-label="Target" value={targetId} onChange={(event) => setTargetId(event.target.value)} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white">
+                {(targetType === "agent" ? agents : models).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+              </select>
+            </div>
+            {validationError && <p className="mt-3 text-xs text-rose-400">{validationError}</p>}
+            <p className="mt-3 text-xs text-slate-400">Route preview: {preview}</p>
+            <button type="button" onClick={saveRule} className="mt-3 rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white">Save routing rule</button>
+          </div>
+        )}
         <div className="kb-glass kb-fade-in flex flex-col gap-2 rounded-2xl p-4">
           {[...routingRules]
             .sort((a, b) => a.priority - b.priority)

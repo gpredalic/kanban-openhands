@@ -7,15 +7,12 @@
  *   - Cost estimation (OpenRouter-style token pricing).
  *   - Dependency graph analysis (cycle detection, ready-task computation).
  *   - Workflow DAG layout (LangGraph-style layered positioning).
- *   - Parallel execution simulation (Temporal-style run lifecycle).
  */
 
 import type {
   AiConfig,
   Agent,
-  CostEstimate,
   EnrichedTask,
-  ExecutionRun,
   LLMModel,
   RoutingResolution,
   RoutingRule,
@@ -96,21 +93,6 @@ export function resolveExecution(
  * Cost estimation.
  * ------------------------------------------------------------------ */
 
-/**
- * Estimate the token usage and cost for running a task on a model.
- *
- * The estimate is derived from the task's title/description length (a proxy
- * for prompt size) and a fixed output ratio. It's deterministic so tests can
- * assert exact values.
- */
-export function estimateCost(task: EnrichedTask, model: LLMModel): CostEstimate {
-  const promptText = `${task.title} ${task.description ?? ""}`.length;
-  // ~4 chars per token for input; output is ~30% of input.
-  const tokensIn = Math.max(64, Math.round(promptText / 4));
-  const tokensOut = Math.max(32, Math.round(tokensIn * 0.3));
-  const cost = (tokensIn * model.inputCostPer1k + tokensOut * model.outputCostPer1k) / 1000;
-  return { tokensIn, tokensOut, cost };
-}
 
 /** Format a USD cost for display. */
 export function formatCost(cost: number): string {
@@ -267,78 +249,3 @@ export function layoutWorkflow(workflow: Workflow, tasks: EnrichedTask[]): { nod
   return { nodes, layers: maxLayer + 1 };
 }
 
-/* ------------------------------------------------------------------ *
- * Execution simulation.
- * ------------------------------------------------------------------ */
-
-/** A deterministic-ish id generator for runs. */
-let runCounter = 0;
-export function nextRunId(): string {
-  runCounter += 1;
-  return `run-${Date.now().toString(36)}-${runCounter}`;
-}
-
-/**
- * Create a "queued" execution run for a task. The run carries the resolved
- * agent/model and a cost estimate. The execution loop will advance it through
- * running → succeeded/failed.
- */
-export function createRun(task: EnrichedTask, config: AiConfig): ExecutionRun | null {
-  const { agent, model } = resolveExecution(task, config);
-  if (!agent || !model) return null; // unrouted — nothing to run
-  const estimate = estimateCost(task, model);
-  return {
-    id: nextRunId(),
-    taskId: task.id,
-    taskTitle: task.title,
-    agentId: agent.id,
-    modelId: model.id,
-    status: "queued",
-    startedAt: null,
-    finishedAt: null,
-    tokensIn: estimate.tokensIn,
-    tokensOut: estimate.tokensOut,
-    cost: estimate.cost,
-    log: [{ label: "Queued", at: Date.now() }],
-  };
-}
-
-/**
- * Advance a run one step. Returns the updated run. A "queued" run becomes
- * "running"; a "running" run accumulates a log step and eventually becomes
- * "succeeded". The `step` parameter controls how far to advance (0 = just
- * started, 1 = finished).
- */
-export function advanceRun(run: ExecutionRun, step: 0 | 1): ExecutionRun {
-  if (run.status === "queued" && step === 0) {
-    return {
-      ...run,
-      status: "running",
-      startedAt: Date.now(),
-      log: [...run.log, { label: "Started", at: Date.now() }],
-    };
-  }
-  if (run.status === "running" && step === 1) {
-    return {
-      ...run,
-      status: "succeeded",
-      finishedAt: Date.now(),
-      log: [...run.log, { label: "Completed", at: Date.now() }],
-    };
-  }
-  return run;
-}
-
-/**
- * Compute the total cost and tokens across a set of runs.
- */
-export function sumRuns(runs: ExecutionRun[]): { tokensIn: number; tokensOut: number; cost: number } {
-  return runs.reduce(
-    (acc, run) => ({
-      tokensIn: acc.tokensIn + run.tokensIn,
-      tokensOut: acc.tokensOut + run.tokensOut,
-      cost: acc.cost + run.cost,
-    }),
-    { tokensIn: 0, tokensOut: 0, cost: 0 },
-  );
-}

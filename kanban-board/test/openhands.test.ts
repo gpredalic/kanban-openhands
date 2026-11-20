@@ -63,7 +63,7 @@ test("normalizeSnapshot handles all statuses and defensive malformed input", () 
   assert.deepEqual(normalizeSnapshot(null).executions, []);
   assert.deepEqual(normalizeSnapshot({ items: "bad" }).executions, []);
   for (const [source, status] of [
-    ["finished", "succeeded"],
+    ["finished", "completed"],
     ["error", "failed"],
     ["deleting", "cancelled"],
     ["paused", "queued"],

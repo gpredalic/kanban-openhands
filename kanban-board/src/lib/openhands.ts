@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import type { Host } from "../types/task";
+import type { Host, Task, TaskStatus } from "../types/task";
 import type {
   OpenHandsEvent,
   OpenHandsExecution,
@@ -8,10 +8,10 @@ import type {
   OpenHandsState,
 } from "../types/openhands";
 import { setTaskOverlay } from "./task-overlay";
+import { fetchTasks, saveTasks, updateTask } from "./task-store";
 
-const POLL_INTERVAL_MS = 10_000;
+const POLL_INTERVAL_MS = 2_000;
 const EMPTY_SNAPSHOT: OpenHandsSnapshot = { executions: [], events: [], links: [], updatedAt: 0 };
-const ACTIVITY_KEY = "kanban-board.openhands-activity.v1";
 
 function asObject(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -61,7 +61,7 @@ function eventArray(value: unknown): Record<string, unknown>[] {
 function mapStatus(value: unknown): OpenHandsExecution["status"] {
   const status = asString(value)?.toLowerCase();
   if (status === "running" || status === "waiting_for_confirmation") return "running";
-  if (status === "finished" || status === "succeeded" || status === "success" || status === "completed") return "succeeded";
+  if (status === "finished" || status === "succeeded" || status === "success" || status === "completed") return "completed";
   if (status === "error" || status === "stuck" || status === "failed") return "failed";
   if (status === "deleting" || status === "cancelled" || status === "canceled") return "cancelled";
   if (status === "paused") return "queued";
@@ -74,7 +74,14 @@ function getConversationTags(conversation: Record<string, unknown>): Record<stri
   return Object.fromEntries(Object.entries(tags).filter(([, value]) => typeof value === "string")) as Record<string, string>;
 }
 
-function conversationMetrics(conversation: Record<string, unknown>): { tokensIn: number; tokensOut: number; cost: number } {
+function conversationMetrics(conversation: Record<string, unknown>): {
+  tokensIn: number;
+  tokensOut: number;
+  cost: number;
+  tokensInReported: boolean;
+  tokensOutReported: boolean;
+  costReported: boolean;
+} {
   const stats = asObject(conversation.stats) ?? {};
   const metrics = asObject(conversation.metrics) ?? {};
   const accumulated = asObject(metrics.accumulated_token_usage);
@@ -105,7 +112,26 @@ function conversationMetrics(conversation: Record<string, unknown>): { tokensIn:
     || asNumber(stats.completion_tokens)
     || asNumber(stats.tokens_out)
     || asNumber(stats.output_tokens);
-  return { tokensIn, tokensOut, cost };
+  return {
+    tokensIn,
+    tokensOut,
+    cost,
+    tokensInReported: tokensIn !== 0
+      || accumulated?.prompt_tokens !== undefined
+      || stats.prompt_tokens !== undefined
+      || stats.tokens_in !== undefined
+      || stats.input_tokens !== undefined,
+    tokensOutReported: tokensOut !== 0
+      || accumulated?.completion_tokens !== undefined
+      || stats.completion_tokens !== undefined
+      || stats.tokens_out !== undefined
+      || stats.output_tokens !== undefined,
+    costReported: cost !== 0
+      || metrics.accumulated_cost !== undefined
+      || stats.cost !== undefined
+      || stats.total_cost !== undefined
+      || stats.accumulated_cost !== undefined,
+  };
 }
 
 function eventType(kind: string): OpenHandsEvent["type"] {
@@ -150,6 +176,10 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
     const createdAt = timestamp(conversation.created_at);
     const updatedAt = timestamp(conversation.updated_at, createdAt);
     const launchedProfile = asObject(conversation.launched_agent_profile);
+    const retriesValue = asNumber(conversation.retry_count ?? conversation.retries ?? conversation.attempt_count);
+    const error = asString(conversation.error)
+      ?? asString(conversation.error_message)
+      ?? (conversation.execution_status === "error" ? asString(conversation.message) : undefined);
     return {
       id: asString(conversation.id) ?? "",
       taskId: tags.taskid,
@@ -158,13 +188,22 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
       agentId: tags.agentprofileid ?? tags.agentid
         ?? asString(conversation.agent_profile_id)
         ?? asString(launchedProfile?.agent_profile_id),
+      profileId: asString(conversation.agent_profile_id)
+        ?? asString(launchedProfile?.agent_profile_id)
+        ?? tags.agentprofileid
+        ?? tags.agentid,
       modelId: asString(conversation.current_model_id),
       repository: tags.repository,
       startedAt: createdAt,
-      finishedAt: status === "succeeded" || status === "failed" || status === "cancelled" ? updatedAt : undefined,
+      finishedAt: status === "completed" || status === "failed" || status === "cancelled" ? updatedAt : undefined,
       tokensIn: metrics.tokensIn,
       tokensOut: metrics.tokensOut,
       cost: metrics.cost,
+      tokensInReported: metrics.tokensInReported,
+      tokensOutReported: metrics.tokensOutReported,
+      costReported: metrics.costReported,
+      retries: retriesValue,
+      error,
     };
   }).filter((execution) => execution.id);
 
@@ -245,32 +284,10 @@ export async function fetchOpenHandsSnapshot(host: Host): Promise<OpenHandsSnaps
   }
 
   events.sort((a, b) => b.at - a.at);
-  try {
-    const raw = localStorage.getItem(ACTIVITY_KEY);
-    const stored = raw ? JSON.parse(raw) : [];
-    if (Array.isArray(stored)) {
-      for (const entry of stored) {
-        const object = asObject(entry);
-        if (!object) continue;
-        const action = asString(object.action);
-        const taskId = asString(object.taskId);
-        if (!action || !taskId) continue;
-        events.push({
-          id: asString(object.id) ?? `${taskId}-${timestamp(object.at)}`,
-          type: "task",
-          title: `Board task ${action}`,
-          detail: asString(object.title) ?? asString(object.status) ?? `Task ${taskId}`,
-          at: timestamp(object.at),
-          taskId,
-        });
-      }
-    }
-  } catch {
-    // Local activity is optional.
-  }
   events.sort((a, b) => b.at - a.at);
   return { ...snapshot, events: events.length > 0 ? events : snapshot.events, updatedAt: Date.now() };
 }
+
 
 export type OpenHandsCommand = "start" | "stop" | "retry" | "schedule";
 
@@ -294,7 +311,7 @@ export interface RelayHop {
   agent: string;
   question: string;
   response: string;
-  status: "running" | "succeeded" | "failed";
+  status: "running" | "completed" | "failed";
   childConversationId?: string;
   error?: string;
 }
@@ -450,7 +467,7 @@ export async function startAgentRelay(
             agent,
             question,
             response,
-            status: "succeeded",
+            status: "completed",
             childConversationId,
           }, index, index < hopLimit - 1 && !stopped);
         } else {
@@ -467,7 +484,7 @@ export async function startAgentRelay(
             agent,
             question,
             response,
-            status: "succeeded",
+            status: "completed",
           }, index, index < hopLimit - 1 && !stopped);
         }
       } catch (error) {
@@ -536,7 +553,100 @@ export function buildConversationRequest(input: OpenHandsCommandInput): Record<s
   return body;
 }
 
-async function createConversation(host: Host, input: OpenHandsCommandInput): Promise<Record<string, unknown>> {
+/**
+ * Map an OpenHands execution status onto the board's task lifecycle.
+ *
+ * OpenHands is the single source of truth for execution status. The board
+ * column is a projection of it:
+ *   queued/running  -> in_progress
+ *   completed       -> done
+ *   failed/cancelled-> review (a failed run needs human attention)
+ * A `boardstatus` tag set by the user (e.g. via drag-and-drop) is authoritative
+ * for the column and is returned as-is; this mapping is only used when the
+ * conversation carries no explicit boardstatus.
+ */
+function statusForConversation(
+  conversation: Record<string, unknown>,
+  tags: Record<string, string>,
+): TaskStatus {
+  const explicit = tags.boardstatus as TaskStatus | undefined;
+  if (explicit && ["todo", "in_progress", "review", "done"].includes(explicit)) return explicit;
+  const status = mapStatus(conversation.execution_status);
+  if (status === "queued" || status === "running") return "in_progress";
+  if (status === "completed") return "done";
+  if (status === "failed" || status === "cancelled") return "review";
+  return "todo";
+}
+
+export async function syncInboundConversations(host: Host): Promise<Task[]> {
+  try {
+    const response = await host.agentServer.request({
+      method: "GET",
+      path: "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC",
+    });
+    const conversations = conversationArray(response);
+    if (conversations.length === 0) return fetchTasks(host);
+    const tasks = await fetchTasks(host);
+    let changed = false;
+
+    // The search is sorted CREATED_AT_DESC, so the first conversation seen for a
+    // given task is the newest. Reconcile identity and status from that newest
+    // conversation only — older conversations for the same task must not clobber
+    // the link (this is what previously pinned a task to a stale conversation).
+    const seenTaskIds = new Set<string>();
+    for (const conversation of conversations) {
+      const id = asString(conversation.id);
+      if (!id) continue;
+      const tags = getConversationTags(conversation);
+      const title = asString(conversation.title) ?? tags.tasktitle ?? "OpenHands conversation";
+      const profileId = asString(conversation.agent_profile_id)
+        ?? asString(asObject(conversation.launched_agent_profile)?.agent_profile_id)
+        ?? tags.agentprofileid
+        ?? tags.agentid;
+      let task = tags.taskid ? tasks.find((item) => item.id === tags.taskid) : undefined;
+      if (!task) task = tasks.find((item) => item.conversationId === id);
+      if (!task) {
+        const status = statusForConversation(conversation, tags);
+        task = {
+          id: tags.taskid ?? `oh-${id}`,
+          title,
+          status,
+          assignee: tags.assignee ?? null,
+          projectId: tags.projectid ?? "default",
+          waitingOn: null,
+          conversationId: id,
+          executionId: id,
+          profileId: profileId ?? null,
+          agentId: tags.agentprofileid ?? tags.agentid ?? null,
+        };
+        tasks.push(task);
+        changed = true;
+        if (tags.taskid) seenTaskIds.add(tags.taskid);
+        continue;
+      }
+      // Only the newest conversation for a task reconciles identity/status.
+      if (tags.taskid && seenTaskIds.has(tags.taskid)) continue;
+      if (tags.taskid) seenTaskIds.add(tags.taskid);
+      if (task.title !== title) { task.title = title; changed = true; }
+      if (task.conversationId !== id) { task.conversationId = id; changed = true; }
+      if (task.executionId !== id) { task.executionId = id; changed = true; }
+      if (profileId && task.profileId !== profileId) { task.profileId = profileId; changed = true; }
+      if (tags.assignee && task.assignee !== tags.assignee) { task.assignee = tags.assignee; changed = true; }
+      if (tags.agentprofileid && task.agentId !== tags.agentprofileid) { task.agentId = tags.agentprofileid; changed = true; }
+      const status = statusForConversation(conversation, tags);
+      if (task.status !== status) { task.status = status; changed = true; }
+    }
+    if (changed) await saveTasks(host, tasks);
+    return tasks;
+  } catch {
+    return fetchTasks(host);
+  }
+}
+
+async function createConversation(
+  host: Host,
+  input: OpenHandsCommandInput,
+): Promise<{ conversation: Record<string, unknown>; profileId?: string }> {
   const body = buildConversationRequest(input);
   const agentProfileId = await getAgentProfileId(host, input.agentId);
   if (agentProfileId) body.agent_profile_id = agentProfileId;
@@ -552,7 +662,43 @@ async function createConversation(host: Host, input: OpenHandsCommandInput): Pro
   });
   const conversation = asObject(response);
   if (!conversation) throw new Error("OpenHands did not return a conversation");
-  return conversation;
+  return { conversation, profileId: agentProfileId };
+}
+
+/**
+ * Persist the OpenHands execution identity and status onto a board task.
+ *
+ * OpenHands is the single source of truth for execution identity
+ * (conversationId / executionId / profileId) and execution status. This is the
+ * one place that writes those fields to the board, so the board never invents
+ * its own identity — it always mirrors what OpenHands reports.
+ *
+ * The status is mapped onto the board's task lifecycle:
+ *   queued/running  -> in_progress
+ *   completed       -> done
+ *   failed/cancelled-> review (a failed run needs human attention)
+ *
+ * A `status` of `null` means "identity only" — the run was just created and is
+ * about to be queued, so we pin the identity without forcing a column move yet.
+ */
+export async function recordExecution(
+  host: Host,
+  taskId: string,
+  conversationId: string,
+  profileId: string | undefined,
+  status: OpenHandsExecution["status"] | null,
+): Promise<void> {
+  const patch: {
+    conversationId: string;
+    executionId: string;
+    profileId?: string | null;
+    status?: TaskStatus;
+  } = { conversationId, executionId: conversationId };
+  if (profileId) patch.profileId = profileId;
+  if (status === "queued" || status === "running") patch.status = "in_progress";
+  else if (status === "completed") patch.status = "done";
+  else if (status === "failed" || status === "cancelled") patch.status = "review";
+  await updateTask(host, taskId, patch);
 }
 
 export async function commandExecution(
@@ -597,9 +743,14 @@ export async function commandExecution(
         // Retry still creates a fresh conversation when the original cannot be read.
       }
     }
-    const conversation = await createConversation(host, retryInput);
+    const { conversation, profileId } = await createConversation(host, retryInput);
     const conversationId = asString(conversation.id);
     if (conversationId) {
+      // Persist the new execution identity immediately so the board mirrors
+      // OpenHands the moment the run is created, not only after the next poll.
+      if (retryInput.taskId) {
+        await recordExecution(host, retryInput.taskId, conversationId, profileId, "queued");
+      }
       await host.agentServer.request({
         method: "POST",
         path: `/api/conversations/${encodeURIComponent(conversationId)}/run`,
@@ -616,35 +767,84 @@ export async function commandExecution(
     return;
   }
 
-  const conversation = await createConversation(host, input);
+  const { conversation, profileId } = await createConversation(host, input);
   const conversationId = asString(conversation.id);
   if (!conversationId) throw new Error("OpenHands conversation has no id");
+  // Persist the execution identity immediately so the board mirrors OpenHands
+  // the moment the run is created, not only after the next inbound poll.
+  if (input.taskId) {
+    await recordExecution(host, input.taskId, conversationId, profileId, "queued");
+  }
   await host.agentServer.request({
     method: "POST",
     path: `/api/conversations/${encodeURIComponent(conversationId)}/run`,
   });
 }
 
-const localBoardEvents: Array<Record<string, unknown>> = [];
+/**
+ * Delete a live OpenHands conversation by its raw conversation id.
+ *
+ * Called from the board's delete flow so that removing a task also removes the
+ * conversation that `syncInboundConversations` would otherwise resurrect on the
+ * next load(). The task's `conversationId` field holds the raw conversation id
+ * (no `oh-` prefix), so this is a direct DELETE. A 404 (already gone) is
+ * swallowed — the conversation is already absent, which is the desired state.
+ */
+export async function deleteConversation(host: Host, conversationId: string): Promise<void> {
+  try {
+    await host.agentServer.request({
+      method: "DELETE",
+      path: `/api/conversations/${encodeURIComponent(conversationId)}`,
+    });
+  } catch (error) {
+    // A 404 means the conversation is already gone — the desired end state.
+    // Swallow it so a stale/phantom conversationId (the task's conversation was
+    // already deleted) doesn't surface as a visible error during task delete.
+    if (error && (error as { status?: number }).status === 404) return;
+    throw error;
+  }
+}
 
 export async function syncBoardAction(
   host: Host,
   action: "created" | "updated" | "moved" | "deleted",
   taskId: string,
   details?: Record<string, unknown>,
-): Promise<void> {
-  const entry = { id: `${taskId}-${Date.now()}`, action, taskId, at: Date.now(), ...details };
-  localBoardEvents.push(entry);
-  try {
-    const raw = localStorage.getItem(ACTIVITY_KEY);
-    const stored = raw ? JSON.parse(raw) : [];
-    const events = Array.isArray(stored) ? [...stored, entry].slice(-200) : [entry];
-    localStorage.setItem(ACTIVITY_KEY, JSON.stringify(events));
-  } catch {
-    // Local activity is best-effort and must never block board CRUD.
-  }
+): Promise<string | null> {
+  const entry: Record<string, unknown> & { id: string; action: typeof action; taskId: string; at: number } =
+    { id: `${taskId}-${Date.now()}`, action, taskId, at: Date.now(), ...details };
 
   try {
+    if (action === "created") {
+      // The agent server rejects a conversation POST that carries none of
+      // `agent`, `agent_settings`, or `agent_profile_id` (HTTP 422). Resolve the
+      // profile id from the requested agent name before posting, mirroring
+      // createConversation, so the board->OpenHands sync actually succeeds.
+      const body = buildConversationRequest({
+        taskId,
+        title: asString(details?.title) ?? "Board task",
+        description: asString(details?.description),
+        agentId: asString(details?.agentId),
+      });
+      const agentProfileId = await getAgentProfileId(host, asString(details?.agentId));
+      if (agentProfileId) {
+        body.agent_profile_id = agentProfileId;
+        const tags = asObject(body.tags) ?? {};
+        tags.agentprofileid = agentProfileId;
+        body.tags = tags;
+      }
+      const response = await host.agentServer.request({
+        method: "POST",
+        path: "/api/conversations",
+        body,
+      });
+      const conversation = asObject(response);
+      const conversationId = conversation ? asString(conversation.id) : undefined;
+      if (conversationId) {
+        entry.conversationId = conversationId;
+        return conversationId;
+      }
+    }
     const response = await host.agentServer.request({
       method: "GET",
       path: "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC",
@@ -678,17 +878,26 @@ export async function syncBoardAction(
   } catch {
     // Conversation metadata is optional; board CRUD remains independent.
   }
+  return null;
 }
 
 export class OpenHandsStateStore {
-  private state: OpenHandsState = { snapshot: EMPTY_SNAPSHOT, loading: true, error: null };
+  private state: OpenHandsState = { snapshot: EMPTY_SNAPSHOT, loading: true, error: null, lastSyncedAt: null };
   private listeners = new Set<() => void>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private disposed = false;
   private readonly host: Host;
+  private readonly handleFocus = (): void => {
+    void this.refresh();
+  };
+  private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState === "visible") void this.refresh();
+  };
 
   constructor(host: Host) {
     this.host = host;
+    window.addEventListener("focus", this.handleFocus);
+    document.addEventListener("visibilitychange", this.handleVisibilityChange);
     void this.refresh();
     this.timer = setInterval(() => void this.refresh(), POLL_INTERVAL_MS);
   }
@@ -703,7 +912,7 @@ export class OpenHandsStateStore {
     if (this.disposed) return;
     try {
       const snapshot = await fetchOpenHandsSnapshot(this.host);
-      this.state = { snapshot, loading: false, error: null };
+      this.state = { snapshot, loading: false, error: null, lastSyncedAt: Date.now() };
     } catch (error) {
       this.state = {
         ...this.state,
@@ -717,6 +926,8 @@ export class OpenHandsStateStore {
   dispose(): void {
     this.disposed = true;
     if (this.timer) clearInterval(this.timer);
+    window.removeEventListener("focus", this.handleFocus);
+    document.removeEventListener("visibilitychange", this.handleVisibilityChange);
     this.listeners.clear();
   }
 }

@@ -1,52 +1,59 @@
 /**
  * ExecutionHistory — the "History" view.
  *
- * Shows the live execution state: active runs (with a pulsing indicator) and
- * the run history (most recent first). Each run shows the task, the agent that
- * ran it, the model, the status, and the token/cost it consumed.
+ * Shows real OpenHands executions from the live snapshot: active runs (with a
+ * pulsing indicator) and completed runs (most recent first). Each run shows the
+ * task, the agent profile, the model, the status, and the real token/cost
+ * reported by the OpenHands agent server.
  */
 
 import { History, Loader2, CheckCircle2, XCircle, Clock, Bot, Cpu } from "lucide-react";
-import type { AiState, Agent, ExecutionRun, LLMModel } from "../types/ai";
-import { formatCost, formatTokens } from "../lib/ai-engine";
+import type { OpenHandsExecution, OpenHandsState } from "../types/openhands";
+import type { AiState } from "../types/ai";
 
 interface ExecutionHistoryProps {
+  openHandsState: OpenHandsState;
   aiState: AiState;
 }
 
-export function ExecutionHistory({ aiState }: ExecutionHistoryProps) {
-  const { activeRuns, history } = aiState.execution;
-  const { agents, models } = aiState.config;
-
-  const agentById = new Map(agents.map((a) => [a.id, a]));
-  const modelById = new Map(models.map((m) => [m.id, m]));
+export function ExecutionHistory({ openHandsState }: ExecutionHistoryProps) {
+  const executions = openHandsState.snapshot.executions;
+  const { loading, error } = openHandsState;
+  const active = executions.filter((e) => e.status === "running" || e.status === "queued");
+  const completed = executions
+    .filter((e) => e.status === "completed" || e.status === "failed" || e.status === "cancelled")
+    .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
 
   return (
     <div className="relative z-10 flex flex-col gap-6">
       <div>
         <h2 className="text-lg font-semibold tracking-tight text-white">Execution History</h2>
         <p className="mt-0.5 text-xs text-slate-400">
-          {activeRuns.length} active · {history.length} completed
+          {active.length} active · {completed.length} completed
         </p>
       </div>
+
+      {error && (
+        <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{error}</div>
+      )}
 
       {/* Active runs */}
       <section>
         <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
           <Loader2 className="h-4 w-4 animate-spin text-blue-400" /> Active Runs
         </h3>
-        {activeRuns.length === 0 ? (
-          <EmptyState label="No active runs — start orchestration from the Board header." />
+        {active.length === 0 ? (
+          <EmptyState
+            label={
+              loading
+                ? "Connecting to OpenHands…"
+                : "No active runs — start orchestration from the Board header."
+            }
+          />
         ) : (
           <div className="flex flex-col gap-2">
-            {activeRuns.map((run) => (
-              <RunRow
-                key={run.id}
-                run={run}
-                agent={agentById.get(run.agentId)}
-                model={modelById.get(run.modelId)}
-                active
-              />
+            {active.map((run) => (
+              <RunRow key={run.id} run={run} active />
             ))}
           </div>
         )}
@@ -57,17 +64,12 @@ export function ExecutionHistory({ aiState }: ExecutionHistoryProps) {
         <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
           <History className="h-4 w-4 text-slate-400" /> Completed Runs
         </h3>
-        {history.length === 0 ? (
+        {completed.length === 0 ? (
           <EmptyState label="No completed runs yet." />
         ) : (
           <div className="flex flex-col gap-2">
-            {history.map((run) => (
-              <RunRow
-                key={run.id}
-                run={run}
-                agent={agentById.get(run.agentId)}
-                model={modelById.get(run.modelId)}
-              />
+            {completed.map((run) => (
+              <RunRow key={run.id} run={run} />
             ))}
           </div>
         )}
@@ -76,21 +78,11 @@ export function ExecutionHistory({ aiState }: ExecutionHistoryProps) {
   );
 }
 
-function RunRow({
-  run,
-  agent,
-  model,
-  active,
-}: {
-  run: ExecutionRun;
-  agent?: Agent;
-  model?: LLMModel;
-  active?: boolean;
-}) {
+function RunRow({ run, active }: { run: OpenHandsExecution; active?: boolean }) {
   const StatusIcon =
-    run.status === "succeeded" ? CheckCircle2 : run.status === "failed" ? XCircle : Loader2;
+    run.status === "completed" ? CheckCircle2 : run.status === "failed" ? XCircle : Loader2;
   const statusColor =
-    run.status === "succeeded"
+    run.status === "completed"
       ? "text-emerald-400"
       : run.status === "failed"
         ? "text-rose-400"
@@ -107,33 +99,35 @@ function RunRow({
         strokeWidth={1.75}
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white">{run.taskTitle}</p>
+        <p className="truncate text-sm font-medium text-white">{run.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
-          {agent && (
+          <span className="font-mono text-slate-500">ID: {run.id}</span>
+          {run.agentId && (
             <span className="flex items-center gap-1">
-              <Bot className="h-3 w-3 text-indigo-400" /> {agent.name}
+              <Bot className="h-3 w-3 text-indigo-400" /> {run.agentId}
             </span>
           )}
-          {model && (
+          {run.modelId && (
             <span className="flex items-center gap-1">
-              <Cpu className="h-3 w-3 text-violet-400" /> {model.name}
+              <Cpu className="h-3 w-3 text-violet-400" /> {run.modelId}
             </span>
           )}
           <span className="flex items-center gap-1">
             <Clock className="h-3 w-3" />
-            {run.finishedAt
-              ? new Date(run.finishedAt).toLocaleTimeString()
-              : run.startedAt
-                ? new Date(run.startedAt).toLocaleTimeString()
-                : "queued"}
+            {run.startedAt ? `Started ${new Date(run.startedAt).toLocaleString()}` : "Start time unavailable"}
+            {run.finishedAt ? ` · Finished ${new Date(run.finishedAt).toLocaleString()}` : ""}
           </span>
+          {typeof run.retries === "number" && <span>Retries: {run.retries}</span>}
+          {run.error && <span className="text-rose-400">Error: {run.error}</span>}
         </div>
       </div>
       <div className="shrink-0 text-right text-xs">
-        <p className="font-medium text-slate-300">{formatCost(run.cost)}</p>
-        <p className="text-slate-500">
-          {formatTokens(run.tokensIn)} in · {formatTokens(run.tokensOut)} out
+        <p className="font-medium text-slate-300">
+          {run.tokensInReported !== false && run.tokensOutReported !== false
+            ? `${run.tokensIn.toLocaleString()} in · ${run.tokensOut.toLocaleString()} out`
+            : "Tokens unavailable"}
         </p>
+        <p className="text-slate-500">{run.costReported === false ? "Cost unavailable" : `$${run.cost.toFixed(4)} reported`}</p>
       </div>
     </div>
   );

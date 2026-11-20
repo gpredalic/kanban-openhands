@@ -93,7 +93,7 @@ export interface ExecutionRun {
   taskTitle: string;
   agentId: string;
   modelId: string;
-  status: "queued" | "running" | "succeeded" | "failed" | "cancelled";
+  status: "queued" | "running" | "completed" | "failed" | "cancelled";
   startedAt: number | null;
   finishedAt: number | null;
   tokensIn: number;
@@ -145,6 +145,8 @@ export interface TaskAiOverlay {
   cost?: number;
   /** The most recent execution status. */
   executionStatus?: ExecutionRun["status"];
+  /** The OpenHands conversation id backing the current execution (for stop). */
+  executionId?: string;
   /** Timestamp of the last run. */
   lastRunAt?: number;
 }
@@ -163,25 +165,13 @@ export interface AiConfig {
   workflows: Workflow[];
 }
 
-/** The live orchestration state (ephemeral, never persisted). */
-export interface ExecutionState {
-  /** Whether the orchestration loop is running. */
-  running: boolean;
-  /** Runs currently in flight. */
-  activeRuns: ExecutionRun[];
-  /** Completed runs (most recent first). */
-  history: ExecutionRun[];
-  /** Total tokens consumed this session. */
-  totalTokensIn: number;
-  totalTokensOut: number;
-  /** Total USD cost this session. */
-  totalCost: number;
-}
-
-/** The full AI state: config + live execution + the per-task AI overlay. */
+/**
+ * The full AI state: routing/profile/workflow config + the per-task AI overlay.
+ * Execution state (runs, tokens, cost, history) is owned exclusively by the
+ * OpenHands snapshot — there is no local execution reality here.
+ */
 export interface AiState {
   config: AiConfig;
-  execution: ExecutionState;
   /** Per-task AI overlay (agent, model, deps, tokens, cost, execution status). */
   overlay: Record<string, TaskAiOverlay>;
 }

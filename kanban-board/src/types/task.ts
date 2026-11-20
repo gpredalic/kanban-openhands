@@ -23,6 +23,14 @@ export interface Task {
   status: TaskStatus;
   assignee: string | null;
   projectId: string;
+  /** Configured AI agent assigned to this task. */
+  agentId?: string | null;
+  /** OpenHands conversation correlated to this task. */
+  conversationId?: string | null;
+  /** OpenHands execution id (same as conversationId for 1:1 runs). */
+  executionId?: string | null;
+  /** OpenHands agent profile id that owns the execution. */
+  profileId?: string | null;
   /** Local schedule time for OpenHands work; no server cron is required. */
   scheduledAt?: string | null;
   /** Inherited from the native Task model — a non-empty list means the task is blocked. */
