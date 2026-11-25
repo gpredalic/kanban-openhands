@@ -142,3 +142,101 @@ test("workflow definitions persist across localStorage clear and fresh host remo
   freshCleanup();
   freshContainer.remove();
 });
+
+test("save workflow: unsaved changes indicator, save, and save-as", async () => {
+  (globalThis as Record<string, unknown>).FormData = window.FormData;
+  localStorage.clear();
+
+  const fixture = makeHost([
+    { id: "task-1", title: "Save workflow task", status: "todo", assignee: null, projectId: "default", waitingOn: null },
+  ]);
+  const cleanup = activate(fixture.host);
+  const container = fixture.trigger();
+  await waitFor(() => container.textContent?.includes("Create Task") ?? false);
+
+  // Navigate to the Workflow view.
+  clickText(container, "Workflow");
+  await waitFor(() => Boolean(container.textContent?.includes("Feature Pipeline") || container.textContent?.includes("No workflows defined")));
+
+  // Create a workflow to work with.
+  clickText(container, "Create workflow");
+  const input = await waitFor(() =>
+    Boolean(container.querySelector('input[aria-label="Workflow name"]')),
+  ).then(() => container.querySelector('input[aria-label="Workflow name"]') as HTMLInputElement);
+  assert.ok(input, "workflow name input exists");
+  changeInput(input, "Save Test Workflow");
+  clickText(container, "Create");
+  await waitFor(() => container.textContent?.includes("Save Test Workflow"));
+
+  // Initially, no unsaved changes indicator.
+  assert.ok(
+    !container.textContent?.includes("Unsaved changes"),
+    "no unsaved changes indicator before any edit",
+  );
+
+  // Add a node — this should mark the workflow as dirty.
+  clickText(container, "Agent");
+  await waitFor(() => container.textContent?.includes("Unsaved changes"));
+  assert.ok(
+    container.textContent?.includes("Unsaved changes"),
+    "unsaved changes indicator appears after adding a node",
+  );
+
+  // The Save button should be visible.
+  const saveBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Save");
+  assert.ok(saveBtn, "Save button is visible when dirty");
+
+  // Click Save — the changes should persist and the indicator should clear.
+  saveBtn!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => !container.textContent?.includes("Unsaved changes"));
+  assert.ok(
+    !container.textContent?.includes("Unsaved changes"),
+    "unsaved changes indicator clears after save",
+  );
+
+  // The workflow should have been uploaded with the new node.
+  const savedWorkflows = fixture.getWorkflows();
+  const savedWf = savedWorkflows.find((w) => w.name === "Save Test Workflow");
+  assert.ok(savedWf, "saved workflow exists in persisted state");
+  assert.ok(
+    (savedWf!.nodes as unknown[]).length >= 2,
+    "saved workflow has the start node plus the added agent node",
+  );
+
+  // Save As: add another node to make it dirty again, then Save As.
+  clickText(container, "Delay");
+  await waitFor(() => container.textContent?.includes("Unsaved changes"));
+
+  const saveAsBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Save As");
+  assert.ok(saveAsBtn, "Save As button is visible when dirty");
+  saveAsBtn!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+
+  // The Save As form should appear. Find the input, then the form's own
+  // "Save As" button (a sibling of the input, not the toolbar button).
+  const saveAsInput = await waitFor(() =>
+    Boolean(container.querySelector('input[aria-label="New workflow name"]')),
+  ).then(() => container.querySelector('input[aria-label="New workflow name"]') as HTMLInputElement);
+  assert.ok(saveAsInput, "Save As name input exists");
+  changeInput(saveAsInput, "Save As Copy");
+  const formContainer = saveAsInput.parentElement!;
+  const saveAsConfirm = [...formContainer.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Save As");
+  assert.ok(saveAsConfirm, "form Save As button exists");
+  saveAsConfirm.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+
+  // The new workflow should exist.
+  await waitFor(() => fixture.getWorkflows().some((w) => w.name === "Save As Copy"));
+  assert.ok(
+    fixture.getWorkflows().some((w) => w.name === "Save As Copy"),
+    "Save As creates a new workflow with the given name",
+  );
+
+  // The dirty indicator should be cleared after Save As.
+  await waitFor(() => !container.textContent?.includes("Unsaved changes"));
+  assert.ok(
+    !container.textContent?.includes("Unsaved changes"),
+    "unsaved changes indicator clears after Save As",
+  );
+
+  cleanup();
+  container.remove();
+});

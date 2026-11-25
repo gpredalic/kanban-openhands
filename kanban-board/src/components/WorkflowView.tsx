@@ -32,7 +32,6 @@ import {
   Flag,
   Square,
   Loader2,
-  GitCommit,
   Repeat,
   RefreshCw,
   Timer,
@@ -40,9 +39,8 @@ import {
   UserCheck,
   GitMerge,
   RotateCcw,
-  Activity,
-  ChevronUp,
-  ChevronDown,
+  Save,
+  Copy,
 } from "lucide-react";
 import type {
   AiState,
@@ -58,17 +56,13 @@ import type {
 } from "../types/ai";
 import { branchTypeForCondition } from "../types/ai";
 import type { OpenHandsState } from "../types/openhands";
-import { autoLayout, formatCost, formatTokens } from "../lib/ai-engine";
+import { autoLayout } from "../lib/ai-engine";
 import {
-  computeRouting,
-  loopEdgeIds,
   edgeGeometry,
   NODE_W,
   NODE_H,
-  type NodeStateInput,
-  type NodeExecState as EngineNodeExecState,
 } from "../lib/workflow-engine";
-import { Badge, statusBadge } from "../lib/badges";
+import { useWorkflowRouting, nodeExecState } from "../hooks/useWorkflowRouting";
 
 /* ------------------------------------------------------------------ *
  * Geometry + node metadata.
@@ -130,32 +124,6 @@ const CONDITION_OPTIONS: { value: EdgeCondition; label: string }[] = [
 /** The execution state of a node, derived from the OpenHands snapshot. */
 type NodeExecState = "idle" | "pending" | "queued" | "running" | "completed" | "failed" | "cancelled";
 
-function nodeExecState(node: WorkflowNode, openHandsState: OpenHandsState): NodeExecState {
-  if (!node.taskId) return "idle";
-  const exec = openHandsState.snapshot.executions.find((e) => e.taskId === node.taskId);
-  if (!exec) return "idle";
-  return exec.status;
-}
-
-/**
- * Map a node to the engine's NodeStateInput. The engine routes on this; the
- * OpenHands snapshot supplies the raw execution status, and the node's config
- * supplies the retry/approval context the branch types need.
- */
-function nodeStateInput(node: WorkflowNode, openHandsState: OpenHandsState): NodeStateInput {
-  const state = nodeExecState(node, openHandsState);
-  // The engine's state set has no "pending"; treat it as queued.
-  const engineState: EngineNodeExecState = state === "pending" ? "queued" : state;
-  const input: NodeStateInput = { state: engineState };
-  if (node.config?.retryPolicy) {
-    input.retriesExhausted = state === "failed" && (node.config.retryPolicy.maxAttempts ?? 0) > 0;
-  }
-  if (node.type === "approval") {
-    input.approved = state === "completed";
-  }
-  return input;
-}
-
 const EXEC_META: Record<NodeExecState, { label: string; icon: typeof Circle; spin: boolean }> = {
   idle: { label: "Idle", icon: Circle, spin: false },
   pending: { label: "Pending", icon: Clock, spin: false },
@@ -192,8 +160,6 @@ interface WorkflowViewProps {
   openHandsState: OpenHandsState;
   /** OpenHands profiles available for node assignment. */
   profiles: Agent[];
-  /** Per-execution command (start / stop / retry) — task-centric, never global. */
-  onCommand: (command: "start" | "stop" | "retry", executionId: string) => void;
   onCreate: (workflow: Workflow) => void;
   onUpdate: (workflow: Workflow) => void;
   onDelete: (workflowId: string) => void;
@@ -208,7 +174,6 @@ export function WorkflowView({
   tasks,
   openHandsState,
   profiles,
-  onCommand,
   onCreate,
   onUpdate,
   onDelete,
@@ -225,25 +190,18 @@ export function WorkflowView({
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
 
+  // Save state: the builder edits a local copy of the graph. Changes are
+  // "dirty" until the user explicitly saves (or saves-as). This decouples
+  // editing from persistence so the user always knows the save state.
+  const [dirty, setDirty] = useState(false);
+  const [showSaveAs, setShowSaveAs] = useState(false);
+  const [saveAsName, setSaveAsName] = useState("");
+
   // Drag state.
   const [drag, setDrag] = useState<DragState | null>(null);
   const [pendingEdge, setPendingEdge] = useState<PendingEdge | null>(null);
 
   const svgRef = useRef<SVGSVGElement | null>(null);
-
-  /* ------------------------- read-only status panel ------------------------- */
-
-  // The orchestration panel is now read-only: it surfaces the OpenHands
-  // snapshot (metrics, live executions, knowledge graph). Execution is driven
-  // by the engine from nodes + connections, not by a relay chain.
-  const [orchOpen, setOrchOpen] = useState(false);
-  const { executions, links } = openHandsState.snapshot;
-  const active = executions.filter((run) => run.status === "running").length;
-  const queued = executions.filter((run) => run.status === "queued").length;
-  const failed = executions.filter((run) => run.status === "failed").length;
-  const completed = executions.filter((run) => run.status === "completed").length;
-  const taskNames = new Map(tasks.map((task) => [task.id, task.title]));
-  const agentNames = new Map(profiles.map((agent) => [agent.id, agent.name]));
 
   // Sync local state when the selected workflow changes.
   useEffect(() => {
@@ -256,6 +214,11 @@ export function WorkflowView({
       setNodes([]);
       setEdges([]);
     }
+    // Switching workflows discards any unsaved edits to the previous one and
+    // resets the save state.
+    setDirty(false);
+    setShowSaveAs(false);
+    setSaveAsName("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
@@ -265,60 +228,44 @@ export function WorkflowView({
   /* ------------------------- routing (engine-driven) ------------------------- */
 
   // The engine computes which edges are active from the node states. This is
-  // the single source of truth for "what is executing / what is next" — the
-  // old orchestration panel is gone; routing is derived purely from nodes,
-  // connections, and the OpenHands snapshot.
-  const nodeStates = useMemo(() => {
-    const map: Record<string, NodeStateInput> = {};
-    for (const node of nodes) map[node.id] = nodeStateInput(node, openHandsState);
-    return map;
-  }, [nodes, openHandsState]);
+  // the single source of truth for "what is executing / what is next" — routing
+  // is derived purely from nodes, connections, and the OpenHands snapshot. The
+  // same hook the Monitoring view uses, so the canvas highlight and the
+  // monitoring readout can never disagree.
+  const { activeEdges, activeNodes, loopEdgeSet, loopCounts } =
+    useWorkflowRouting(nodes, edges, openHandsState);
 
-  // Loops present in the graph (for the loop-limit badge + dashed rendering).
-  const loopEdgeSet = useMemo(() => new Set(loopEdgeIds(nodes, edges)), [nodes, edges]);
+  /** Mark the graph as edited. The local copy is the source of truth while
+   *  editing; nothing is written back until the user saves. */
+  const persist = (_nextNodes: WorkflowNode[], _nextEdges: WorkflowEdge[]) => {
+    setDirty(true);
+  };
 
-  // How many times each loop edge has fired, derived from the real OpenHands
-  // execution history: a loop edge fires when its source node completes, so the
-  // count is the number of completed executions of that node's task. The engine
-  // reads this to enforce loop limits (a loop edge that has fired loopLimit
-  // times stops firing). This is the loop-limit proof — driven by real events,
-  // not a local counter.
-  const loopCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const edge of edges) {
-      if (edge.condition !== "IF_LOOP") continue;
-      const from = nodeById.get(edge.from);
-      if (!from?.taskId) continue;
-      counts[edge.id] = executions.filter((run) => run.taskId === from.taskId && run.status === "completed").length;
-    }
-    return counts;
-  }, [edges, nodeById, executions]);
+  /** Write the current graph back to the selected workflow and clear the
+   *  dirty flag. */
+  const save = () => {
+    if (!workflow || !dirty) return;
+    onUpdate({ ...workflow, nodes, edges });
+    setDirty(false);
+  };
 
-  const routing = useMemo(
-    () => computeRouting({ nodes, edges, states: nodeStates, loopCounts }),
-    [nodes, edges, nodeStates, loopCounts],
-  );
-
-  // Display values derived from the engine's routing. The engine is the source
-  // of truth; these are just the shapes the render code expects.
-  const currentNode = routing.currentNode;
-  const nextNode = routing.nextNode;
-  const path = routing.path;
-
-  // Edges that would fire from the current node (multi-way fan-out included).
-  const activeEdges = useMemo(() => new Set(routing.firingEdges.map((e) => e.id)), [routing]);
-  // Nodes the engine considers live: the current node and the next node.
-  const activeNodes = useMemo(() => {
-    const ids = new Set<string>();
-    if (routing.currentNode) ids.add(routing.currentNode.id);
-    if (routing.nextNode) ids.add(routing.nextNode.id);
-    return ids;
-  }, [routing]);
-
-  /** Persist the current graph back to the workflow. */
-  const persist = (nextNodes: WorkflowNode[], nextEdges: WorkflowEdge[]) => {
-    if (!workflow) return;
-    onUpdate({ ...workflow, nodes: nextNodes, edges: nextEdges });
+  /** Save the current graph as a new workflow with a different name. */
+  const saveAs = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed || !workflow) return;
+    const id = `wf-${Date.now()}`;
+    onCreate({
+      id,
+      name: trimmed,
+      description: workflow.description,
+      nodes: nodes.map((n) => ({ ...n })),
+      edges: edges.map((e) => ({ ...e })),
+      status: "draft",
+    });
+    setSelectedId(id);
+    setShowSaveAs(false);
+    setSaveAsName("");
+    setDirty(false);
   };
 
   /* ------------------------- node handlers ------------------------- */
@@ -574,6 +521,12 @@ export function WorkflowView({
           )}
         </div>
         <div className="flex items-center gap-2">
+          {dirty && (
+            <span className="flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-[10px] font-semibold text-amber-300 ring-1 ring-amber-400/30">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              Unsaved changes
+            </span>
+          )}
           <button
             type="button"
             onClick={autoArrange}
@@ -582,6 +535,26 @@ export function WorkflowView({
             <Wand2 className="h-3.5 w-3.5" strokeWidth={2} />
             Auto-arrange
           </button>
+          {dirty && (
+            <>
+              <button
+                type="button"
+                onClick={save}
+                className="kb-gradient kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-white"
+              >
+                <Save className="h-3.5 w-3.5" strokeWidth={2} />
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSaveAs(true)}
+                className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+              >
+                <Copy className="h-3.5 w-3.5" strokeWidth={2} />
+                Save As
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() => setShowCreate(true)}
@@ -602,61 +575,6 @@ export function WorkflowView({
           )}
         </div>
       </div>
-
-      {/* Routing display — current node, next node, execution path */}
-      {workflow && nodes.length > 0 && (
-        <div className="kb-glass rounded-2xl p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <GitCommit className="h-4 w-4 text-indigo-400" strokeWidth={2} />
-            <h3 className="text-sm font-semibold text-white">Execution Routing</h3>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Current Node</p>
-              {currentNode ? (
-                <div className="mt-1 flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
-                  <span className="text-sm font-medium text-white">{currentNode.label}</span>
-                  {(() => {
-                    const s = nodeExecState(currentNode, openHandsState);
-                    return statusBadge(s) ? <Badge style={statusBadge(s)!} pulse={s === "running"} /> : null;
-                  })()}
-                </div>
-              ) : (
-                <p className="mt-1 text-sm text-slate-500">No active node</p>
-              )}
-            </div>
-            <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Next Node</p>
-              {nextNode ? (
-                <div className="mt-1 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-amber-400" />
-                  <span className="text-sm font-medium text-white">{nextNode.label}</span>
-                </div>
-              ) : (
-                <p className="mt-1 text-sm text-slate-500">No next node</p>
-              )}
-            </div>
-            <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Execution Path</p>
-              {path.length > 0 ? (
-                <div className="mt-1 flex flex-wrap items-center gap-1">
-                  {path.map((n, i) => (
-                    <span key={n.id} className="flex items-center gap-1">
-                      <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${i === path.length - 1 ? "bg-blue-500/20 text-blue-300" : "bg-white/5 text-slate-400"}`}>
-                        {n.label}
-                      </span>
-                      {i < path.length - 1 && <span className="text-slate-600">→</span>}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-1 text-sm text-slate-500">No path yet</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Create workflow form */}
       {showCreate && (
@@ -686,87 +604,33 @@ export function WorkflowView({
         </div>
       )}
 
-      {/* Orchestration panel — collapsible, hosts the former Command Center */}
-      <div className="kb-glass rounded-2xl">
-        <button
-          type="button"
-          onClick={() => setOrchOpen((open) => !open)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left"
-          aria-expanded={orchOpen}
-        >
-          <span className="flex items-center gap-2 text-sm font-semibold text-white">
-            <Activity className="h-4 w-4 text-indigo-400" strokeWidth={2} />
-            Orchestration
-            <span className="text-[11px] font-normal text-slate-500">
-              {openHandsState.lastSyncedAt === null ? "Not synced yet" : `Last synced ${Math.max(0, Math.floor((Date.now() - openHandsState.lastSyncedAt) / 1000))}s ago`}
-            </span>
-          </span>
-          {orchOpen ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
-        </button>
-        {orchOpen && (
-          <div className="flex flex-col gap-4 border-t border-white/5 p-4">
-            {openHandsState.error && <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{openHandsState.error}</div>}
-
-            {/* Metrics */}
-            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <OrchMetric label="Active jobs" value={active} accent="text-blue-400" />
-              <OrchMetric label="Queued jobs" value={queued} accent="text-amber-400" />
-              <OrchMetric label="Failed jobs" value={failed} accent="text-rose-400" />
-              <OrchMetric label="Completed jobs" value={completed} accent="text-emerald-400" />
-            </div>
-
-            {/* Live executions */}
-            <section>
-              <OrchSectionTitle icon={Activity} label="Live executions" />
-              <div className="flex flex-col gap-2">
-                {openHandsState.loading && executions.length === 0 ? (
-                  <>
-                    <SkeletonRow />
-                    <SkeletonRow />
-                  </>
-                ) : executions.length === 0 ? (
-                  <OrchEmpty label="No executions reported yet." />
-                ) : (
-                  executions.map((run) => (
-                  <div key={run.id} className="kb-glass flex items-center gap-3 rounded-2xl px-4 py-3">
-                    {statusBadge(run.status) && (
-                      <Badge style={statusBadge(run.status)!} pulse={run.status === "running" || run.status === "queued"} />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">{run.title}</p>
-                      <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? run.taskId : "OpenHands execution"} · {agentNames.get(run.agentId ?? "") ?? run.agentId ?? "unassigned"}</p>
-                    </div>
-                    <span className="text-right text-[11px] text-slate-400">
-                      {run.tokensInReported === false && run.tokensOutReported === false
-                        ? "Tokens unavailable"
-                        : `${formatTokens(run.tokensIn + run.tokensOut)} tokens reported`}<br />
-                      {run.costReported === false ? "Cost unavailable" : `${formatCost(run.cost)} reported`}
-                    </span>
-                    <div className="flex gap-1">
-                      {run.status === "running" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Stop execution" onClick={() => onCommand("stop", run.id)}><Square className="h-3.5 w-3.5" /></button>}
-                      {run.status === "failed" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Retry execution" onClick={() => onCommand("retry", run.id)}><RotateCcw className="h-3.5 w-3.5" /></button>}
-                      {run.status === "queued" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Start execution" onClick={() => onCommand("start", run.id)}><Play className="h-3.5 w-3.5" /></button>}
-                    </div>
-                  </div>
-                  ))
-                )}
-              </div>
-            </section>
-
-            {/* Knowledge graph */}
-            <section>
-              <OrchSectionTitle icon={GitCommit} label="Knowledge graph" />
-              <div className="kb-glass rounded-2xl p-4">
-                <p className="mb-3 text-xs text-slate-500">Relationships discovered across tasks, agents, models, repositories, conversations, and executions.</p>
-                <div className="flex flex-wrap gap-2">
-                  {links.length === 0 && <OrchEmpty label="Relationships will appear as OpenHands work is reported." />}
-                  {links.slice(0, 40).map((link) => <span key={`${link.from.id}-${link.to.id}-${link.relation}`} className="rounded-lg bg-slate-800/70 px-3 py-2 text-[11px] text-slate-300">{link.from.label} <span className="text-indigo-400">→ {link.relation} →</span> {link.to.label}</span>)}
-                </div>
-              </div>
-            </section>
-          </div>
-        )}
-      </div>
+      {/* Save As form */}
+      {showSaveAs && (
+        <div className="kb-glass flex items-center gap-3 rounded-2xl p-3">
+          <input
+            type="text"
+            aria-label="New workflow name"
+            value={saveAsName}
+            onChange={(e) => setSaveAsName(e.target.value)}
+            placeholder="New workflow name"
+            className="flex-1 rounded-xl border-0 bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          />
+          <button
+            type="button"
+            onClick={() => saveAs(saveAsName)}
+            className="kb-gradient rounded-xl px-4 py-2 text-sm font-semibold text-white"
+          >
+            Save As
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowSaveAs(false)}
+            className="kb-glass-sm rounded-xl px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
       {/* Main area: palette + canvas + inspector */}
       <div className="flex min-h-0 flex-1 gap-4">
@@ -1106,42 +970,6 @@ export function WorkflowView({
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- * Orchestration panel sub-components (former Command Center).
- * ------------------------------------------------------------------ */
-
-function OrchMetric({ label, value, accent }: { label: string; value: number; accent: string }) {
-  return (
-    <div className="kb-glass rounded-2xl p-3">
-      <p className={`text-2xl font-bold ${accent}`}>{value}</p>
-      <p className="mt-1 text-[11px] text-slate-500">{label}</p>
-    </div>
-  );
-}
-
-function OrchSectionTitle({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
-  return (
-    <div className="mb-2 flex items-center gap-2">
-      <Icon className="h-4 w-4 text-indigo-400" strokeWidth={2} />
-      <h3 className="text-sm font-semibold text-white">{label}</h3>
-    </div>
-  );
-}
-
-function OrchEmpty({ label }: { label: string }) {
-  return <p className="rounded-xl bg-white/5 px-4 py-6 text-center text-xs text-slate-500">{label}</p>;
-}
-
-function SkeletonRow() {
-  return (
-    <div className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2.5">
-      <div className="h-3 w-3 animate-pulse rounded-full bg-slate-600/60" />
-      <div className="h-3 flex-1 animate-pulse rounded bg-slate-600/40" />
-      <div className="h-3 w-10 animate-pulse rounded bg-slate-600/40" />
     </div>
   );
 }
