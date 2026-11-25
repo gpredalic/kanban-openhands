@@ -470,23 +470,42 @@ export function WorkflowView({
   // forward (left→right) and backward (right→left, i.e. loop) routing with
   // curved bezier paths and correct arrowhead direction. Multi-way nodes fan
   // their outgoing edges out from distinct output ports.
-  const edgePath = (from: WorkflowNode, to: WorkflowNode, portIndex = 0, portCount = 1) => {
-    const geo = edgeGeometry(from, to, portIndex, portCount);
-    return geo.d;
-  };
+  //
+  // Performance: the port index and the bezier path for every edge are
+  // computed ONCE per render into memoized maps, instead of being recomputed
+  // inside the render loop for each edge. The old portIndexForEdge filtered +
+  // sorted the full edge list for every edge (O(E² log E)); this groups
+  // outgoing edges by source node and assigns port indices in a single pass
+  // (O(E log E)), and the path map avoids re-running edgeGeometry for edges
+  // whose endpoints have not moved.
+  const edgePorts = useMemo(() => {
+    const bySource = new Map<string, WorkflowEdge[]>();
+    for (const edge of edges) {
+      const list = bySource.get(edge.from);
+      if (list) list.push(edge);
+      else bySource.set(edge.from, [edge]);
+    }
+    const ports = new Map<string, { index: number; count: number }>();
+    for (const [sourceId, outgoing] of bySource) {
+      const from = nodeById.get(sourceId);
+      const count = Math.max(1, from?.outputPorts ?? 1);
+      outgoing.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0) || a.id.localeCompare(b.id));
+      outgoing.forEach((edge, index) => ports.set(edge.id, { index: Math.min(index, count - 1), count }));
+    }
+    return ports;
+  }, [edges, nodeById]);
 
-  // For a multi-way node, the port index an edge leaves from is its position
-  // among the node's outgoing edges (ordered by priority, then id).
-  const portIndexForEdge = (edge: WorkflowEdge): { index: number; count: number } => {
-    const from = nodeById.get(edge.from);
-    const count = Math.max(1, from?.outputPorts ?? 1);
-    if (count <= 1) return { index: 0, count: 1 };
-    const outgoing = edges
-      .filter((e) => e.from === edge.from)
-      .sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0) || a.id.localeCompare(b.id));
-    const idx = outgoing.findIndex((e) => e.id === edge.id);
-    return { index: Math.max(0, idx), count };
-  };
+  const edgePaths = useMemo(() => {
+    const paths = new Map<string, string>();
+    for (const edge of edges) {
+      const from = nodeById.get(edge.from);
+      const to = nodeById.get(edge.to);
+      if (!from || !to) continue;
+      const { index, count } = edgePorts.get(edge.id) ?? { index: 0, count: 1 };
+      paths.set(edge.id, edgeGeometry(from, to, index, count).d);
+    }
+    return paths;
+  }, [edges, nodeById, edgePorts]);
 
   const selectedNode = selectedNodeId ? nodeById.get(selectedNodeId) ?? null : null;
   const selectedEdge = selectedEdgeId ? edges.find((e) => e.id === selectedEdgeId) ?? null : null;
@@ -726,11 +745,12 @@ export function WorkflowView({
               const isSelected = edge.id === selectedEdgeId;
               const isLoop = loopEdgeSet.has(edge.id);
               const stroke = isEngineActive ? "#34d399" : isSelected ? "#a5b4fc" : isLoop ? "#d946ef" : "#818cf8";
-              const { index: portIndex, count: portCount } = portIndexForEdge(edge);
+              const pathD = edgePaths.get(edge.id);
+              if (!pathD) return null;
               return (
                 <g key={edge.id}>
                   <path
-                    d={edgePath(from, to, portIndex, portCount)}
+                    d={pathD}
                     fill="none"
                     stroke={stroke}
                     strokeWidth={isEngineActive || isSelected ? 2.5 : 1.75}

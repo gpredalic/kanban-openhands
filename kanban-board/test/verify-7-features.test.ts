@@ -241,14 +241,15 @@ test("F4: task execution details visible in the detail modal", async () => {
   runningCard!.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
   runningCard!.dispatchEvent(new window.Event("pointerup", { bubbles: true }));
 
-  const modalShown = await waitFor(() => container.innerHTML.includes("OpenHands Execution"));
-  assert.ok(modalShown, "detail modal must show the OpenHands Execution section");
+  const modalShown = await waitFor(() => container.innerHTML.includes("Task Goal"));
+  assert.ok(modalShown, "detail modal must show the Task Goal section");
 
   const html = container.innerHTML;
-  assert.match(html, /Current Step/, "must show Current Step");
-  assert.match(html, /Latest Agent Message/, "must show Latest Agent Message");
+  assert.match(html, /What the Agent Is Doing/, "must show What the Agent Is Doing");
+  assert.match(html, /Agent Summary/, "must show Agent Summary");
   assert.match(html, /Progress/, "must show Progress");
-  assert.match(html, /Conversation:/, "must show conversation id");
+  assert.match(html, /Original Prompt/, "must show Original Prompt");
+  assert.match(html, /Advanced Details/, "must show the Advanced Details collapsed section");
 
   cleanup();
   container.remove();

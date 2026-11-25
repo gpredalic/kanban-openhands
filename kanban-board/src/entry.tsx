@@ -18,6 +18,26 @@ import type { Host } from "./types/task";
 import "./styles/globals.css";
 
 /**
+ * Inject the Nunito web font into the host document head.
+ *
+ * The extension is a single self-contained bundle (no external CSS assets),
+ * so the font is loaded at activation time from the Google Fonts CDN. The
+ * link is idempotent — a second activation reuses the existing link. Nunito
+ * is the global UI font (see globals.css font-family); the system stack is
+ * the fallback if the CDN is unreachable.
+ */
+function ensureNunitoFont(): void {
+  if (typeof document === "undefined") return;
+  if (document.getElementById("kanban-nunito-font")) return;
+  const link = document.createElement("link");
+  link.id = "kanban-nunito-font";
+  link.rel = "stylesheet";
+  link.href =
+    "https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap";
+  document.head.appendChild(link);
+}
+
+/**
  * Activate the Kanban Board extension.
  *
  * Called by Agent Canvas with the host API object. Returns a cleanup function
@@ -25,6 +45,8 @@ import "./styles/globals.css";
  */
 export function activate(host: Host): () => void {
   let root: Root | null = null;
+
+  ensureNunitoFont();
 
   const unregisterPage = host.registerPage("board", (ctx) => {
     // Mount under a dedicated root id so every scoped rule (Tailwind utilities

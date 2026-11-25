@@ -90,10 +90,24 @@ function captureCardRects(container: HTMLElement): Map<string, CardRect> {
  * FLIP column-move animation. Call once in the board component.
  *
  * @param boardRef — ref to the element that wraps all four columns.
+ * @param columns — the current columns array. Its reference is the cheap
+ *   signal that the board data actually changed. The expensive rect capture
+ *   (getBoundingClientRect on every card) only runs when this reference
+ *   changes, so a filter change, modal open, or drag-state update — none of
+ *   which move cards between columns — does not pay for a full board
+ *   re-measure. This is what keeps large boards from thrashing layout on
+ *   every render.
  */
-export function useFlipAnimation(boardRef: React.RefObject<HTMLElement | null>): void {
+export function useFlipAnimation(
+  boardRef: React.RefObject<HTMLElement | null>,
+  columns: readonly unknown[],
+): void {
   // The card rects captured on the previous render (First).
   const prevRects = useRef<Map<string, CardRect>>(new Map());
+  // The columns reference we last measured against. A change means the board
+  // data moved and we must re-measure; the same reference means nothing moved
+  // and the capture can be skipped.
+  const lastColumnsRef = useRef<readonly unknown[] | null>(null);
 
   useLayoutEffect(() => {
     const container = boardRef.current;
@@ -106,8 +120,16 @@ export function useFlipAnimation(boardRef: React.RefObject<HTMLElement | null>):
       // "moved" — triggering a spurious FLIP that reads as a flicker/jump.
       // Clearing here makes a re-entry a clean fade-in only.
       prevRects.current = new Map();
+      lastColumnsRef.current = null;
       return;
     }
+
+    // Skip the expensive capture when the board data has not changed. The
+    // container-null check above still runs every render (it is a cheap null
+    // test), so a view switch away always clears the rects; this guard only
+    // avoids re-measuring a board that has not moved.
+    if (lastColumnsRef.current === columns) return;
+    lastColumnsRef.current = columns;
 
     const nextRects = captureCardRects(container);
 

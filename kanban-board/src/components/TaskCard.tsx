@@ -21,6 +21,8 @@ interface TaskCardProps {
   task: Task;
   agents?: Agent[];
   isDragging: boolean;
+  /** True when this card is the DragOverlay clone (rendered outside the column). */
+  isOverlay?: boolean;
   /** True while the task is being deleted — shows a visible "Deleting…" overlay. */
   deleting?: boolean;
   /** The current delete phase, driving the phase-specific overlay text. */
@@ -72,23 +74,32 @@ function formatDue(iso: string): string {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function TaskCardInner({ task, agents = [], isDragging, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
+function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
   // Disable dragging while a delete is in flight or has failed — the card is
   // locked to its column during the transaction.
   const locked = deleting || Boolean(deleteError);
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id,
-    disabled: locked,
+    // The DragOverlay clone is a pure visual — it must not register itself as
+    // a second draggable with the same id (that would double-handle pointer
+    // events and fight the original card's drag).
+    disabled: locked || isOverlay,
   });
   // Capture dnd-kit's pointer-down handler so we can chain our own position
   // recording onto it without overwriting it (the spread would otherwise
   // replace it and break dragging).
   const dndOnPointerDown = listeners?.onPointerDown;
 
-  const style = {
-    transform: CSS.Translate.toString(transform),
-    zIndex: isDragging ? 50 : undefined,
-  };
+  // DragOverlay pattern: the original card stays in the column as an invisible
+  // placeholder (preserving layout), while a floating clone rendered by the
+  // board's <DragOverlay> follows the pointer. The clone is never clipped by
+  // the column's overflow container and always sits above all UI.
+  const style = isOverlay
+    ? { zIndex: 9999 }
+    : {
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? 0 : undefined,
+      };
 
   const priority = task.priority ?? "medium";
   const pStyle = priorityBadge(priority);
@@ -190,7 +201,7 @@ function TaskCardInner({ task, agents = [], isDragging, deleting = false, delete
         onEdit?.(task);
       }}
       className={`kb-glass kb-card kb-fade-in group cursor-grab rounded-2xl p-4 active:cursor-grabbing ${
-        isDragging ? "kb-dragging" : ""
+        isOverlay ? "kb-dragging kb-drag-overlay" : isDragging ? "kb-drag-placeholder" : ""
       } ${deleting ? "opacity-60" : ""} ${deleteError ? "kb-delete-failed" : ""} ${deletePhase === "fading" ? "kb-delete-fading" : ""} ${running ? "kb-running" : ""} ${animClass}`}
     >
       {deleteError ? (

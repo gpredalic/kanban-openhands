@@ -158,6 +158,28 @@ test("activate(host) registers the board page and renders the React tree", async
   container.remove();
 });
 
+test("Nunito font is applied globally", async () => {
+  const { host, trigger } = makeHost();
+  const cleanup = activate(host);
+  const container = trigger();
+  const loaded = await waitFor(() => container.innerHTML.length > 0);
+  assert.ok(loaded, "container rendered");
+
+  // The font link must be injected into the document head at activation time.
+  const fontLink = document.head.querySelector("#kanban-nunito-font");
+  assert.ok(fontLink, "Nunito font <link> must be injected into the head");
+  assert.match(String(fontLink?.getAttribute("href")), /fonts\.googleapis\.com\/css2\?family=Nunito/, "link must point at the Nunito Google Fonts stylesheet");
+
+  // The global font-family must prefer Nunito. The CSS is minified in the
+  // bundle, so the font names are unquoted: font-family:Nunito,Inter,...
+  const styleTag = document.head.querySelector("style");
+  assert.ok(styleTag, "inlined <style> tag must exist");
+  assert.match(String(styleTag?.textContent), /font-family:\s*Nunito/, "global font-family must prefer Nunito");
+
+  cleanup();
+  container.remove();
+});
+
 test("cleanup unmounts the React root and clears the container", async () => {
   const { host, trigger } = makeHost();
   const cleanup = activate(host);

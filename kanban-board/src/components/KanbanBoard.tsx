@@ -5,19 +5,15 @@
  * columns inside a DndContext. Applies the active filter.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { DndContext } from "@dnd-kit/core";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { Header } from "./Header";
 import { StatsCards } from "./StatsCards";
 import { FilterBar } from "./FilterBar";
 import { KanbanColumn } from "./KanbanColumn";
+import { TaskCard } from "./TaskCard";
 import { ViewSwitcher } from "./ViewSwitcher";
 import type { ViewId } from "./ViewSwitcher";
-import { WorkflowView } from "./WorkflowView";
-import { MonitoringView } from "./MonitoringView";
-import { AgentRoster } from "./AgentRoster";
-import { ExecutionHistory } from "./ExecutionHistory";
-import { AnalyticsView } from "./AnalyticsView";
 import { TaskDetailModal } from "./TaskDetailModal";
 import { CreateTaskModal } from "./CreateTaskModal";
 import { SkeletonColumn, SkeletonStat } from "./Skeleton";
@@ -31,6 +27,37 @@ import type { Host, Task, BoardFilter, TaskPriority } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import { commandExecution, fetchAgentProfiles, useOpenHandsState } from "../lib/openhands";
 import { resolveRouting } from "../lib/ai-engine";
+
+/**
+ * Progressive loading — the heavy secondary views are lazy-loaded so their
+ * mount-time work (state init, effects, agent/profile fetches, workflow graph
+ * layout) is deferred until the user actually opens the view. The board view
+ * itself stays eager: it is the default and must render immediately.
+ *
+ * The build inlines everything into a single extension.js (inlineDynamicImports),
+ * so the lazy() import resolves synchronously — but React still defers the
+ * component's *mount* (its effects and initial state) until it is first
+ * rendered inside the Suspense boundary. That is the real win: opening the
+ * board no longer pays for the Workflow / Analytics / History / Agents /
+ * Monitoring views' setup cost.
+ */
+const WorkflowView = lazy(() => import("./WorkflowView").then((m) => ({ default: m.WorkflowView })));
+const MonitoringView = lazy(() => import("./MonitoringView").then((m) => ({ default: m.MonitoringView })));
+const AgentRoster = lazy(() => import("./AgentRoster").then((m) => ({ default: m.AgentRoster })));
+const ExecutionHistory = lazy(() => import("./ExecutionHistory").then((m) => ({ default: m.ExecutionHistory })));
+const AnalyticsView = lazy(() => import("./AnalyticsView").then((m) => ({ default: m.AnalyticsView })));
+
+/** Shown while a lazy view is resolving — a quiet, non-blocking placeholder. */
+function ViewFallback() {
+  return (
+    <div className="flex h-64 items-center justify-center">
+      <div className="flex items-center gap-2 text-sm text-slate-500">
+        <span className="h-3 w-3 animate-spin rounded-full border-2 border-slate-600 border-t-transparent" />
+        Loading view…
+      </div>
+    </div>
+  );
+}
 
 interface KanbanBoardProps {
   host: Host;
@@ -76,7 +103,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
   // FLIP animation: captures card positions before each render and animates
   // any card that moved between columns (status change) with a lift + glide.
   const boardRef = useRef<HTMLDivElement>(null);
-  useFlipAnimation(boardRef);
+  useFlipAnimation(boardRef, state.columns);
 
   useEffect(() => {
     let cancelled = false;
@@ -320,45 +347,71 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                     />
                   ))}
                 </div>
+                {/* DragOverlay: renders the dragged card as a floating clone that
+                    follows the pointer. It is portaled outside the column's
+                    overflow container, so the card is never clipped and always
+                    stays above all UI (z-index 9999). The original card in the
+                    column becomes an invisible placeholder (opacity 0), so
+                    there is no ghost duplicate. */}
+                <DragOverlay dropAnimation={null}>
+                  {activeTaskId ? (
+                    (() => {
+                      const activeTask = enrichedTasks.find((t) => t.id === activeTaskId);
+                      if (!activeTask) return null;
+                      return (
+                        <TaskCard
+                          task={activeTask}
+                          agents={assignmentAgents}
+                          isDragging
+                          isOverlay
+                        />
+                      );
+                    })()
+                  ) : null}
+                </DragOverlay>
               </DndContext>
             </>
           )}
         </>
-      ) : view === "workflow" ? (
-        <WorkflowView
-          aiState={aiState}
-          tasks={enrichedTasks}
-          openHandsState={openHandsState}
-          profiles={assignmentAgents}
-          onCreate={(workflow) => aiStore.setConfig({
-            ...aiState.config,
-            workflows: [...aiState.config.workflows, workflow],
-          })}
-          onUpdate={(workflow) => aiStore.setConfig({
-            ...aiState.config,
-            workflows: aiState.config.workflows.map((item) => item.id === workflow.id ? workflow : item),
-          })}
-          onDelete={(workflowId) => aiStore.setConfig({
-            ...aiState.config,
-            workflows: aiState.config.workflows.filter((item) => item.id !== workflowId),
-          })}
-        />
-      ) : view === "monitoring" ? (
-        <MonitoringView
-          workflows={aiState.config.workflows}
-          selectedId={monitoringWorkflowId ?? aiState.config.workflows[0]?.id ?? null}
-          onSelectId={setMonitoringWorkflowId}
-          openHandsState={openHandsState}
-          tasks={enrichedTasks}
-          profiles={assignmentAgents}
-          onCommand={handleOpenHandsCommand}
-        />
-      ) : view === "agents" ? (
-        <AgentRoster host={host} openHandsState={openHandsState} />
-      ) : view === "history" ? (
-        <ExecutionHistory openHandsState={openHandsState} aiState={aiState} onReset={resetOpenHands} />
       ) : (
-        <AnalyticsView aiState={aiState} openHandsState={openHandsState} onReset={resetOpenHands} />
+        <Suspense fallback={<ViewFallback />}>
+          {view === "workflow" ? (
+            <WorkflowView
+              aiState={aiState}
+              tasks={enrichedTasks}
+              openHandsState={openHandsState}
+              profiles={assignmentAgents}
+              onCreate={(workflow) => aiStore.setConfig({
+                ...aiState.config,
+                workflows: [...aiState.config.workflows, workflow],
+              })}
+              onUpdate={(workflow) => aiStore.setConfig({
+                ...aiState.config,
+                workflows: aiState.config.workflows.map((item) => item.id === workflow.id ? workflow : item),
+              })}
+              onDelete={(workflowId) => aiStore.setConfig({
+                ...aiState.config,
+                workflows: aiState.config.workflows.filter((item) => item.id !== workflowId),
+              })}
+            />
+          ) : view === "monitoring" ? (
+            <MonitoringView
+              workflows={aiState.config.workflows}
+              selectedId={monitoringWorkflowId ?? aiState.config.workflows[0]?.id ?? null}
+              onSelectId={setMonitoringWorkflowId}
+              openHandsState={openHandsState}
+              tasks={enrichedTasks}
+              profiles={assignmentAgents}
+              onCommand={handleOpenHandsCommand}
+            />
+          ) : view === "agents" ? (
+            <AgentRoster host={host} openHandsState={openHandsState} />
+          ) : view === "history" ? (
+            <ExecutionHistory openHandsState={openHandsState} aiState={aiState} onReset={resetOpenHands} />
+          ) : (
+            <AnalyticsView aiState={aiState} openHandsState={openHandsState} onReset={resetOpenHands} />
+          )}
+        </Suspense>
       )}
 
       {editingTask && (

@@ -4,8 +4,8 @@
  * Also displays execution metadata (conversation ID, execution ID, profile).
  */
 
-import { useState, useEffect } from "react";
-import { X, Trash2, Save, Tag, Calendar, User, Terminal, History, Activity, AlertTriangle, Clock, MessageSquare, Gauge, Play, Square, RotateCcw } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { X, Trash2, Save, Tag, Calendar, User, Terminal, History, MessageSquare, Gauge, Play, Square, RotateCcw, ChevronDown, ChevronUp, Target, ListChecks, Bot, FileText, AlertCircle, ScrollText } from "lucide-react";
 import type { Task, TaskStatus, TaskPriority } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import type { OpenHandsState, OpenHandsExecution } from "../types/openhands";
@@ -100,6 +100,29 @@ export function TaskDetailModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   // Confirmation state for Stop / Run-Again actions.
   const [confirmAction, setConfirmAction] = useState<"stop" | "retry" | null>(null);
+  // Advanced Details is collapsed by default — the modal is user-friendly
+  // first, technical content second.
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Derive the execution + events for this task once, so the main sections
+  // (Progress, What the Agent Is Doing, Agent Summary, Final Result, Issues)
+  // and the Advanced Details section all read from the same stable values.
+  const exec = useMemo(() => {
+    const execution = openHandsState?.snapshot.executions.find(
+      (run) => run.taskId === task.id || run.id === task.conversationId || run.id === task.executionId,
+    );
+    const events = (openHandsState?.snapshot.events ?? [])
+      .filter((e) => e.taskId === task.id || e.executionId === task.conversationId || e.executionId === task.executionId)
+      .sort((a, b) => b.at - a.at);
+    const latest = events[0];
+    const currentStep = latest?.title ?? "—";
+    const latestMessage = latest?.detail ?? latest?.title ?? "—";
+    const error = execution?.error ?? events.find((e) => e.type === "error")?.detail;
+    const progress = executionProgress(execution);
+    const isRunning = execution?.status === "running";
+    const statusStyle = statusBadge(execution?.status);
+    return { execution, events, latest, currentStep, latestMessage, error, progress, isRunning, statusStyle };
+  }, [openHandsState, task.id, task.conversationId, task.executionId]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -186,119 +209,109 @@ export function TaskDetailModal({
             </div>
           )}
 
-          {/* OpenHands execution visibility — live state from the task's conversation */}
-          {(() => {
-            const execution = openHandsState?.snapshot.executions.find(
-              (run) => run.taskId === task.id || run.id === task.conversationId || run.id === task.executionId,
-            );
-            const events = (openHandsState?.snapshot.events ?? [])
-              .filter((e) => e.taskId === task.id || e.executionId === task.conversationId || e.executionId === task.executionId)
-              .sort((a, b) => b.at - a.at);
-            const latest = events[0];
-            const currentStep = latest?.title ?? "—";
-            const latestMessage = latest?.detail ?? latest?.title ?? "—";
-            const error = execution?.error ?? events.find((e) => e.type === "error")?.detail;
-            const progress = executionProgress(execution);
-            const isRunning = execution?.status === "running";
-            const statusStyle = statusBadge(execution?.status);
-            return (
+          {/* ─── User-Friendly Execution Sections ─── */}
+          {exec.execution && (
+            <div className="flex flex-col gap-3">
+              {/* Task Goal */}
               <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-                  <Activity className="h-3.5 w-3.5" /> OpenHands Execution
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                  <Target className="h-3.5 w-3.5" /> Task Goal
                 </h4>
-                {execution ? (
-                  <div className="flex flex-col gap-2.5">
-                    {/* Execution status + conversation status */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      {statusStyle && <Badge style={statusStyle} pulse={isRunning} />}
-                      <span className="text-[11px] text-slate-500">
-                        Conversation: <span className="font-mono text-slate-400">{execution.id.slice(0, 8)}…</span>
-                      </span>
-                    </div>
-
-                    {/* Current step */}
-                    <div className="flex items-start gap-2">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-400/20">
-                        <Terminal className="h-3 w-3" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[10px] font-medium uppercase tracking-wide text-slate-600">Current Step</div>
-                        <div className="truncate text-xs text-slate-300" title={currentStep}>{currentStep}</div>
-                      </div>
-                    </div>
-
-                    {/* Latest agent message */}
-                    <div className="flex items-start gap-2">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-400/20">
-                        <MessageSquare className="h-3 w-3" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[10px] font-medium uppercase tracking-wide text-slate-600">Latest Agent Message</div>
-                        <div className="line-clamp-3 whitespace-pre-wrap text-xs text-slate-300" title={latestMessage}>{latestMessage}</div>
-                      </div>
-                    </div>
-
-                    {/* Progress */}
-                    <div className="flex items-start gap-2">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-amber-500/10 text-amber-300 ring-1 ring-amber-400/20">
-                        <Gauge className="h-3 w-3" />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-1 flex items-center justify-between">
-                          <span className="text-[10px] font-medium uppercase tracking-wide text-slate-600">Progress</span>
-                          <span className="text-[11px] font-semibold text-slate-300">
-                            {isRunning ? "In progress…" : `${progress}%`}
-                          </span>
-                        </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
-                          {isRunning ? (
-                            <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
-                          ) : (
-                            <div
-                              className={`h-full rounded-full transition-all ${execution.status === "completed" ? "bg-emerald-400" : execution.status === "failed" || execution.status === "cancelled" ? "bg-rose-400" : "bg-slate-600"}`}
-                              style={{ width: `${progress}%` }}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Errors */}
-                    {error && (
-                      <div className="flex items-start gap-2 rounded-lg bg-rose-500/10 px-2.5 py-2 ring-1 ring-rose-500/20">
-                        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-rose-400" />
-                        <div className="min-w-0 flex-1">
-                          <div className="text-[10px] font-medium uppercase tracking-wide text-rose-400/80">Error</div>
-                          <div className="whitespace-pre-wrap text-xs text-rose-300" title={error}>{error}</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Times */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-start gap-2">
-                        <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500" />
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-medium uppercase tracking-wide text-slate-600">Started</div>
-                          <div className="text-xs text-slate-300">{fmtTime(execution.startedAt)}</div>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <Clock className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-500" />
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-medium uppercase tracking-wide text-slate-600">Last Update</div>
-                          <div className="text-xs text-slate-300">{fmtTime(execution.updatedAt)}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-[11px] text-slate-600">Elapsed: {fmtElapsed(execution.startedAt, execution.updatedAt)}</div>
-                  </div>
-                ) : (
-                  <p className="text-xs text-slate-600">No OpenHands execution linked to this task yet. Run the task to start one.</p>
-                )}
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {task.expectedOutput || task.agentPrompt || "No goal defined."}
+                </p>
               </div>
-            );
-          })()}
+
+              {/* Progress */}
+              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
+                <div className="mb-2 flex items-center justify-between">
+                  <h4 className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                    <Gauge className="h-3.5 w-3.5" /> Progress
+                  </h4>
+                  {exec.statusStyle && <Badge style={exec.statusStyle} pulse={exec.isRunning} />}
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
+                  {exec.isRunning ? (
+                    <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
+                  ) : (
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        exec.execution.status === "completed"
+                          ? "bg-emerald-400"
+                          : exec.execution.status === "failed" || exec.execution.status === "cancelled"
+                            ? "bg-rose-400"
+                            : "bg-slate-600"
+                      }`}
+                      style={{ width: `${exec.progress}%` }}
+                    />
+                  )}
+                </div>
+                <div className="mt-1.5 text-[11px] text-slate-500">
+                  {exec.isRunning
+                    ? "Agent is working…"
+                    : exec.execution.status === "completed"
+                      ? "Completed"
+                      : exec.execution.status === "failed"
+                        ? "Failed"
+                        : exec.execution.status === "cancelled"
+                          ? "Cancelled"
+                          : "Waiting to start"}
+                </div>
+              </div>
+
+              {/* What the Agent Is Doing */}
+              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                  <Bot className="h-3.5 w-3.5" /> What the Agent Is Doing
+                </h4>
+                <p className="text-xs leading-relaxed text-slate-300">
+                  {exec.isRunning ? exec.currentStep : exec.execution.status === "completed" ? "Task completed successfully." : "—"}
+                </p>
+              </div>
+
+              {/* Agent Summary */}
+              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                  <MessageSquare className="h-3.5 w-3.5" /> Agent Summary
+                </h4>
+                <p className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-slate-300">
+                  {exec.latestMessage !== "—" ? exec.latestMessage : "No agent messages yet."}
+                </p>
+              </div>
+
+              {/* Final Result */}
+              {exec.execution.status === "completed" && (
+                <div className="rounded-xl bg-emerald-500/[0.06] p-3.5 ring-1 ring-emerald-500/15">
+                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                    <ListChecks className="h-3.5 w-3.5" /> Final Result
+                  </h4>
+                  <p className="text-xs leading-relaxed text-emerald-200/80">
+                    {task.successCriteria || "Task completed. See agent summary above for details."}
+                  </p>
+                </div>
+              )}
+
+              {/* Issues Encountered */}
+              {exec.error && (
+                <div className="rounded-xl bg-rose-500/[0.06] p-3.5 ring-1 ring-rose-500/15">
+                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-rose-400">
+                    <AlertCircle className="h-3.5 w-3.5" /> Issues Encountered
+                  </h4>
+                  <p className="whitespace-pre-wrap text-xs leading-relaxed text-rose-200/80">{exec.error}</p>
+                </div>
+              )}
+
+              {/* Original Prompt */}
+              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                  <FileText className="h-3.5 w-3.5" /> Original Prompt
+                </h4>
+                <p className="line-clamp-3 whitespace-pre-wrap text-xs leading-relaxed text-slate-400">
+                  {task.agentPrompt || "No prompt set."}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Execution actions — Run / Stop / Retry, moved here from the card */}
           {(() => {
@@ -473,76 +486,117 @@ export function TaskDetailModal({
             </div>
           </div>
 
-          {/* Execution metadata */}
-          {(task.conversationId || task.executionId || task.profileId) && (
-            <div className="rounded-xl bg-white/[0.03] p-3 ring-1 ring-white/5">
-              <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-                <Terminal className="h-3.5 w-3.5" /> Execution
-              </h4>
-              <div className="flex flex-col gap-1.5 text-xs">
-                {task.conversationId && (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-slate-500">Conversation ID</span>
-                    <span className="font-mono text-slate-300">{task.conversationId}</span>
-                  </div>
-                )}
-                {task.executionId && (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-slate-500">Execution ID</span>
-                    <span className="font-mono text-slate-300">{task.executionId}</span>
-                  </div>
-                )}
-                {task.profileId && (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-slate-500">Profile</span>
-                    <span className="font-mono text-slate-300">{task.profileId}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* History */}
-          <div className="rounded-xl bg-white/[0.03] p-3 ring-1 ring-white/5">
-            <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
-              <History className="h-3.5 w-3.5" /> History
-            </h4>
-            {(() => {
-              const events = openHandsState?.snapshot.events
-                ?.filter((e) => e.taskId === task.id)
-                .sort((a, b) => b.at - a.at) ?? [];
-              const executions = openHandsState?.snapshot.executions
-                ?.filter((e) => e.taskId === task.id) ?? [];
-              if (events.length === 0 && executions.length === 0) {
-                return <p className="text-xs text-slate-600">No activity recorded yet.</p>;
-              }
-              return (
-                <div className="flex max-h-48 flex-col gap-1.5 overflow-y-auto">
-                  {executions.map((run) => (
-                    <div key={run.id} className="flex items-center gap-2 text-xs">
-                      {statusBadge(run.status) && <Badge style={statusBadge(run.status)!} />}
-                      {run.startedAt && (
-                        <span className="text-slate-500">{new Date(run.startedAt).toLocaleString()}</span>
+          {/* Advanced Details — collapsed by default. Technical content that
+              developers and power users need, kept out of the main flow. */}
+          <div className="rounded-xl bg-white/[0.02] ring-1 ring-white/5">
+            <button
+              type="button"
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"
+              aria-expanded={showAdvanced}
+            >
+              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                <ScrollText className="h-3.5 w-3.5" /> Advanced Details
+              </span>
+              {showAdvanced ? (
+                <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+              )}
+            </button>
+            {showAdvanced && (
+              <div className="flex flex-col gap-3 border-t border-white/5 px-3.5 py-3">
+                {/* Execution metadata */}
+                {(task.conversationId || task.executionId || task.profileId || exec.execution) && (
+                  <div>
+                    <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                      <Terminal className="h-3 w-3" /> Execution Metadata
+                    </h5>
+                    <div className="flex flex-col gap-1 text-[11px]">
+                      {task.conversationId && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500">Conversation ID</span>
+                          <span className="font-mono text-slate-400">{task.conversationId}</span>
+                        </div>
+                      )}
+                      {task.executionId && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500">Execution ID</span>
+                          <span className="font-mono text-slate-400">{task.executionId}</span>
+                        </div>
+                      )}
+                      {task.profileId && (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-slate-500">Profile</span>
+                          <span className="font-mono text-slate-400">{task.profileId}</span>
+                        </div>
+                      )}
+                      {exec.execution && (
+                        <>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-slate-500">Started</span>
+                            <span className="text-slate-400">{fmtTime(exec.execution.startedAt)}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-slate-500">Last Update</span>
+                            <span className="text-slate-400">{fmtTime(exec.execution.updatedAt)}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-slate-500">Elapsed</span>
+                            <span className="text-slate-400">{fmtElapsed(exec.execution.startedAt, exec.execution.updatedAt)}</span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-slate-500">Tokens (in / out)</span>
+                            <span className="text-slate-400">
+                              {exec.execution.tokensIn} / {exec.execution.tokensOut}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-slate-500">Cost</span>
+                            <span className="text-slate-400">${exec.execution.cost.toFixed(4)}</span>
+                          </div>
+                        </>
                       )}
                     </div>
-                  ))}
-                  {events.map((event) => (
-                    <div key={event.id} className="flex items-start gap-2 text-xs">
-                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600" />
-                      <div>
-                        <span className="text-slate-400">{event.title}</span>
-                        {event.detail && (
-                          <span className="ml-1 text-slate-600">{event.detail}</span>
-                        )}
-                        <span className="ml-1 text-slate-700">
-                          {new Date(event.at).toLocaleString()}
-                        </span>
-                      </div>
+                  </div>
+                )}
+
+                {/* History */}
+                <div>
+                  <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                    <History className="h-3 w-3" /> History
+                  </h5>
+                  {exec.events.length === 0 && !exec.execution ? (
+                    <p className="text-[11px] text-slate-600">No activity recorded yet.</p>
+                  ) : (
+                    <div className="flex max-h-48 flex-col gap-1.5 overflow-y-auto">
+                      {exec.execution && (
+                        <div className="flex items-center gap-2 text-[11px]">
+                          {exec.statusStyle && <Badge style={exec.statusStyle} />}
+                          {exec.execution.startedAt && (
+                            <span className="text-slate-500">{new Date(exec.execution.startedAt).toLocaleString()}</span>
+                          )}
+                        </div>
+                      )}
+                      {exec.events.map((event) => (
+                        <div key={event.id} className="flex items-start gap-2 text-[11px]">
+                          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600" />
+                          <div>
+                            <span className="text-slate-400">{event.title}</span>
+                            {event.detail && (
+                              <span className="ml-1 text-slate-600">{event.detail}</span>
+                            )}
+                            <span className="ml-1 text-slate-700">
+                              {new Date(event.at).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
                 </div>
-              );
-            })()}
+              </div>
+            )}
           </div>
 
           <div>
