@@ -14,7 +14,7 @@
 export type TaskStatus = "todo" | "in_progress" | "review" | "done";
 
 /** Task priority levels, each with its own accent colour. */
-export type TaskPriority = "low" | "medium" | "high";
+export type TaskPriority = "low" | "medium" | "high" | "critical";
 
 /** A single task as returned by the host backend. */
 export interface Task {
@@ -41,10 +41,16 @@ export interface Task {
   dueDate?: string | null;
   /** Short description shown on the card. Optional — absent on legacy data. */
   description?: string;
+  /** The actual AI prompt/instruction for this task. Never derived from title. */
+  agentPrompt?: string;
   /** Priority level. Optional — defaults to "medium" in the UI when absent. */
   priority?: TaskPriority;
   /** Completion percentage 0–100. Optional — defaults to 0 when absent. */
   progress?: number;
+  /** Structured execution-planning field: what the agent should produce. */
+  expectedOutput?: string;
+  /** Structured execution-planning field: how to verify the work is done. */
+  successCriteria?: string;
 }
 
 /** A board column: a status value plus the tasks currently in that status. */
@@ -77,12 +83,30 @@ export interface BoardStats {
 /** Filter pills shown in the FilterBar. */
 export type BoardFilter = "all" | "active" | "assigned" | "review" | "completed";
 
+/**
+ * The phases of a transaction-based task deletion. The card stays on the board
+ * through every phase and only fades away once the OpenHands conversation is
+ * confirmed gone and the board sync has finished.
+ *
+ *   deleting            — task entered the delete flow, card disabled
+ *   removing_conversation — OpenHands conversation being deleted
+ *   syncing             — verifying the conversation is gone + board sync done
+ *   fading              — backend confirmed, card fading out (300–500ms)
+ */
+export type DeletePhase = "deleting" | "removing_conversation" | "syncing" | "fading";
+
 /** Ephemeral UI state — lives only in the browser, never persisted. */
 export interface BoardUiState {
   filter: BoardFilter;
-  /** Free-text search query (matches title, assignee, tags). */
-  search: string;
   lastLoadedAt: number;
+  /** True while a board load/sync round-trip is in flight. */
+  syncing: boolean;
+  /** Task ids currently being deleted — the card shows a visible "Deleting…" state. */
+  deletingTaskIds: Set<string>;
+  /** The current delete phase per task id. Absent when not deleting. */
+  deletePhases: Map<string, DeletePhase>;
+  /** A delete failure reason per task id. Present when a delete failed. */
+  deleteErrors: Map<string, string>;
 }
 
 /** The full board state: persisted data + ephemeral UI state. */
@@ -93,10 +117,10 @@ export interface BoardState {
 
 /**
  * The five top-level views of the orchestration platform. The board view is
- * the Kanban board; the other four are AI views (workflow DAG, agent roster,
- * execution history, token/cost analytics).
+ * the Kanban board; the other four are AI views (workflow — the orchestration
+ * center, agent roster, execution history, token/cost analytics).
  */
-export type ViewId = "board" | "command" | "workflow" | "agents" | "history" | "analytics";
+export type ViewId = "board" | "workflow" | "agents" | "history" | "analytics";
 
 /** The host API surface injected by Agent Canvas. */
 export interface HostApi {

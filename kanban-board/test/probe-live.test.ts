@@ -129,10 +129,13 @@ function makeHost(profilesMode: "live" | "empty" | "offline"): Fixture {
   };
 }
 
+/** The title input placeholder in the Create Task modal. */
+const TITLE_PLACEHOLDER = 'input[placeholder="e.g. Replace vending machine cash reader"]';
+
 /** Open the Create Task modal and return the AI-agent <select>. */
 async function openCreateModal(container: HTMLElement): Promise<HTMLSelectElement> {
   clickText(container, "Create Task");
-  assert.ok(await waitFor(() => Boolean(container.querySelector('input[placeholder="What needs to be done?"]'))));
+  assert.ok(await waitFor(() => Boolean(container.querySelector(TITLE_PLACEHOLDER))));
   const select = container.querySelector('select[aria-label="AI agent"]') as HTMLSelectElement;
   assert.ok(select, "AI agent select must render in the create modal");
   return select;
@@ -209,7 +212,8 @@ test("3. real OpenHands profile id is persisted on the created task", async () =
   await waitFor(() => container.textContent?.includes("Create Task") ?? false);
 
   const select = await openCreateModal(container);
-  changeInput(container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement, "Live profile task");
+  changeInput(container.querySelector(TITLE_PLACEHOLDER) as HTMLInputElement, "Live profile task");
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Investigate the live profile assignment path.");
   selectValue(select, "profile-forge");
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Live profile task") ?? false));
@@ -231,7 +235,8 @@ test("4. assigned profile is shown on the task card and in the task detail", asy
   await waitFor(() => container.textContent?.includes("Create Task") ?? false);
 
   const select = await openCreateModal(container);
-  changeInput(container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement, "Card and detail task");
+  changeInput(container.querySelector(TITLE_PLACEHOLDER) as HTMLInputElement, "Card and detail task");
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Verify the assigned profile renders on the card and in the detail.");
   selectValue(select, "profile-forge");
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Card and detail task") ?? false));
@@ -260,7 +265,8 @@ test("5. agent assignment survives a page reload", async () => {
   await waitFor(() => container.textContent?.includes("Create Task") ?? false);
 
   const select = await openCreateModal(container);
-  changeInput(container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement, "Reload survival task");
+  changeInput(container.querySelector(TITLE_PLACEHOLDER) as HTMLInputElement, "Reload survival task");
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Confirm the agent assignment survives a page reload.");
   selectValue(select, "profile-scout");
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Reload survival task") ?? false));

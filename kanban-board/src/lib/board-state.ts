@@ -130,8 +130,11 @@ export class BoardStateStore {
       columns: groupTasksByStatus([]),
       uiState: {
         filter: "all",
-        search: "",
         lastLoadedAt: 0,
+        syncing: false,
+        deletingTaskIds: new Set(),
+        deletePhases: new Map(),
+        deleteErrors: new Map(),
       },
     };
   }

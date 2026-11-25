@@ -8,7 +8,7 @@ import type {
   OpenHandsState,
 } from "../types/openhands";
 import { setTaskOverlay } from "./task-overlay";
-import { fetchTasks, saveTasks, updateTask } from "./task-store";
+import { fetchTasks, saveTasks, updateTask, withBoardLock, dedupeTasks } from "./task-store";
 
 const POLL_INTERVAL_MS = 2_000;
 const EMPTY_SNAPSHOT: OpenHandsSnapshot = { executions: [], events: [], links: [], updatedAt: 0 };
@@ -60,12 +60,39 @@ function eventArray(value: unknown): Record<string, unknown>[] {
 
 function mapStatus(value: unknown): OpenHandsExecution["status"] {
   const status = asString(value)?.toLowerCase();
-  if (status === "running" || status === "waiting_for_confirmation") return "running";
+  if (status === "running" || status === "waiting_for_confirmation" || status === "executing" || status === "started") return "running";
   if (status === "finished" || status === "succeeded" || status === "success" || status === "completed") return "completed";
   if (status === "error" || status === "stuck" || status === "failed") return "failed";
-  if (status === "deleting" || status === "cancelled" || status === "canceled") return "cancelled";
+  if (status === "deleting" || status === "cancelled" || status === "canceled" || status === "stopped") return "cancelled";
+  if (status === "pending") return "pending";
   if (status === "paused") return "queued";
   return "queued";
+}
+
+/**
+ * The single source of truth for mapping an OpenHands execution status onto a
+ * board column. Every surface that derives a column from an execution status
+ * (recordExecution, statusForConversation, the inbound reconcile) reads from
+ * this map, so the status → column contract is defined exactly once:
+ *
+ *   Queued / Pending            -> todo         (not started yet)
+ *   Running / Executing / Started -> in_progress (actively executing)
+ *   Failed / Error              -> review       (needs human attention)
+ *   Cancelled / Stopped         -> review       (needs human attention)
+ *   Completed                   -> done
+ */
+export const EXECUTION_STATUS_TO_COLUMN: Record<OpenHandsExecution["status"], TaskStatus> = {
+  pending: "todo",
+  queued: "todo",
+  running: "in_progress",
+  completed: "done",
+  failed: "review",
+  cancelled: "review",
+};
+
+/** Resolve an execution status to its board column. */
+export function executionStatusToColumn(status: OpenHandsExecution["status"]): TaskStatus {
+  return EXECUTION_STATUS_TO_COLUMN[status];
 }
 
 function getConversationTags(conversation: Record<string, unknown>): Record<string, string> {
@@ -157,6 +184,58 @@ function eventDetail(event: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
+/** Concatenate the text parts of an LLM content array (MessageEvent.llm_message.content). */
+function llmContentText(value: unknown): string | undefined {
+  const message = asObject(value);
+  const content = message?.content;
+  if (Array.isArray(content)) {
+    const parts = content
+      .map((part) => asString(asObject(part)?.text))
+      .filter((part): part is string => !!part);
+    if (parts.length > 0) return parts.join("\n");
+  }
+  if (typeof content === "string") return content;
+  return undefined;
+}
+
+/**
+ * A human-readable "current step" label for an event. This is what the
+ * execution-visibility panel shows as the agent's active step. It prefers the
+ * tool being invoked (ActionEvent), then the message role, then the raw kind.
+ */
+function eventStepTitle(event: Record<string, unknown>, kind: string): string {
+  const toolName = asString(event.tool_name);
+  const action = asObject(event.action);
+  const actionKind = asString(action?.kind);
+  const command = asString(action?.command);
+  if (toolName) {
+    const label = toolName.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    return command ? `${label} · ${command}` : label;
+  }
+  if (actionKind) return actionKind.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const source = asString(event.source);
+  if (kind.toLowerCase().includes("message")) {
+    return source === "user" ? "User message" : "Agent message";
+  }
+  if (kind.toLowerCase().includes("observation")) return "Observation";
+  return kind.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
+ * The most recent agent-facing text for an event: the agent's reasoning, the
+ * message body, or the observation text. Used as the "Latest Agent Message".
+ */
+function eventAgentMessage(event: Record<string, unknown>): string | undefined {
+  const reasoning = asString(event.reasoning_content);
+  if (reasoning) return reasoning;
+  const messageText = llmContentText(event.llm_message);
+  if (messageText) return messageText;
+  const observation = asObject(event.observation);
+  const observationText = llmContentText(observation?.content) ?? asString(observation?.text);
+  if (observationText) return observationText;
+  return eventDetail(event);
+}
+
 export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
   const object = asObject(value);
   if (object?.executions || object?.events || object?.links) {
@@ -195,6 +274,7 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
       modelId: asString(conversation.current_model_id),
       repository: tags.repository,
       startedAt: createdAt,
+      updatedAt,
       finishedAt: status === "completed" || status === "failed" || status === "cancelled" ? updatedAt : undefined,
       tokensIn: metrics.tokensIn,
       tokensOut: metrics.tokensOut,
@@ -268,8 +348,8 @@ export async function fetchOpenHandsSnapshot(host: Host): Promise<OpenHandsSnaps
         events.push({
           id: eventId,
           type: eventType(source ? `${source}-${kind}` : kind),
-          title: asString(event.title) ?? asString(event.key) ?? kind,
-          detail: eventDetail(event),
+          title: eventStepTitle(event, kind),
+          detail: eventAgentMessage(event),
           status: mapStatus(conversation.execution_status),
           at: timestamp(event.timestamp, timestamp(conversation.created_at)),
           taskId: tags.taskid,
@@ -298,14 +378,81 @@ export interface OpenHandsCommandInput {
   modelId?: string;
   title?: string;
   description?: string;
+  /** The actual instruction sent to the AI. When present, this is the prompt — never the title. */
+  agentPrompt?: string;
+  /** Structured execution-planning field: what the agent should produce. */
+  expectedOutput?: string;
+  /** Structured execution-planning field: how to verify the work is done. */
+  successCriteria?: string;
   workspaceId?: string;
   scheduledAt?: string;
 }
 
+/** A single tool selection in a profile's `tools` list. */
+export interface AgentToolRef {
+  name: string;
+  params?: Record<string, unknown>;
+}
+
+/**
+ * An agent profile as returned by the OpenHands agent-profile API.
+ *
+ * The list endpoint (`GET /api/agent-profiles`) returns only a summary
+ * projection (id, name, llm_profile_ref, mcp_server_refs). The detail endpoint
+ * (`GET /api/agent-profiles/{name}`) returns the full stored profile. This
+ * interface models the full schema; summary fields are simply absent on list
+ * results. All optional fields default to the OpenHands built-in behavior when
+ * omitted, so a profile with only id/name/llmProfileRef is still valid.
+ */
 export interface AgentProfile {
   id: string;
   name: string;
+  /** The LLM profile this agent runs on (its `llm_profile_ref`). */
+  llmProfileRef?: string;
+  /** Whether this is the currently active agent profile. */
+  active?: boolean;
+  /** Monotonic revision counter, bumped on each saved edit. */
+  revision?: number;
+  /** Agent class to build (default "CodeActAgent"). */
+  agent?: string;
+  /**
+   * Tool selection. null = the server's standard tool set; [] = an explicitly
+   * bare agent; a non-empty list is used exactly as given.
+   */
+  tools?: AgentToolRef[] | null;
+  /** Persona text that replaces OpenHands' built-in persona. null = built-in. */
+  persona?: string | null;
+  /** Optional suffix appended to the system prompt. */
+  systemMessageSuffix?: string | null;
+  /**
+   * Which of the user's globally configured MCP servers to expose.
+   * null = all; [] = none; a non-null list = filter to the named keys.
+   */
+  mcpServerRefs?: string[] | null;
+  /**
+   * Which of the user's saved secrets to expose. null = all; [] = none; a
+   * non-null list = filter to the named keys.
+   */
+  secretRefs?: string[] | null;
+  /** Which public-catalog skills to load. null = all; [] = none; a list = only those. */
+  publicSkills?: string[] | null;
+  /** Deny-list of server-discovered skills to exclude. [] = all discovered. */
+  disabledSkills?: string[];
+  /** Maximum concurrent tool calls per agent step (default 1 = sequential). */
+  toolConcurrencyLimit?: number;
 }
+
+/** The canonical tool catalog the editor offers as selectable tools. */
+export const TOOL_CATALOG: ReadonlyArray<{ name: string; label: string }> = [
+  { name: "terminal", label: "Terminal" },
+  { name: "file_editor", label: "File Editor" },
+  { name: "task_tracker", label: "Task Tracker" },
+  { name: "browser_tool_set", label: "Browser" },
+  { name: "task_tool_set", label: "Sub-agents" },
+  { name: "switch_llm", label: "Switch LLM" },
+  { name: "glob", label: "Glob" },
+  { name: "grep", label: "Grep" },
+];
 
 export interface RelayHop {
   agent: string;
@@ -335,13 +482,328 @@ export async function fetchAgentProfiles(host: Host): Promise<AgentProfile[]> {
     const response = await host.agentServer.request({ method: "GET", path: "/api/agent-profiles" });
     const object = asObject(response);
     if (!object || !Array.isArray(object.profiles)) return [];
+    const activeId = asString(object.active_agent_profile_id);
     return object.profiles
       .filter((item): item is Record<string, unknown> => !!asObject(item))
       .map((profile) => ({
         id: asString(profile.id) ?? asString(profile.name) ?? asString(profile.profile_name) ?? "",
         name: asString(profile.name) ?? asString(profile.profile_name) ?? "",
+        llmProfileRef: asString(profile.llm_profile_ref),
+        active: activeId !== undefined && activeId === asString(profile.id),
       }))
       .filter((profile) => profile.id && profile.name);
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Create or update an agent profile (upsert).
+ *
+ * The OpenHands API exposes a single write endpoint for profiles:
+ * `POST /api/agent-profiles/{name}` with a body of `{ "llm_profile_ref": "…" }`.
+ * The URL path segment is the profile name; posting to an existing name edits
+ * that profile, posting to a new name creates it. There is no separate
+ * create/update verb — this is the full write surface.
+ *
+ * Returns the saved profile name on success, or null on failure.
+ */
+export async function saveAgentProfile(
+  host: Host,
+  name: string,
+  llmProfileRef: string,
+): Promise<string | null> {
+  const trimmedName = name.trim();
+  const trimmedRef = llmProfileRef.trim();
+  if (!trimmedName || !trimmedRef) return null;
+  try {
+    const response = await host.agentServer.request({
+      method: "POST",
+      path: `/api/agent-profiles/${encodeURIComponent(trimmedName)}`,
+      body: { llm_profile_ref: trimmedRef },
+    });
+    // A 4xx/5xx response surfaces as a thrown error in the host client, so a
+    // resolved response means the profile was saved.
+    void response;
+    return trimmedName;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Activate an agent profile so it becomes the default for new conversations.
+ * Uses the profile's stable id: `POST /api/agent-profiles/{id}/activate`.
+ * Returns true on success.
+ */
+export async function activateAgentProfile(host: Host, profileId: string): Promise<boolean> {
+  if (!profileId) return false;
+  try {
+    await host.agentServer.request({
+      method: "POST",
+      path: `/api/agent-profiles/${encodeURIComponent(profileId)}/activate`,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Delete an agent profile.
+ *
+ * The delete endpoint is keyed by profile NAME, not id:
+ * `DELETE /api/agent-profiles/{name}`. Deleting by id returns a success
+ * message but is a no-op, so the name must be used. Returns true on success.
+ */
+export async function deleteAgentProfile(host: Host, profileName: string): Promise<boolean> {
+  const trimmedName = profileName.trim();
+  if (!trimmedName) return false;
+  try {
+    await host.agentServer.request({
+      method: "DELETE",
+      path: `/api/agent-profiles/${encodeURIComponent(trimmedName)}`,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fetch the full stored profile for a name (`GET /api/agent-profiles/{name}`).
+ * The response body is `{ name, profile }` where `profile` is the complete
+ * schema dump. Returns the mapped profile, or null when the profile is missing
+ * or the request fails.
+ */
+export async function fetchAgentProfileDetail(host: Host, name: string): Promise<AgentProfile | null> {
+  const trimmedName = name.trim();
+  if (!trimmedName) return null;
+  try {
+    const response = await host.agentServer.request({
+      method: "GET",
+      path: `/api/agent-profiles/${encodeURIComponent(trimmedName)}`,
+    });
+    const object = asObject(response);
+    const profile = object ? asObject(object.profile) : null;
+    if (!profile) return null;
+    return mapProfileDetail(profile, trimmedName);
+  } catch {
+    return null;
+  }
+}
+
+/** Map a raw profile-detail payload onto the AgentProfile interface. */
+function mapProfileDetail(profile: Record<string, unknown>, name: string): AgentProfile {
+  const tools = Array.isArray(profile.tools)
+    ? profile.tools
+        .filter((item): item is Record<string, unknown> => !!asObject(item))
+        .map((tool) => ({
+          name: asString(tool.name) ?? "",
+          params: asObject(tool.params) ?? undefined,
+        }))
+        .filter((tool) => tool.name)
+    : profile.tools === null
+      ? null
+      : undefined;
+  return {
+    id: asString(profile.id) ?? name,
+    name: asString(profile.name) ?? name,
+    llmProfileRef: asString(profile.llm_profile_ref),
+    revision: typeof profile.revision === "number" ? profile.revision : undefined,
+    agent: asString(profile.agent),
+    tools,
+    persona: typeof profile.persona === "string" ? profile.persona : null,
+    systemMessageSuffix: typeof profile.system_message_suffix === "string" ? profile.system_message_suffix : null,
+    mcpServerRefs: Array.isArray(profile.mcp_server_refs)
+      ? profile.mcp_server_refs.map((item) => asString(item) ?? "").filter(Boolean)
+      : profile.mcp_server_refs === null
+        ? null
+        : undefined,
+    secretRefs: Array.isArray(profile.secret_refs)
+      ? profile.secret_refs.map((item) => asString(item) ?? "").filter(Boolean)
+      : profile.secret_refs === null
+        ? null
+        : undefined,
+    publicSkills: Array.isArray(profile.public_skills)
+      ? profile.public_skills.map((item) => asString(item) ?? "").filter(Boolean)
+      : profile.public_skills === null
+        ? null
+        : undefined,
+    disabledSkills: Array.isArray(profile.disabled_skills)
+      ? profile.disabled_skills.map((item) => asString(item) ?? "").filter(Boolean)
+      : [],
+    toolConcurrencyLimit: typeof profile.tool_concurrency_limit === "number" ? profile.tool_concurrency_limit : undefined,
+  };
+}
+
+/**
+ * Build the POST body for saving a profile from an AgentProfile. Only fields
+ * the editor manages are emitted; the server fills the rest with defaults.
+ * The `id` is intentionally omitted — the server mints it on create and keeps
+ * the namesake's id on overwrite.
+ */
+export function buildProfileBody(profile: AgentProfile): Record<string, unknown> {
+  const body: Record<string, unknown> = {
+    agent_kind: "openhands",
+    llm_profile_ref: profile.llmProfileRef ?? "",
+  };
+  if (profile.agent) body.agent = profile.agent;
+  if (profile.tools !== undefined) body.tools = profile.tools;
+  if (profile.persona !== undefined) body.persona = profile.persona;
+  if (profile.systemMessageSuffix !== undefined) body.system_message_suffix = profile.systemMessageSuffix;
+  if (profile.mcpServerRefs !== undefined) body.mcp_server_refs = profile.mcpServerRefs;
+  if (profile.secretRefs !== undefined) body.secret_refs = profile.secretRefs;
+  if (profile.publicSkills !== undefined) body.public_skills = profile.publicSkills;
+  if (profile.disabledSkills !== undefined) body.disabled_skills = profile.disabledSkills;
+  if (profile.toolConcurrencyLimit !== undefined) body.tool_concurrency_limit = profile.toolConcurrencyLimit;
+  return body;
+}
+
+/**
+ * Save a full profile (upsert) via `POST /api/agent-profiles/{name}`. The path
+ * name is authoritative and overrides any name in the body. Returns the saved
+ * name on success, or null on failure.
+ */
+export async function saveAgentProfileFull(host: Host, name: string, profile: AgentProfile): Promise<string | null> {
+  const trimmedName = name.trim();
+  if (!trimmedName) return null;
+  try {
+    await host.agentServer.request({
+      method: "POST",
+      path: `/api/agent-profiles/${encodeURIComponent(trimmedName)}`,
+      body: buildProfileBody(profile),
+    });
+    return trimmedName;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Rename a profile via `POST /api/agent-profiles/{oldName}/rename`. The stable
+ * id survives the rename. Returns the new name on success, or null on failure.
+ */
+export async function renameAgentProfile(host: Host, oldName: string, newName: string): Promise<string | null> {
+  const trimmedOld = oldName.trim();
+  const trimmedNew = newName.trim();
+  if (!trimmedOld || !trimmedNew) return null;
+  try {
+    await host.agentServer.request({
+      method: "POST",
+      path: `/api/agent-profiles/${encodeURIComponent(trimmedOld)}/rename`,
+      body: { new_name: trimmedNew },
+    });
+    return trimmedNew;
+  } catch {
+    return null;
+  }
+}
+
+/** A saved secret as returned by `GET /api/settings/secrets`. */
+export interface SecretRef {
+  name: string;
+  description?: string;
+}
+
+/**
+ * Fetch the user's saved secrets (`GET /api/settings/secrets`). These are the
+ * names a profile's `secret_refs` can reference. Returns an empty list on any
+ * failure.
+ */
+export async function fetchSecrets(host: Host): Promise<SecretRef[]> {
+  try {
+    const response = await host.agentServer.request({ method: "GET", path: "/api/settings/secrets" });
+    const object = asObject(response);
+    if (!object || !Array.isArray(object.secrets)) return [];
+    return object.secrets
+      .filter((item): item is Record<string, unknown> => !!asObject(item))
+      .map((secret) => ({
+        name: asString(secret.name) ?? "",
+        description: asString(secret.description),
+      }))
+      .filter((secret) => secret.name);
+  } catch {
+    return [];
+  }
+}
+
+/** The diagnostics report returned by `POST /api/agent-profiles/{name}/materialize`. */
+export interface MaterializeDiagnostics {
+  agentKind: string;
+  valid: boolean;
+  errors: string[];
+  unusableTools: string[];
+  llmProfileRef: string | null;
+  llmProfileResolved: boolean;
+  llmApiKeySet: boolean;
+  danglingMcpServerRefs: string[];
+  resolvedSkills: string[];
+  danglingMetaProfileRef: string | null;
+}
+
+/**
+ * Dry-run resolve a stored profile (`POST /api/agent-profiles/{name}/materialize`).
+ * Returns the diagnostics report, or null when the profile is missing or the
+ * request fails.
+ */
+export async function materializeAgentProfile(host: Host, name: string): Promise<MaterializeDiagnostics | null> {
+  const trimmedName = name.trim();
+  if (!trimmedName) return null;
+  try {
+    const response = await host.agentServer.request({
+      method: "POST",
+      path: `/api/agent-profiles/${encodeURIComponent(trimmedName)}/materialize`,
+    });
+    const object = asObject(response);
+    if (!object) return null;
+    return {
+      agentKind: asString(object.agent_kind) ?? "",
+      valid: object.valid === true,
+      errors: Array.isArray(object.errors) ? object.errors.map((item) => asString(item) ?? "").filter(Boolean) : [],
+      unusableTools: Array.isArray(object.unusable_tools) ? object.unusable_tools.map((item) => asString(item) ?? "").filter(Boolean) : [],
+      llmProfileRef: asString(object.llm_profile_ref) ?? null,
+      llmProfileResolved: object.llm_profile_resolved === true,
+      llmApiKeySet: object.llm_api_key_set === true,
+      danglingMcpServerRefs: Array.isArray(object.dangling_mcp_server_refs) ? object.dangling_mcp_server_refs.map((item) => asString(item) ?? "").filter(Boolean) : [],
+      resolvedSkills: Array.isArray(object.resolved_skills) ? object.resolved_skills.map((item) => asString(item) ?? "").filter(Boolean) : [],
+      danglingMetaProfileRef: asString(object.dangling_meta_profile_ref) ?? null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** An LLM profile as returned by the OpenHands `/api/profiles` endpoint. */
+export interface LlmProfile {
+  name: string;
+  model: string;
+  baseUrl: string;
+  active: boolean;
+  apiKeySet: boolean;
+}
+
+/**
+ * Fetch the LLM profiles visible from the OpenHands API (`GET /api/profiles`).
+ * These are the only models the platform can actually run — the local model
+ * catalog is not a source of truth. Returns an empty list on any failure.
+ */
+export async function fetchLlmProfiles(host: Host): Promise<LlmProfile[]> {
+  try {
+    const response = await host.agentServer.request({ method: "GET", path: "/api/profiles" });
+    const object = asObject(response);
+    if (!object || !Array.isArray(object.profiles)) return [];
+    const activeName = asString(object.active_profile);
+    return object.profiles
+      .filter((item): item is Record<string, unknown> => !!asObject(item))
+      .map((profile) => ({
+        name: asString(profile.name) ?? "",
+        model: asString(profile.model) ?? "",
+        baseUrl: asString(profile.base_url) ?? "",
+        active: asString(profile.name) === activeName,
+        apiKeySet: profile.api_key_set === true,
+      }))
+      .filter((profile) => profile.name);
   } catch {
     return [];
   }
@@ -531,7 +993,25 @@ export async function getAgentProfileId(host: Host, requestedId?: string): Promi
 
 export function buildConversationRequest(input: OpenHandsCommandInput): Record<string, unknown> {
   const taskTitle = input.title ?? "Board task";
-  const taskText = input.description ? `${taskTitle}\n\n${input.description}` : taskTitle;
+  // The agent prompt is the actual instruction sent to the AI. When present it
+  // is used verbatim as the initial message. The title is only the business
+  // identifier — it is never used as the prompt.
+  const promptText = input.agentPrompt?.trim()
+    ? input.agentPrompt.trim()
+    : input.description?.trim()
+      ? `${taskTitle}\n\n${input.description.trim()}`
+      : taskTitle;
+  // Structured execution-planning fields are appended as explicit sections so
+  // the agent knows what to produce and how to verify it. They are only added
+  // when present, so legacy tasks without them are unaffected.
+  const sections: string[] = [];
+  if (input.expectedOutput?.trim()) {
+    sections.push(`Expected Output:\n${input.expectedOutput.trim()}`);
+  }
+  if (input.successCriteria?.trim()) {
+    sections.push(`Success Criteria:\n${input.successCriteria.trim()}`);
+  }
+  const fullPrompt = sections.length > 0 ? `${promptText}\n\n${sections.join("\n\n")}` : promptText;
   const workspacePath = input.workspaceId ?? "workspace/project";
   const body: Record<string, unknown> = {
     workspace: {
@@ -540,7 +1020,7 @@ export function buildConversationRequest(input: OpenHandsCommandInput): Record<s
     },
     initial_message: {
       role: "user",
-      content: [{ type: "text", text: taskText }],
+      content: [{ type: "text", text: fullPrompt }],
       run: false,
     },
     autotitle: true,
@@ -557,10 +1037,11 @@ export function buildConversationRequest(input: OpenHandsCommandInput): Record<s
  * Map an OpenHands execution status onto the board's task lifecycle.
  *
  * OpenHands is the single source of truth for execution status. The board
- * column is a projection of it:
- *   queued/running  -> in_progress
+ * column is a projection of it, defined once in executionStatusToColumn:
+ *   queued/pending  -> todo
+ *   running         -> in_progress
  *   completed       -> done
- *   failed/cancelled-> review (a failed run needs human attention)
+ *   failed/cancelled-> review (a failed or stopped run needs human attention)
  * A `boardstatus` tag set by the user (e.g. via drag-and-drop) is authoritative
  * for the column and is returned as-is; this mapping is only used when the
  * conversation carries no explicit boardstatus.
@@ -571,14 +1052,22 @@ function statusForConversation(
 ): TaskStatus {
   const explicit = tags.boardstatus as TaskStatus | undefined;
   if (explicit && ["todo", "in_progress", "review", "done"].includes(explicit)) return explicit;
-  const status = mapStatus(conversation.execution_status);
-  if (status === "queued" || status === "running") return "in_progress";
-  if (status === "completed") return "done";
-  if (status === "failed" || status === "cancelled") return "review";
-  return "todo";
+  // The execution status → column contract lives in executionStatusToColumn.
+  return executionStatusToColumn(mapStatus(conversation.execution_status));
 }
 
-export async function syncInboundConversations(host: Host): Promise<Task[]> {
+/**
+ * Reconcile inbound OpenHands conversations into board tasks.
+ *
+ * `ignoreTaskIds` is the resurrection guard. A task that is being deleted (or
+ * was deleted moments ago) must never be rebuilt from a conversation that is
+ * still lingering in the search index — the conversation delete is eventually
+ * consistent, so a stale entry can outlive the task's removal from disk. Any
+ * conversation whose task id (or `oh-<id>` phantom id) is in the ignore set is
+ * skipped AND best-effort deleted, so it cannot resurrect the card on this or
+ * a later poll.
+ */
+export async function syncInboundConversations(host: Host, ignoreTaskIds?: ReadonlySet<string>): Promise<Task[]> {
   try {
     const response = await host.agentServer.request({
       method: "GET",
@@ -586,8 +1075,18 @@ export async function syncInboundConversations(host: Host): Promise<Task[]> {
     });
     const conversations = conversationArray(response);
     if (conversations.length === 0) return fetchTasks(host);
-    const tasks = await fetchTasks(host);
-    let changed = false;
+    // The fetch → reconcile → save cycle is a read-modify-write against the
+    // board file. Serialize it with the other board-file writers (create/move/
+    // update/delete) so a concurrent mutation cannot be clobbered by a stale
+    // snapshot — the exact race that dropped a freshly created task.
+    return withBoardLock(async () => {
+      // Collapse any duplicate task ids before reconciling. A duplicate id is
+      // what renders the same card in two columns; deduping here also cleans
+      // the board file on the next save (the `changed` flag below is set when
+      // the list actually shrank).
+      const fetched = await fetchTasks(host);
+      const tasks = dedupeTasks(fetched);
+      let changed = tasks.length !== fetched.length;
 
     // The search is sorted CREATED_AT_DESC, so the first conversation seen for a
     // given task is the newest. Reconcile identity and status from that newest
@@ -598,7 +1097,23 @@ export async function syncInboundConversations(host: Host): Promise<Task[]> {
       const id = asString(conversation.id);
       if (!id) continue;
       const tags = getConversationTags(conversation);
-      const title = asString(conversation.title) ?? tags.tasktitle ?? "OpenHands conversation";
+      // Resurrection guard: a conversation belonging to a task that is being
+      // deleted (or was just deleted) must not rebuild that task. Skip it and
+      // best-effort delete the stale conversation so it cannot resurrect the
+      // card on this or a later poll.
+      if (ignoreTaskIds) {
+        const guardId = tags.taskid ?? `oh-${id}`;
+        if (ignoreTaskIds.has(guardId) || ignoreTaskIds.has(id)) {
+          void deleteConversation(host, id).catch(() => { /* already gone */ });
+          continue;
+        }
+      }
+      // The conversation title is the prompt (or an auto-generated title), NOT
+      // the business title. The business title lives in tags.tasktitle. For
+      // phantom tasks we prefer the tag; for existing tasks we never clobber
+      // the title — it is the business identifier, not the AI instruction.
+      const conversationTitle = asString(conversation.title) ?? "OpenHands conversation";
+      const businessTitle = tags.tasktitle ?? conversationTitle;
       const profileId = asString(conversation.agent_profile_id)
         ?? asString(asObject(conversation.launched_agent_profile)?.agent_profile_id)
         ?? tags.agentprofileid
@@ -609,7 +1124,7 @@ export async function syncInboundConversations(host: Host): Promise<Task[]> {
         const status = statusForConversation(conversation, tags);
         task = {
           id: tags.taskid ?? `oh-${id}`,
-          title,
+          title: businessTitle,
           status,
           assignee: tags.assignee ?? null,
           projectId: tags.projectid ?? "default",
@@ -627,7 +1142,7 @@ export async function syncInboundConversations(host: Host): Promise<Task[]> {
       // Only the newest conversation for a task reconciles identity/status.
       if (tags.taskid && seenTaskIds.has(tags.taskid)) continue;
       if (tags.taskid) seenTaskIds.add(tags.taskid);
-      if (task.title !== title) { task.title = title; changed = true; }
+      // Never overwrite the business title with the conversation title.
       if (task.conversationId !== id) { task.conversationId = id; changed = true; }
       if (task.executionId !== id) { task.executionId = id; changed = true; }
       if (profileId && task.profileId !== profileId) { task.profileId = profileId; changed = true; }
@@ -638,6 +1153,7 @@ export async function syncInboundConversations(host: Host): Promise<Task[]> {
     }
     if (changed) await saveTasks(host, tasks);
     return tasks;
+    });
   } catch {
     return fetchTasks(host);
   }
@@ -673,10 +1189,12 @@ async function createConversation(
  * one place that writes those fields to the board, so the board never invents
  * its own identity — it always mirrors what OpenHands reports.
  *
- * The status is mapped onto the board's task lifecycle:
- *   queued/running  -> in_progress
+ * The status is mapped onto the board's task lifecycle via the single source
+ * of truth, executionStatusToColumn:
+ *   queued/pending  -> todo
+ *   running         -> in_progress
  *   completed       -> done
- *   failed/cancelled-> review (a failed run needs human attention)
+ *   failed/cancelled-> review (a failed or stopped run needs human attention)
  *
  * A `status` of `null` means "identity only" — the run was just created and is
  * about to be queued, so we pin the identity without forcing a column move yet.
@@ -695,9 +1213,7 @@ export async function recordExecution(
     status?: TaskStatus;
   } = { conversationId, executionId: conversationId };
   if (profileId) patch.profileId = profileId;
-  if (status === "queued" || status === "running") patch.status = "in_progress";
-  else if (status === "completed") patch.status = "done";
-  else if (status === "failed" || status === "cancelled") patch.status = "review";
+  if (status) patch.status = executionStatusToColumn(status);
   await updateTask(host, taskId, patch);
 }
 
@@ -759,7 +1275,15 @@ export async function commandExecution(
     return;
   }
 
-  if (input.executionId && !input.taskId) {
+  // Reuse the task's existing conversation whenever one is already linked. This
+  // is what keeps an edited task on the SAME conversation it was first created
+  // in — only a task with no conversation yet falls through to createConversation.
+  if (input.executionId) {
+    if (input.taskId) {
+      // Re-pin the identity and move the task to in_progress immediately, so the
+      // board reflects the re-run before the next inbound poll.
+      await recordExecution(host, input.taskId, input.executionId, undefined, "queued");
+    }
     await host.agentServer.request({
       method: "POST",
       path: `/api/conversations/${encodeURIComponent(input.executionId)}/run`,
@@ -805,6 +1329,92 @@ export async function deleteConversation(host: Host, conversationId: string): Pr
   }
 }
 
+/**
+ * Verify that an OpenHands conversation is actually gone from the backend.
+ *
+ * A DELETE can return success while the conversation is still being torn down
+ * (or the delete is eventually consistent). This polls `GET /api/conversations/{id}`
+ * until it 404s (gone) or a hard error surfaces. Returns true when the
+ * conversation is confirmed absent, false when it is still present after the
+ * retry budget is exhausted.
+ *
+ * Used by the transaction-based delete flow so the board card only fades away
+ * once the conversation is verifiably gone — never before.
+ */
+export async function verifyConversationGone(
+  host: Host,
+  conversationId: string,
+  options?: { attempts?: number; delayMs?: number },
+): Promise<boolean> {
+  const attempts = Math.max(1, options?.attempts ?? 5);
+  const delayMs = Math.max(0, options?.delayMs ?? 400);
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await host.agentServer.request({
+        method: "GET",
+        path: `/api/conversations/${encodeURIComponent(conversationId)}`,
+      });
+      // A 200 means the conversation still exists — wait and retry.
+      if (attempt < attempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
+      }
+      return false;
+    } catch (error) {
+      // A 404 means the conversation is gone — the desired end state.
+      if (error && (error as { status?: number }).status === 404) return true;
+      // Any other error (network, 5xx) is treated as "not yet confirmed gone";
+      // the caller decides whether to surface it. We keep retrying.
+      if (attempt < attempts - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
+      }
+      return false;
+    }
+  }
+  return false;
+}
+
+/**
+ * Create an OpenHands conversation for a board task BEFORE the task is
+ * persisted to disk. The conversation carries the task id in its tags so
+ * `syncInboundConversations` can link them. Returns the conversation id, or
+ * null if the conversation could not be created.
+ *
+ * This is the first step of the "card appears only after conversation exists"
+ * lifecycle: the conversation is created first, and only if it succeeds is the
+ * task written to the board file.
+ */
+export async function createConversationForTask(
+  host: Host,
+  taskId: string,
+  details: { title?: string; description?: string; agentPrompt?: string; expectedOutput?: string; successCriteria?: string; agentId?: string },
+): Promise<string | null> {
+  const body = buildConversationRequest({
+    taskId,
+    title: details.title ?? "Board task",
+    description: details.description,
+    agentPrompt: details.agentPrompt,
+    expectedOutput: details.expectedOutput,
+    successCriteria: details.successCriteria,
+    agentId: details.agentId,
+  });
+  const agentProfileId = await getAgentProfileId(host, details.agentId);
+  if (agentProfileId) {
+    body.agent_profile_id = agentProfileId;
+    const tags = asObject(body.tags) ?? {};
+    tags.agentprofileid = agentProfileId;
+    body.tags = tags;
+  }
+  const response = await host.agentServer.request({
+    method: "POST",
+    path: "/api/conversations",
+    body,
+  });
+  const conversation = asObject(response);
+  return conversation ? asString(conversation.id) ?? null : null;
+}
+
 export async function syncBoardAction(
   host: Host,
   action: "created" | "updated" | "moved" | "deleted",
@@ -824,6 +1434,9 @@ export async function syncBoardAction(
         taskId,
         title: asString(details?.title) ?? "Board task",
         description: asString(details?.description),
+        agentPrompt: asString(details?.agentPrompt),
+        expectedOutput: asString(details?.expectedOutput),
+        successCriteria: asString(details?.successCriteria),
         agentId: asString(details?.agentId),
       });
       const agentProfileId = await getAgentProfileId(host, asString(details?.agentId));
@@ -887,6 +1500,14 @@ export class OpenHandsStateStore {
   private timer: ReturnType<typeof setInterval> | null = null;
   private disposed = false;
   private readonly host: Host;
+  /**
+   * Reset baseline. When set, only executions started at or after this
+   * timestamp are surfaced. This is what makes "Reset Metrics" / "Reset
+   * History" meaningful: the snapshot is re-fetched from the live agent server
+   * on every poll, so a plain clear would be undone on the next refresh. The
+   * baseline survives polling and re-applies on each fetch.
+   */
+  private resetAt: number | null = null;
   private readonly handleFocus = (): void => {
     void this.refresh();
   };
@@ -908,11 +1529,37 @@ export class OpenHandsStateStore {
     return () => this.listeners.delete(listener);
   };
 
+  /**
+   * Clear the surfaced executions and set the reset baseline to "now".
+   * Executions started before this moment are hidden from the Analytics and
+   * History views until the next reset. The baseline is re-applied on every
+   * poll, so the reset persists across the 15s refresh cycle.
+   */
+  reset = (): void => {
+    this.resetAt = Date.now();
+    this.state = {
+      snapshot: { ...EMPTY_SNAPSHOT, updatedAt: Date.now() },
+      loading: false,
+      error: null,
+      lastSyncedAt: Date.now(),
+    };
+    for (const listener of this.listeners) listener();
+  };
+
   async refresh(): Promise<void> {
     if (this.disposed) return;
     try {
       const snapshot = await fetchOpenHandsSnapshot(this.host);
-      this.state = { snapshot, loading: false, error: null, lastSyncedAt: Date.now() };
+      const resetAt = this.resetAt;
+      const executions = resetAt
+        ? snapshot.executions.filter((execution) => (execution.startedAt ?? 0) >= resetAt)
+        : snapshot.executions;
+      this.state = {
+        snapshot: { ...snapshot, executions, updatedAt: Date.now() },
+        loading: false,
+        error: null,
+        lastSyncedAt: Date.now(),
+      };
     } catch (error) {
       this.state = {
         ...this.state,
@@ -932,9 +1579,9 @@ export class OpenHandsStateStore {
   }
 }
 
-export function useOpenHandsState(host: Host): OpenHandsState {
+export function useOpenHandsState(host: Host): { state: OpenHandsState; reset: () => void } {
   const [store] = useState(() => new OpenHandsStateStore(host));
   const state = useSyncExternalStore(store.subscribe, store.get, store.get);
   useEffect(() => () => store.dispose(), [store]);
-  return state;
+  return { state, reset: store.reset };
 }

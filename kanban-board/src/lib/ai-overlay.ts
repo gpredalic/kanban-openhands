@@ -204,13 +204,18 @@ export const SEED_WORKFLOWS: Workflow[] = [
     id: "wf-feature",
     name: "Feature Pipeline",
     description: "Research → implement → review → ship.",
-    nodeIds: ["t1", "t2", "t3", "t4"],
-    edges: [
-      { from: "t1", to: "t2" },
-      { from: "t2", to: "t3" },
-      { from: "t3", to: "t4" },
-    ],
     status: "active",
+    nodes: [
+      { id: "t1", type: "task", label: "Research", x: 80, y: 160, taskId: "t1" },
+      { id: "t2", type: "task", label: "Implement", x: 320, y: 160, taskId: "t2" },
+      { id: "t3", type: "approval", label: "Review", x: 560, y: 160 },
+      { id: "t4", type: "task", label: "Ship", x: 800, y: 160, taskId: "t4" },
+    ],
+    edges: [
+      { id: "wf-e1", from: "t1", to: "t2", name: "Research Complete", condition: "IF_SUCCESS" },
+      { id: "wf-e2", from: "t2", to: "t3", name: "Implementation Ready", condition: "IF_SUCCESS" },
+      { id: "wf-e3", from: "t3", to: "t4", name: "Approved", condition: "IF_APPROVED" },
+    ],
   },
 ];
 
@@ -221,7 +226,7 @@ export function seedAiConfig(): AiConfig {
     models: SEED_MODELS.map((m) => ({ ...m })),
     teams: SEED_TEAMS.map((t) => ({ ...t, memberIds: [...t.memberIds] })),
     routingRules: SEED_ROUTING_RULES.map((r) => ({ ...r, condition: { ...r.condition }, target: { ...r.target } })),
-    workflows: SEED_WORKFLOWS.map((w) => ({ ...w, nodeIds: [...w.nodeIds], edges: w.edges.map((e) => ({ ...e })) })),
+    workflows: SEED_WORKFLOWS.map((w) => ({ ...w, nodes: w.nodes.map((n) => ({ ...n })), edges: w.edges.map((e) => ({ ...e })) })),
   };
 }
 

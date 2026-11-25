@@ -1,6 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { inlineCss } from "./inline-css-plugin";
+import { execSync } from "node:child_process";
+
+// Build-time version stamp, baked into the bundle so the running UI can prove
+// which build it is actually executing (a hard refresh that still shows the
+// old stamp means the browser is serving a cached bundle, not the fresh one).
+function buildStamp(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+function gitCommit(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim();
+  } catch {
+    return "unknown";
+  }
+}
 
 // Build the React app as a single self-contained ESM file named extension.js.
 // - lib mode, single entry (src/entry.tsx) exporting activate(host)
@@ -15,6 +34,8 @@ export default defineConfig({
   // bundle is self-contained and browser-safe.
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
+    __BUILD_TIME__: JSON.stringify(buildStamp()),
+    __COMMIT__: JSON.stringify(gitCommit()),
   },
   build: {
     // Build into dist/, then the build script moves the single artifact to the

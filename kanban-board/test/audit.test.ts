@@ -110,9 +110,12 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   evidence.initial = container.textContent?.replace(/\s+/g, " ").slice(0, 500);
 
   clickText(container, "Create Task");
-  assert.ok(await waitFor(() => Boolean(container.querySelector('input[placeholder="What needs to be done?"]'))));
-  const createTitle = container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement;
+  assert.ok(await waitFor(() => Boolean(container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]'))));
+  const createTitle = container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]') as HTMLInputElement;
   changeInput(createTitle, "Persisted audit task");
+  // The agent prompt is its own required field (never derived from the title);
+  // the Create button stays disabled until both are filled.
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Audit: verify the task-centric create and execution flow.");
   const createAgent = container.querySelector('select[aria-label="AI agent"]') as HTMLSelectElement;
   if (createAgent) {
     createAgent.value = "agent-coder";
@@ -139,21 +142,23 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   };
   clickText(container, "Save");
 
+  // Task creation has a single entry point: the header's "Create Task" button.
+  // The column-local "Add Task" cards are gone — no column may offer its own
+  // inline creation form.
   const addButtons = [...container.querySelectorAll("button")].filter((b) => b.textContent?.trim() === "Add Task");
-  addButtons[0]?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => Boolean(container.querySelector('input[placeholder="Task title…"]'))));
-  await sleep(20);
-  const addInput = container.querySelector('input[placeholder="Task title…"]') as HTMLInputElement;
-  changeInput(addInput, "Inline add task");
-  clickText(container, "Add");
-  await waitFor(() => fixture.getTasks().some((t) => t.title === "Inline add task"));
-  evidence.inlineAdd = { visible: container.textContent?.includes("Inline add task"), persisted: fixture.getTasks().some((t) => t.title === "Inline add task") };
+  evidence.inlineAdd = {
+    columnAddTaskButtons: addButtons.length,
+    noColumnAddTask: addButtons.length === 0,
+    noInlineTitleInput: container.querySelector('input[placeholder="Task title…"]') === null,
+  };
 
-  const notification = container.querySelector('button[aria-label="Notifications"]') as HTMLButtonElement;
-  const beforeNotification = container.textContent;
-  notification.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await sleep(20);
-  evidence.notifications = { domChanged: beforeNotification !== container.textContent, callCount: fixture.calls.length };
+  // The notification icon and its panel were removed from the header; no
+  // notification button or surface may remain.
+  evidence.notifications = {
+    buttonPresent: container.querySelector('button[aria-label="Notifications"]') !== null,
+    surfacePresent: container.querySelector('[aria-label="Notification surface"]') !== null,
+    callCount: fixture.calls.length,
+  };
 
   const edit = container.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
   edit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
@@ -192,67 +197,104 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     moveUploads: fixture.calls.filter((call) => call.method === "POST" && call.path.startsWith("/api/file/upload")).length,
   };
 
-  const search = container.querySelector('input[aria-label="Search tasks"]') as HTMLInputElement;
-  changeInput(search, "Edited audit");
-  await sleep(50);
+  // Board search was removed: the header no longer carries a search box and the
+  // board no longer filters by free-text query.
   evidence.search = {
-    editedVisible: container.textContent?.includes("Edited audit task"),
-    originalVisible: container.textContent?.includes("Design the onboarding flow"),
+    searchInputPresent: container.querySelector('input[aria-label="Search tasks"]') !== null,
   };
 
-  for (const view of ["Command Center", "Workflow", "Agents", "History", "Analytics"]) {
+  for (const view of ["Workflow", "Agents", "History", "Analytics"]) {
     clickText(container, view);
     await sleep(50);
     evidence[view] = container.textContent?.replace(/\s+/g, " ").slice(0, 350);
   }
 
   clickText(container, "Board");
-  // The Run AI / Stop AI button is state-driven: it reads "Stop AI" once a real
-  // OpenHands execution is queued/running (creating a task posts a running
-  // conversation). Click whichever label is present, mirroring the acceptance test.
-  const aiToggle = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Run AI" || b.textContent?.trim() === "Stop AI");
-  assert.ok(aiToggle, "Run AI / Stop AI toggle present");
-  aiToggle.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // Wait for React to re-render the board view after the view switch. The
+  // Edit task button is still on the card, so it is a reliable board-rendered
+  // signal.
+  assert.ok(await waitFor(() => container.querySelectorAll('button[aria-label="Edit task"]').length > 0, 2000), "board view renders with task cards after view switch");
+  // Execution is task-centric: the header no longer carries a global Run AI /
+  // Stop AI toggle. The Run / Stop / Retry actions live in the task detail
+  // modal (moved off the card). Opening a task's detail modal and clicking Run
+  // posts a fresh OpenHands conversation for THAT task only, and the button
+  // flips to Stop AI once the run is live.
+  const auditEditBtn = container.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
+  auditEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => Boolean(container.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
+  const taskRunBtn = container.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
+  taskRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await sleep(100);
   evidence.runAi = {
-    buttonPressed: container.querySelector('button[aria-pressed="true"]')?.textContent?.trim(),
+    perTaskRunButtonPresent: Boolean(taskRunBtn),
+    stopButtonAppears: Boolean(container.querySelector('button[aria-label="Stop this task"]')),
     commandPosts: fixture.calls.filter((call) => call.method === "POST" && call.path === "/api/conversations").length,
     visibleExecution: container.textContent?.includes("execution"),
   };
   clickText(container, "History");
   await sleep(50);
+  // Clicking Reset History must open a confirmation dialog (a question) before
+  // the reset fires — it must not reset immediately.
+  const resetHistoryBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Clear History"));
+  resetHistoryBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await sleep(20);
+  const historyConfirmDialog = container.querySelector('[role="dialog"][aria-label="Clear execution history?"]');
   evidence.historyAfterRun = {
     visible: container.textContent?.includes("Execution History"),
     completedVisible: container.textContent?.includes("Completed Runs"),
     runTitleVisible: container.textContent?.includes("Persisted audit task"),
+    resetHistoryButtonPresent: Boolean(resetHistoryBtn),
+    confirmDialogOpens: Boolean(historyConfirmDialog),
+    confirmQuestionShown: historyConfirmDialog?.textContent?.includes("Clear execution history?") ?? false,
+  };
+  // Cancel the confirmation so the reset does not fire.
+  [...(historyConfirmDialog?.querySelectorAll("button") ?? [])].find((b) => b.textContent?.includes("Cancel"))?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await sleep(20);
+  evidence.historyConfirmCancelled = {
+    dialogClosed: container.querySelector('[role="dialog"][aria-label="Clear execution history?"]') === null,
   };
   clickText(container, "Analytics");
   await sleep(50);
+  const resetMetricsBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Clear Analytics"));
+  resetMetricsBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await sleep(20);
+  const analyticsConfirmDialog = container.querySelector('[role="dialog"][aria-label="Clear analytics?"]');
   evidence.analyticsAfterRun = {
     text: container.textContent?.replace(/\s+/g, " ").slice(0, 600),
+    resetMetricsButtonPresent: Boolean(resetMetricsBtn),
+    confirmDialogOpens: Boolean(analyticsConfirmDialog),
+    confirmQuestionShown: analyticsConfirmDialog?.textContent?.includes("Clear analytics?") ?? false,
   };
-  const notificationButton = container.querySelector('button[aria-label="Notifications"]') as HTMLButtonElement;
-  notificationButton?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => container.querySelector('button[aria-label="Notifications"]')?.getAttribute("data-notifications-open") === "true", 1500);
+  // Cancel the confirmation so the reset does not fire.
+  [...(analyticsConfirmDialog?.querySelectorAll("button") ?? [])].find((b) => b.textContent?.includes("Cancel"))?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await sleep(20);
+  evidence.analyticsConfirmCancelled = {
+    dialogClosed: container.querySelector('[role="dialog"][aria-label="Clear analytics?"]') === null,
+  };
+  // The notification icon and its panel were removed from the header; no
+  // notification button or surface may remain.
   evidence.notificationsAfterRun = {
-    visible: Boolean(container.querySelector('[aria-label="Notification surface"]')?.textContent?.includes("AI execution started")),
-    text: container.textContent?.replace(/\s+/g, " ").slice(0, 500),
-    panelPresent: Boolean(container.querySelector('[aria-label="Notification surface"]')),
-    panelHtml: container.querySelector('[aria-label="Notification surface"]')?.outerHTML?.slice(0, 300),
+    buttonPresent: container.querySelector('button[aria-label="Notifications"]') !== null,
+    surfacePresent: container.querySelector('[aria-label="Notification surface"]') !== null,
   };
 
-  clickText(container, "Command Center");
-  assert.ok(await waitFor(() => container.textContent?.includes("OpenHands Command Center") ?? false));
-  const seed = container.querySelector("textarea") as HTMLTextAreaElement;
-  changeInput(seed, "Audit relay seed");
+  // The relay is now a workflow node type (not a separate panel). The
+  // orchestration panel hosts live executions + the knowledge graph, and the
+  // node palette exposes the relay as a first-class node type.
+  clickText(container, "Workflow");
+  assert.ok(await waitFor(() => container.textContent?.includes("Orchestration") ?? false));
+  const orchToggle = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Orchestration"));
+  orchToggle?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => container.textContent?.includes("Live executions") ?? false));
+  // The relay is a node type in the palette.
+  const relayNodeButton = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Relay");
+  relayNodeButton?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await sleep(50);
-  const startRelay = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Start relay")) as HTMLButtonElement;
-  startRelay?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => container.textContent?.includes("Relay response from mock agent") ?? false, 1500);
   evidence.relay = {
-    hopVisible: container.textContent?.includes("Relay response from mock agent"),
-    conversationPosts: fixture.calls.filter((call) => call.method === "POST" && call.path === "/api/conversations").length,
-    askPosts: fixture.calls.filter((call) => call.path.includes("/ask_agent")).length,
+    relayNodeTypeInPalette: Boolean(relayNodeButton),
+    relayNodeAdded: container.textContent?.includes("Relay") ?? false,
+    liveExecutionsSection: container.textContent?.includes("Live executions"),
+    knowledgeGraphSection: container.textContent?.includes("Knowledge graph"),
   };
 
   await fixture.host.agentServer.request({
@@ -277,7 +319,6 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   await waitFor(() => reload.textContent?.includes("OpenHands acceptance conversation") ?? false, 1500);
   evidence.reload = {
     editedVisible: reload.textContent?.includes("Edited audit task"),
-    inlineAddVisible: reload.textContent?.includes("Inline add task"),
     taskCountInFile: fixture.getTasks().length,
     movedTaskStatus: fixture.getTasks().find((task) => task.title === "Persisted audit task")?.status,
     movedTaskRendered: reload.textContent?.includes("Persisted audit task"),

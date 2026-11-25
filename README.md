@@ -20,12 +20,25 @@ holds credentials.
 - **Task CRUD** — create, edit, delete, and move tasks. Every mutation persists
   to `board.json` on the agent server.
 - **Search & filter** — real client-side filtering of the loaded task list.
+- **Status & priority badges** — every status (`pending`, `queued`, `running`,
+  `completed`, `failed`, `cancelled`) and priority (`low`, `medium`, `high`,
+  `critical`) renders as a colored dot + Title Case label, vertically centered
+  via flex. All render sites resolve through the shared `src/lib/badges.tsx`
+  module, so the pattern is identical on cards, the detail modal, the create
+  modal, execution history, and the workflow view, in both light and dark mode.
 - **OpenHands integration** — board tasks link to OpenHands conversations via
   lowercase-alphanumeric tags (`taskid`, `agentid`, `boardstatus`, …). Inbound
   conversations appear on the board; board actions create/update conversations.
 - **AI orchestration** — Run AI, multi-agent relay, agent assignment, and
   routing rules (see the audit notes for what is fully wired vs. partial).
 - **Views** — Board, Command Center, Workflow, Agents, History, Analytics.
+- **Column-move animation** — when a task's status changes and the card moves
+  between columns, the card lifts (scale 1.02 + accent glow), glides across the
+  board, and settles into its destination column (scale back to 1, shadow
+  normalizes). The destination column pulses with a soft border glow and
+  background tint that fade out. The accent color is status-aware: done →
+  green, review → amber, in_progress → blue, todo/other → indigo. Implemented
+  with the FLIP technique (no Framer Motion dependency).
 
 ---
 
@@ -50,7 +63,7 @@ holds credentials.
     ├── src/
     │   ├── entry.tsx             ← activate(host): registers the "board" page, mounts React
     │   ├── components/           ← React UI (KanbanBoard, TaskCard, modals, views, …)
-    │   ├── hooks/                ← useBoardState, useDragDrop
+    │   ├── hooks/                ← useBoardState, useDragDrop, useFlipAnimation
     │   ├── lib/                  ← data layer (the real behavior lives here)
     │   │   ├── task-store.ts     ← task CRUD via the agent-server file API
     │   │   ├── use-board-data.ts ← fetch/group/reconcile controller + 15s poll
@@ -60,6 +73,7 @@ holds credentials.
     │   │   ├── ai-store.ts       ← AI state hook
     │   │   ├── workflow-store.ts ← workflow persistence (workflows.json)
     │   │   ├── task-overlay.ts   ← ephemeral tags/due-date overlay (localStorage)
+    │   │   ├── badges.tsx        ← shared status/priority badge resolvers (dot + Title Case)
     │   │   ├── import-export.ts  ← board JSON export/import
     │   │   └── date.ts           ← date parsing/formatting
     │   ├── styles/globals.css    ← the real stylesheet (scoped to the root id)
@@ -125,6 +139,20 @@ SESSION_TOKEN="$OPENHANDS_AUTOMATION_API_KEY" PORT=8090 node harness/server.mjs
 - **Reconciliation** — `use-board-data.ts` owns a 15-second poll that re-fetches
   and reconciles with the live backend. Every mutation is optimistic in the UI,
   then persisted and re-fetched.
+- **Status → column mapping** — OpenHands is the source of truth for execution
+  status; the board column is a projection of it. The contract is defined once
+  in `executionStatusToColumn()` (`openhands.ts`) and read by every surface that
+  derives a column from an execution status (`recordExecution`,
+  `statusForConversation`, the inbound reconcile):
+  `queued`/`pending` → `todo`, `running`/`executing`/`started` → `in_progress`,
+  `failed`/`error` → `review`, `cancelled`/`stopped` → `review`,
+  `completed` → `done`. A user-set `boardstatus` tag (drag-and-drop) is
+  authoritative and overrides the mapping.
+- **Duplicate-id guard** — a task id must appear at most once on the board; a
+  duplicate id renders the same card in two columns. `dedupeTasks()`
+  (`task-store.ts`) collapses duplicates by id (preferring the entry linked to a
+  live conversation) and is applied both in the inbound reconcile (which also
+  cleans the board file on the next save) and in `load()` as defense in depth.
 - **OpenHands sync** — `openhands.ts` maps board tasks to conversations using
   lowercase-alphanumeric tag keys (the agent server rejects underscores in tag
   keys). `syncInboundConversations` surfaces live conversations on the board;

@@ -93,7 +93,7 @@ export interface ExecutionRun {
   taskTitle: string;
   agentId: string;
   modelId: string;
-  status: "queued" | "running" | "completed" | "failed" | "cancelled";
+  status: "pending" | "queued" | "running" | "completed" | "failed" | "cancelled";
   startedAt: number | null;
   finishedAt: number | null;
   tokensIn: number;
@@ -112,15 +112,240 @@ export interface ExecutionStep {
   at: number;
 }
 
-/** A workflow: a DAG of tasks with explicit dependencies (LangGraph-style). */
+/** The kind of a workflow node. */
+export type WorkflowNodeType =
+  | "task"
+  | "agent"
+  | "condition"
+  | "approval"
+  | "start"
+  | "end"
+  | "delay"
+  | "relay"
+  | "loop";
+
+/**
+ * The execution rule that governs when an edge fires. Mirrors the branching
+ * semantics of n8n / LangGraph: a node's outgoing edges are evaluated against
+ * the node's terminal state and the matching edge(s) advance the workflow.
+ *
+ * The IF_TRUE / IF_FALSE / IF_TIMEOUT values support explicit conditional
+ * routing on a custom expression (see WorkflowEdge.expression), e.g.
+ * `status == 'approved'` or `amount > 1000`.
+ */
+export type EdgeCondition =
+  | "IF_SUCCESS"
+  | "IF_FAILURE"
+  | "IF_ALWAYS"
+  | "IF_APPROVED"
+  | "IF_REJECTED"
+  | "IF_RETRY_EXHAUSTED"
+  | "IF_MANUAL_APPROVAL"
+  | "IF_TRUE"
+  | "IF_FALSE"
+  | "IF_TIMEOUT"
+  | "IF_CANCEL"
+  | "IF_LOOP";
+
+/**
+ * The eight branch types a workflow edge can express. Each maps to one or more
+ * EdgeCondition values so the engine can route on a node's terminal state.
+ *
+ *   Success          -> IF_SUCCESS
+ *   Failure          -> IF_FAILURE
+ *   Retry            -> IF_RETRY_EXHAUSTED (fire when retries are exhausted)
+ *   Timeout          -> IF_TIMEOUT
+ *   Cancel           -> IF_CANCEL
+ *   Manual Approval  -> IF_MANUAL_APPROVAL / IF_APPROVED / IF_REJECTED
+ *   Conditional      -> IF_TRUE / IF_FALSE (custom expression)
+ *   Loop             -> IF_LOOP (re-enter an upstream node, bounded by a limit)
+ */
+export type BranchType =
+  | "success"
+  | "failure"
+  | "retry"
+  | "timeout"
+  | "cancel"
+  | "manual_approval"
+  | "conditional"
+  | "loop";
+
+/** The EdgeCondition values that belong to each branch type. */
+export const BRANCH_CONDITIONS: Record<BranchType, EdgeCondition[]> = {
+  success: ["IF_SUCCESS"],
+  failure: ["IF_FAILURE"],
+  retry: ["IF_RETRY_EXHAUSTED"],
+  timeout: ["IF_TIMEOUT"],
+  cancel: ["IF_CANCEL"],
+  manual_approval: ["IF_MANUAL_APPROVAL", "IF_APPROVED", "IF_REJECTED"],
+  conditional: ["IF_TRUE", "IF_FALSE"],
+  loop: ["IF_LOOP"],
+};
+
+/** Resolve the branch type an edge's condition belongs to. */
+export function branchTypeForCondition(condition: EdgeCondition): BranchType {
+  for (const [branch, conditions] of Object.entries(BRANCH_CONDITIONS) as [BranchType, EdgeCondition[]][]) {
+    if (conditions.includes(condition)) return branch;
+  }
+  return "success";
+}
+
+/**
+ * Type-specific node configuration. Each node type exposes its own dedicated
+ * configuration panel; the fields below are the contract for those panels.
+ * All fields are optional so a node with no config is still valid and the
+ * editor renders sensible defaults.
+ */
+export interface WorkflowNodeConfig {
+  /* ---- Agent ---- */
+  /** Agent profile name (OpenHands agent-profile). */
+  agentProfile?: string;
+  /** The prompt / instruction sent to the agent. */
+  prompt?: string;
+  /** Tool names the agent may use (from the tool catalog). */
+  tools?: string[];
+  /** Memory mode: none, session, or persistent. */
+  memory?: "none" | "session" | "persistent";
+  /** Timeout in seconds before the node is considered timed out. */
+  timeoutSeconds?: number;
+  /** Retry policy. */
+  retryPolicy?: RetryPolicy;
+
+  /* ---- Task ---- */
+  /** Task description (beyond the label). */
+  description?: string;
+  /** Declared input variables (name → description). */
+  inputs?: NodeVariable[];
+  /** Declared output variables (name → description). */
+  outputs?: NodeVariable[];
+
+  /* ---- Condition ---- */
+  /** The routing expression, e.g. `amount > 1000`. */
+  expression?: string;
+  /** Variables the expression may reference. */
+  variables?: NodeVariable[];
+  /** Validation message shown when the expression is malformed. */
+  validation?: string;
+
+  /* ---- Approval ---- */
+  /** The approver (profile name or user). */
+  approver?: string;
+  /** Escalation rules applied when the SLA is breached. */
+  escalationRules?: EscalationRule[];
+  /** Service-level agreement in hours. */
+  slaHours?: number;
+
+  /* ---- Delay ---- */
+  /** Duration in seconds. */
+  durationSeconds?: number;
+  /** Optional schedule (ISO 8601 timestamp or cron expression). */
+  schedule?: string;
+
+  /* ---- Relay ---- */
+  /** The route target (profile name or endpoint). */
+  routeTarget?: string;
+  /** Retry strategy for the relay hop. */
+  retryStrategy?: RetryPolicy;
+
+  /* ---- Loop ---- */
+  /** Maximum number of times this loop may re-enter before it is cut off. */
+  maxIterations?: number;
+  /** The node id the loop returns to (the loop's entry point). */
+  loopTargetId?: string;
+  /** A guard expression that, when false, exits the loop early. */
+  loopCondition?: string;
+}
+
+/** A named variable with an optional description and default. */
+export interface NodeVariable {
+  name: string;
+  description?: string;
+  defaultValue?: string;
+}
+
+/** A retry policy: how many times and with what backoff. */
+export interface RetryPolicy {
+  /** Maximum retry attempts (0 = no retry). */
+  maxAttempts: number;
+  /** Backoff strategy. */
+  backoff: "none" | "fixed" | "exponential";
+  /** Delay between retries in seconds (fixed) or base delay (exponential). */
+  delaySeconds: number;
+}
+
+/** An escalation rule triggered when an SLA is breached. */
+export interface EscalationRule {
+  /** When to escalate, in hours after the SLA deadline. */
+  afterHours: number;
+  /** Who to escalate to. */
+  escalateTo: string;
+  /** Optional action, e.g. "notify", "reassign", "block". */
+  action?: string;
+}
+
+/** A single node in a workflow graph. */
+export interface WorkflowNode {
+  id: string;
+  type: WorkflowNodeType;
+  /** Display label (task title, agent name, condition name, …). */
+  label: string;
+  /** Canvas position in pixels. */
+  x: number;
+  y: number;
+  /** OpenHands profile id assigned to this node (agent orchestration). */
+  profileId?: string | null;
+  /** Agent id assigned to this node. */
+  agentId?: string | null;
+  /** Model id assigned to this node. */
+  modelId?: string | null;
+  /** For task nodes: the board task id this node wraps. */
+  taskId?: string | null;
+  /** Type-specific configuration (see WorkflowNodeConfig). */
+  config?: WorkflowNodeConfig;
+  /**
+   * Number of output ports this node exposes. A node with `outputPorts: 3`
+   * renders three distinct output handles (port 0, 1, 2) so the user can wire
+   * a 3-way / 4-way / N-way branch directly from the node. Defaults to 1.
+   */
+  outputPorts?: number;
+}
+
+/** A directed edge between two workflow nodes. */
+export interface WorkflowEdge {
+  id: string;
+  from: string;
+  to: string;
+  /** Human-readable connection name, e.g. "Research Complete". */
+  name?: string;
+  /** The execution rule that governs this connection. */
+  condition: EdgeCondition;
+  /** A custom routing expression, e.g. `status == 'approved'`. */
+  expression?: string;
+  /** Lower number = higher precedence when multiple edges could fire. */
+  priority?: number;
+  /** Whether this edge is the designated success path. */
+  successPath?: boolean;
+  /** Whether this edge is the designated failure path. */
+  failurePath?: boolean;
+  /**
+   * For loop edges (condition === "IF_LOOP"): the maximum number of times this
+   * edge may fire before the loop is cut off. Defaults to a safe ceiling when
+   * absent. This is the loop-limit that prevents infinite A → B → C → A cycles.
+   */
+  loopLimit?: number;
+  /** Free-form metadata (key → value). */
+  metadata?: Record<string, string>;
+}
+
+/** A workflow: a directed graph of typed nodes with conditional edges. */
 export interface Workflow {
   id: string;
   name: string;
   description: string;
-  /** Task ids that participate in this workflow. */
-  nodeIds: string[];
-  /** Directed edges: from -> to (to depends on from). */
-  edges: { from: string; to: string }[];
+  /** The graph nodes (each carries its own canvas position). */
+  nodes: WorkflowNode[];
+  /** The directed, condition-labelled edges. */
+  edges: WorkflowEdge[];
   status: "draft" | "active" | "completed";
 }
 

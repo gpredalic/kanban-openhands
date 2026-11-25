@@ -106,7 +106,13 @@
  * ------------------------------------------------------------------ */
 .kb-app {
   position: relative;
-  min-height: 100%;
+  /* Self-contained full-page floor. `min-height: 100%` would resolve against
+     the parent's definite `height`, but #kanban-extension-root only sets
+     `min-height: 100vh` (no definite height), so `100%` collapses to `auto`
+     and the gradient stops at the content edge instead of filling the page.
+     `100vh` is viewport-based and always resolves, so the gradient covers the
+     whole page in both the harness and real Agent Canvas. */
+  min-height: 100vh;
   overflow-x: hidden;
   background:
     radial-gradient(1200px 600px at 85% -10%, rgba(99, 102, 241, 0.16), transparent 60%),
@@ -180,15 +186,20 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Task card — glass surface with a hover lift (scale 1.02), a soft
- * indigo glow, and a 200ms transition. Rounded 16px.
+ * Task card — glass surface with a hover highlight (border + indigo
+ * glow) and a 200ms transition. Rounded 16px.
+ *
+ * No scale transform on hover: scaling the card makes it visually
+ * overflow its column, which widens the board and triggers a
+ * horizontal scrollbar. The hover feedback is carried entirely by the
+ * border-color highlight and the glow shadow — box-shadow never affects
+ * layout, so the card stays strictly within its bounds and the board
+ * remains stable.
  * ------------------------------------------------------------------ */
 .kb-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  will-change: transform;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .kb-card:hover {
-  transform: scale(1.02);
   border-color: rgba(99, 102, 241, 0.35);
   box-shadow: var(--kb-shadow-glow);
 }
@@ -266,6 +277,30 @@
   animation: kb-fade-in 0.2s ease-out both;
 }
 
+/* Deletion failed — rose ring so the card reads as an error state. */
+.kb-delete-failed {
+  border-color: rgba(244, 63, 94, 0.5) !important;
+  box-shadow: 0 0 0 1px rgba(244, 63, 94, 0.3), 0 8px 24px rgba(244, 63, 94, 0.2) !important;
+}
+
+/* Fade-out for the final "fading" phase — the card dissolves over 400ms
+   after the backend confirms the conversation is gone, just before it is
+   removed from the DOM. */
+@keyframes kb-delete-fade-out {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+.kb-delete-fading {
+  animation: kb-delete-fade-out 0.4s ease-in both;
+  pointer-events: none;
+}
+
 /* Loading skeleton shimmer. */
 @keyframes kb-shimmer {
   0% {
@@ -286,6 +321,20 @@
   animation: kb-shimmer 1.6s linear infinite;
 }
 
+/* Running task — pulsing indigo glow to signal active execution. */
+@keyframes kb-running-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3), 0 0 12px rgba(99, 102, 241, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5), 0 0 24px rgba(99, 102, 241, 0.3);
+  }
+}
+.kb-running {
+  animation: kb-running-pulse 2s ease-in-out infinite;
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
 /* Thin custom scrollbar. */
 .kb-scroll::-webkit-scrollbar {
   width: 6px;
@@ -300,4 +349,159 @@
 }
 .kb-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.35);
+}
+
+/* ------------------------------------------------------------------ *
+ * Completion animation — green flash when a task reaches "done".
+ * ------------------------------------------------------------------ */
+@keyframes kb-complete-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+    border-color: rgba(34, 197, 94, 0.8);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.25);
+    border-color: rgba(34, 197, 94, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    border-color: rgba(148, 163, 184, 0.12);
+  }
+}
+.kb-complete {
+  animation: kb-complete-flash 0.8s ease-out both;
+}
+
+/* ------------------------------------------------------------------ *
+ * Failure animation — red shake when a task fails.
+ * ------------------------------------------------------------------ */
+@keyframes kb-fail-shake {
+  0%, 100% {
+    transform: translateX(0);
+    border-color: rgba(148, 163, 184, 0.12);
+  }
+  15% {
+    transform: translateX(-4px);
+    border-color: rgba(244, 63, 94, 0.7);
+  }
+  30% {
+    transform: translateX(4px);
+    border-color: rgba(244, 63, 94, 0.6);
+  }
+  45% {
+    transform: translateX(-3px);
+    border-color: rgba(244, 63, 94, 0.5);
+  }
+  60% {
+    transform: translateX(3px);
+    border-color: rgba(244, 63, 94, 0.4);
+  }
+  75% {
+    transform: translateX(-1px);
+    border-color: rgba(244, 63, 94, 0.3);
+  }
+  90% {
+    transform: translateX(1px);
+    border-color: rgba(244, 63, 94, 0.2);
+  }
+}
+.kb-failed {
+  animation: kb-fail-shake 0.6s ease-in-out both;
+}
+
+/* ------------------------------------------------------------------ *
+ * Status change animation — subtle pulse when a task moves columns.
+ * ------------------------------------------------------------------ */
+@keyframes kb-status-change {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    transform: scale(1.015);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+.kb-status-changed {
+  animation: kb-status-change 0.5s ease-out both;
+}
+
+/* ------------------------------------------------------------------ *
+ * FLIP column-move animation — the card lifts, glides across the board,
+ * and settles into its destination column. The destination column pulses
+ * with a soft border glow and background tint that fade out.
+ *
+ * The accent color is status-aware, set by the hook as a CSS custom
+ * property (--kb-flip-accent on the card, --kb-col-accent on the column):
+ *   done        → green  (success)
+ *   review      → amber  (failure / needs attention)
+ *   in_progress → blue   (active execution)
+ *   todo / other→ indigo (neutral)
+ * ------------------------------------------------------------------ */
+
+/* Lift: raised above siblings, glowing in the accent color, slightly
+   transparent so the card reads as "in flight" rather than stuck to the
+   surface. The scale(1.02) is applied inline by the hook during the glide
+   and removed during the settle. */
+.kb-flip-lift {
+  --kb-flip-accent: 99, 102, 241; /* indigo-500 fallback */
+  box-shadow:
+    0 0 0 1px rgba(var(--kb-flip-accent), 0.45),
+    0 12px 32px rgba(var(--kb-flip-accent), 0.35),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  border-color: rgba(var(--kb-flip-accent), 0.5);
+  opacity: 0.92;
+  will-change: transform;
+}
+
+/* Destination column highlight — a soft pulse: the border glow and
+   background tint appear, dip slightly, rise again, then fade out.
+   The accent is set inline as --kb-col-accent by the hook. */
+@keyframes kb-column-highlight {
+  0% {
+    border-color: rgba(var(--kb-col-accent), 0.6);
+    box-shadow: 0 0 0 1px rgba(var(--kb-col-accent), 0.35), 0 0 24px rgba(var(--kb-col-accent), 0.25);
+    background: rgba(var(--kb-col-accent), 0.08);
+  }
+  40% {
+    border-color: rgba(var(--kb-col-accent), 0.45);
+    box-shadow: 0 0 0 1px rgba(var(--kb-col-accent), 0.25), 0 0 16px rgba(var(--kb-col-accent), 0.18);
+    background: rgba(var(--kb-col-accent), 0.05);
+  }
+  65% {
+    border-color: rgba(var(--kb-col-accent), 0.55);
+    box-shadow: 0 0 0 1px rgba(var(--kb-col-accent), 0.3), 0 0 20px rgba(var(--kb-col-accent), 0.22);
+    background: rgba(var(--kb-col-accent), 0.07);
+  }
+  100% {
+    border-color: rgba(148, 163, 184, 0.12);
+    box-shadow: var(--kb-shadow-md);
+    background: transparent;
+  }
+}
+.kb-column-highlight {
+  --kb-col-accent: 99, 102, 241; /* indigo-500 fallback */
+  animation: kb-column-highlight 0.7s ease-out both;
+}
+
+/* ------------------------------------------------------------------ *
+ * Sync indicator — pulsing dot when the board is syncing with
+ * OpenHands.
+ * ------------------------------------------------------------------ */
+@keyframes kb-sync-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+.kb-sync-dot {
+  animation: kb-sync-pulse 1.5s ease-in-out infinite;
 }

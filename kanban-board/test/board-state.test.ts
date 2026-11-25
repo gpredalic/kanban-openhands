@@ -139,10 +139,9 @@ test("BoardStateStore: setColumns / setUiState / markLoaded notify subscribers",
   assert.equal(calls, 1);
   assert.equal(store.get().columns[0].tasks.length, 1);
 
-  store.setUiState({ filter: "active", search: "foo" });
+  store.setUiState({ filter: "active" });
   assert.equal(calls, 2);
   assert.equal(store.get().uiState.filter, "active");
-  assert.equal(store.get().uiState.search, "foo");
 
   store.markLoaded();
   assert.equal(calls, 3);

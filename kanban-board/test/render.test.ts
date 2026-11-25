@@ -126,7 +126,7 @@ test("activate(host) registers the board page and renders the React tree", async
 
   const html = container.innerHTML;
   assert.ok(html.length > 0, "container must contain rendered markup");
-  assert.match(html, /Project Board/, "page title must render");
+  assert.match(html, /Kanban Board/, "page title must render");
   assert.match(html, /Total Tasks/, "Total Tasks metric must render");
   assert.match(html, /In Progress/, "In Progress metric must render");
   assert.match(html, /Review/, "Review metric must render");
@@ -136,7 +136,10 @@ test("activate(host) registers the board page and renders the React tree", async
   assert.match(html, /Implement auth middleware/, "in-progress task card must render");
   assert.match(html, /Review payment integration PR/, "review task card must render");
   assert.match(html, /Ship v2\.0 release notes/, "done task card must render");
-  assert.match(html, /Add Task/, "add-task button must render");
+  // Column-local "+ Add Task" cards were removed: task creation is a single
+  // entry point (the header's "Create Task" button). No column may offer its
+  // own creation affordance.
+  assert.doesNotMatch(html, /Add Task/, "column-local add-task card must not render");
 
   // The header must render the Kanban AI icon (the same asset the manifest
   // references), not the old placeholder square. The SVG is inlined as a

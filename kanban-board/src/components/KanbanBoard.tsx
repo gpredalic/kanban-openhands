@@ -2,10 +2,10 @@
  * KanbanBoard — the top-level board component.
  *
  * Wires the data controller to the UI: header, stats, filters, and the four
- * columns inside a DndContext. Applies the active filter and search query.
+ * columns inside a DndContext. Applies the active filter.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { DndContext } from "@dnd-kit/core";
 import { Header } from "./Header";
 import { StatsCards } from "./StatsCards";
@@ -17,15 +17,16 @@ import { WorkflowView } from "./WorkflowView";
 import { AgentRoster } from "./AgentRoster";
 import { ExecutionHistory } from "./ExecutionHistory";
 import { AnalyticsView } from "./AnalyticsView";
-import { OpenHandsView } from "./OpenHandsView";
 import { TaskDetailModal } from "./TaskDetailModal";
 import { CreateTaskModal } from "./CreateTaskModal";
+import { SkeletonColumn, SkeletonStat } from "./Skeleton";
 import { useBoardState } from "../hooks/useBoardState";
 import { useDragDrop } from "../hooks/useDragDrop";
+import { useFlipAnimation } from "../hooks/useFlipAnimation";
 import { useAiState } from "../lib/ai-store";
-import { applyAiOverlay, resetAiConfig, SEED_AGENTS } from "../lib/ai-overlay";
+import { applyAiOverlay, SEED_AGENTS } from "../lib/ai-overlay";
 import { computeStats } from "../lib/board-state";
-import type { Host, Task, BoardFilter } from "../types/task";
+import type { Host, Task, BoardFilter, TaskPriority } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import { commandExecution, fetchAgentProfiles, useOpenHandsState } from "../lib/openhands";
 import { resolveRouting } from "../lib/ai-engine";
@@ -49,16 +50,6 @@ function matchesFilter(task: Task, filter: BoardFilter): boolean {
   }
 }
 
-function matchesSearch(task: Task, search: string): boolean {
-  if (!search) return true;
-  const q = search.toLowerCase();
-  return (
-    task.title.toLowerCase().includes(q) ||
-    (task.assignee ?? "").toLowerCase().includes(q) ||
-    (task.tags ?? []).some((t) => t.toLowerCase().includes(q))
-  );
-}
-
 export function KanbanBoard({ host }: KanbanBoardProps) {
   const { state, controller } = useBoardState(host);
   const { sensors, onDragEnd, onDragStart, activeTaskId } = useDragDrop(
@@ -67,13 +58,21 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     },
   );
   const { state: aiState, store: aiStore } = useAiState(host);
-  const openHandsState = useOpenHandsState(host);
+  const { state: openHandsState, reset: resetOpenHands } = useOpenHandsState(host);
   const [view, setView] = useState<ViewId>("board");
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; detail: string; at: number; read: boolean }>>([]);
   const [assignmentAgents, setAssignmentAgents] = useState<Agent[]>([]);
+  // Task ids whose Run / Stop request is in flight — drives the spinner +
+  // disabled state on the card's Run/Stop button so the user sees the action
+  // is being processed instead of a silent click.
+  const [runLoadingTaskIds, setRunLoadingTaskIds] = useState<Set<string>>(new Set());
+  const [stopLoadingTaskIds, setStopLoadingTaskIds] = useState<Set<string>>(new Set());
+
+  // FLIP animation: captures card positions before each render and animates
+  // any card that moved between columns (status change) with a lift + glide.
+  const boardRef = useRef<HTMLDivElement>(null);
+  useFlipAnimation(boardRef);
 
   useEffect(() => {
     let cancelled = false;
@@ -132,25 +131,16 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     return state.columns.map((col) => ({
       ...col,
       tasks: col.tasks
-        .filter(
-          (t) => matchesFilter(t, state.uiState.filter) && matchesSearch(t, state.uiState.search),
-        )
+        .filter((t) => matchesFilter(t, state.uiState.filter))
         .map((t) => enrichedById.get(t.id) ?? t),
     }));
-  }, [state.columns, state.uiState.filter, state.uiState.search, enrichedTasks]);
+  }, [state.columns, state.uiState.filter, enrichedTasks]);
 
-  const handleCreate = (title: string, status: Task["status"], assignee?: string | null, agentId?: string | null) => {
-    void controller.create(title, status, assignee, undefined, agentId);
-    setNotifications((current) => [{
-      id: `board-create-${Date.now()}`,
-      title: "Task created",
-      detail: title,
-      at: Date.now(),
-      read: false,
-    }, ...current].slice(0, 20));
+  const handleCreate = (title: string, status: Task["status"], assignee?: string | null, agentId?: string | null, agentPrompt?: string, expectedOutput?: string, successCriteria?: string, priority?: TaskPriority) => {
+    void controller.create(title, status, assignee, undefined, agentId, agentPrompt, expectedOutput, successCriteria, priority);
   };
 
-  const handleEditSave = (taskId: string, patch: { title?: string; assignee?: string | null; agentId?: string | null }) => {
+  const handleEditSave = (taskId: string, patch: { title?: string; assignee?: string | null; agentId?: string | null; agentPrompt?: string; expectedOutput?: string; successCriteria?: string; priority?: TaskPriority }) => {
     void controller.update(taskId, patch);
   };
 
@@ -158,137 +148,163 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     void controller.remove(taskId);
   };
 
-  const handleToggleOrchestration = () => {
-    const hasActiveOpenHandsRuns = openHandsState.snapshot.executions.some(
-      (item) => item.status === "queued" || item.status === "running",
-    );
-    if (hasActiveOpenHandsRuns) {
-      for (const run of openHandsState.snapshot.executions.filter((item) => item.status === "running")) {
-        void commandExecution(host, "stop", { executionId: run.id }).catch((error: unknown) => {
-          console.error("[kanban-board] OpenHands stop failed:", error);
-        });
-      }
-      return;
-    }
-    for (const task of enrichedTasks.filter((item) => item.status === "in_progress")) {
-      // Resolve the real OpenHands profile id assigned to the task. resolveRouting
-      // returns the explicit assignment (task.ai.agentId) first, which is the real
-      // profile id from /api/agent-profiles (e.g. d83cb56e-...). Passing it straight
-      // through — instead of the SEED_AGENTS lookup, which only knows demo agent ids
-      // and would resolve the real profile to null — is what makes createConversation
-      // post the correct agent_profile_id.
-      const routing = resolveRouting(task, aiState.config);
-      void commandExecution(host, "start", {
-        taskId: task.id,
-        title: task.title,
-        agentId: routing.agentId ?? undefined,
-        modelId: routing.modelId ?? undefined,
-      }).catch((error: unknown) => {
-        console.error("[kanban-board] OpenHands start failed:", error);
-      });
-    }
-    setNotifications((current) => [{
-      id: `ai-run-${Date.now()}`,
-      title: "AI execution started",
-      detail: `${enrichedTasks.filter((item) => item.status === "in_progress").length} task(s) sent to OpenHands`,
-      at: Date.now(),
-      read: false,
-    }, ...current].slice(0, 20));
+  // Retry a failed delete: re-runs the transaction from the top. The task is
+  // still on disk (it was never removed on failure), so the flow can proceed.
+  const handleRetryDelete = (taskId: string) => {
+    void controller.remove(taskId);
   };
 
-  const handleResetAiConfig = () => {
-    aiStore.setConfig(resetAiConfig());
+  // Cancel a failed delete: clear the error state and return the card to normal.
+  const handleCancelDelete = (taskId: string) => {
+    controller.cancelDelete(taskId);
   };
 
-  // Per-task Run AI: starts a fresh OpenHands conversation for THIS task only,
-  // using the real profile id assigned to it (task.ai.agentId). It never looks
-  // at other tasks' executions, so a running Task A cannot block Task B.
+  // Per-task Run: routes to THIS task's own conversation. If the task already
+  // has a linked conversation (task.ai.executionId / task.conversationId) it is
+  // reused — so editing the task (title, prompt, etc.) keeps it on the SAME
+  // conversation it was first created in, instead of spawning a fresh one. Only
+  // a task with no conversation yet gets a new one. It never looks at other
+  // tasks' executions, so a running Task A cannot block Task B.
   const handleTaskRun = (task: EnrichedTask) => {
     const routing = resolveRouting(task, aiState.config);
+    setRunLoadingTaskIds((prev) => new Set(prev).add(task.id));
     void commandExecution(host, "start", {
       taskId: task.id,
       title: task.title,
+      agentPrompt: task.agentPrompt,
+      expectedOutput: task.expectedOutput,
+      successCriteria: task.successCriteria,
       agentId: routing.agentId ?? undefined,
       modelId: routing.modelId ?? undefined,
-    }).catch((error: unknown) => {
-      console.error("[kanban-board] OpenHands task start failed:", error);
-    });
-    setNotifications((current) => [{
-      id: `ai-task-run-${task.id}-${Date.now()}`,
-      title: "AI execution started",
-      detail: task.title,
-      at: Date.now(),
-      read: false,
-    }, ...current].slice(0, 20));
+      executionId: task.ai.executionId ?? task.conversationId ?? undefined,
+    })
+      .catch((error: unknown) => {
+        console.error("[kanban-board] OpenHands task start failed:", error);
+      })
+      .finally(() => {
+        setRunLoadingTaskIds((prev) => {
+          const next = new Set(prev);
+          next.delete(task.id);
+          return next;
+        });
+      });
   };
 
-  // Per-task Stop AI: interrupts only this task's linked conversation.
+  // Per-task Stop: interrupts only this task's linked conversation.
   const handleTaskStop = (task: EnrichedTask) => {
     const executionId = task.ai.executionId;
     if (!executionId) return;
-    void commandExecution(host, "stop", { executionId }).catch((error: unknown) => {
-      console.error("[kanban-board] OpenHands task stop failed:", error);
+    setStopLoadingTaskIds((prev) => new Set(prev).add(task.id));
+    void commandExecution(host, "stop", { executionId })
+      .catch((error: unknown) => {
+        console.error("[kanban-board] OpenHands task stop failed:", error);
+      })
+      .finally(() => {
+        setStopLoadingTaskIds((prev) => {
+          const next = new Set(prev);
+          next.delete(task.id);
+          return next;
+        });
+      });
+  };
+
+  // Per-task Retry: spawns a FRESH conversation carrying this task's current
+  // prompt (never the title) and re-runs it. Distinct from Run, which reuses the
+  // task's existing conversation. Only offered once the task has a prior
+  // execution to retry.
+  const handleTaskRetry = (task: EnrichedTask) => {
+    const routing = resolveRouting(task, aiState.config);
+    void commandExecution(host, "retry", {
+      taskId: task.id,
+      title: task.title,
+      agentPrompt: task.agentPrompt,
+      expectedOutput: task.expectedOutput,
+      successCriteria: task.successCriteria,
+      agentId: routing.agentId ?? undefined,
+      modelId: routing.modelId ?? undefined,
+    }).catch((error: unknown) => {
+      console.error("[kanban-board] OpenHands task retry failed:", error);
     });
   };
 
+  // Command Center execution control: start / stop / retry a specific execution
+  // record by id. Task-centric — never a global toggle.
   const handleOpenHandsCommand = (command: "start" | "stop" | "retry", executionId: string) => {
     void commandExecution(host, command, { executionId }).catch((error: unknown) => {
       console.error("[kanban-board] OpenHands command failed:", error);
     });
   };
 
-  return (
-    <div className="kb-app flex min-h-full flex-col gap-4 p-3 sm:p-4 lg:p-5">
-      <Header
-        search={state.uiState.search}
-        onSearch={(v) => controller.setUiState({ search: v })}
-        onCreate={() => setShowCreateModal(true)}
-        orchestrationRunning={openHandsState.snapshot.executions.some(
-          (item) => item.status === "queued" || item.status === "running",
-        )}
-        onToggleOrchestration={handleToggleOrchestration}
-        notifications={notifications}
-        notificationsOpen={notificationsOpen}
-        onToggleNotifications={() => {
-          setNotificationsOpen((open) => !open);
-          setNotifications((current) => current.map((item) => ({ ...item, read: true })));
-        }}
-      />
+  // Refresh the board when the user returns to the Board view so inbound
+  // OpenHands conversations (created outside the board) are reflected promptly
+  // instead of waiting for the next 15s poll.
+  const handleViewChange = (next: ViewId) => {
+    setView(next);
+    if (next === "board") void controller.load();
+  };
 
-      <ViewSwitcher view={view} onView={setView} />
+  return (
+    <div className="kb-app flex flex-col gap-4 p-3 sm:p-4 lg:p-5">
+      <Header onCreate={() => setShowCreateModal(true)} syncing={state.uiState.syncing} />
+
+      <ViewSwitcher view={view} onView={handleViewChange} />
 
       {view === "board" ? (
         <>
-          <StatsCards stats={stats} />
+          {state.uiState.lastLoadedAt === 0 ? (
+            /* Initial load — show skeleton placeholders */
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <SkeletonStat />
+                <SkeletonStat />
+                <SkeletonStat />
+                <SkeletonStat />
+              </div>
+              <div className="relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <SkeletonColumn />
+                <SkeletonColumn />
+                <SkeletonColumn />
+                <SkeletonColumn />
+              </div>
+            </>
+          ) : (
+            <>
+              <StatsCards stats={stats} />
 
-          <FilterBar
-            filter={state.uiState.filter}
-            onFilter={(f) => controller.setUiState({ filter: f })}
-          />
+              <FilterBar
+                filter={state.uiState.filter}
+                onFilter={(f) => controller.setUiState({ filter: f })}
+              />
 
-          <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-            <div className="relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-              {filteredColumns.map((col) => (
-                <KanbanColumn
-                  key={col.status}
-                  column={col}
-                  agents={assignmentAgents}
-                  activeTaskId={activeTaskId}
-                  onCreate={handleCreate}
-                  onEdit={setEditingTask}
-                  onDelete={handleDelete}
-                  onTaskRun={handleTaskRun}
-                  onTaskStop={handleTaskStop}
-                />
-              ))}
-            </div>
-          </DndContext>
+              <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+                <div ref={boardRef} className="relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  {filteredColumns.map((col) => (
+                    <KanbanColumn
+                      key={col.status}
+                      column={col}
+                      agents={assignmentAgents}
+                      activeTaskId={activeTaskId}
+                      deletingTaskIds={state.uiState.deletingTaskIds}
+                      deletePhases={state.uiState.deletePhases}
+                      deleteErrors={state.uiState.deleteErrors}
+                      onEdit={setEditingTask}
+                      onDelete={handleDelete}
+                      onRetryDelete={handleRetryDelete}
+                      onCancelDelete={handleCancelDelete}
+                    />
+                  ))}
+                </div>
+              </DndContext>
+            </>
+          )}
         </>
       ) : view === "workflow" ? (
         <WorkflowView
           aiState={aiState}
           tasks={enrichedTasks}
           openHandsState={openHandsState}
+          profiles={assignmentAgents}
+          onCommand={handleOpenHandsCommand}
           onCreate={(workflow) => aiStore.setConfig({
             ...aiState.config,
             workflows: [...aiState.config.workflows, workflow],
@@ -302,35 +318,36 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
             workflows: aiState.config.workflows.filter((item) => item.id !== workflowId),
           })}
         />
-      ) : view === "command" ? (
-        <OpenHandsView
-          host={host}
-          state={openHandsState}
-          tasks={enrichedTasks}
-          agents={aiState.config.agents}
-          onCommand={handleOpenHandsCommand}
-        />
       ) : view === "agents" ? (
-        <AgentRoster
-          aiState={aiState}
-          onReset={handleResetAiConfig}
-          onConfigChange={(config) => aiStore.setConfig(config)}
-        />
+        <AgentRoster host={host} openHandsState={openHandsState} />
       ) : view === "history" ? (
-        <ExecutionHistory openHandsState={openHandsState} aiState={aiState} />
+        <ExecutionHistory openHandsState={openHandsState} aiState={aiState} onReset={resetOpenHands} />
       ) : (
-        <AnalyticsView aiState={aiState} openHandsState={openHandsState} />
+        <AnalyticsView aiState={aiState} openHandsState={openHandsState} onReset={resetOpenHands} />
       )}
 
       {editingTask && (
         <TaskDetailModal
           task={editingTask}
           agents={assignmentAgents}
+          openHandsState={openHandsState}
+          running={
+            (() => {
+              const live = enrichedTasks.find((t) => t.id === editingTask.id) as EnrichedTask | undefined;
+              const status = live?.ai?.executionStatus ?? (editingTask as EnrichedTask).ai?.executionStatus;
+              return status === "running" || status === "queued";
+            })()
+          }
           onClose={() => setEditingTask(null)}
           onSave={handleEditSave}
           onDelete={handleDelete}
           onSetTags={(id, tags) => controller.setTags(id, tags)}
           onSetDueDate={(id, due) => controller.setDueDate(id, due)}
+          onTaskRun={handleTaskRun}
+          onTaskStop={handleTaskStop}
+          onTaskRetry={handleTaskRetry}
+          runLoading={runLoadingTaskIds.has(editingTask.id)}
+          stopLoading={stopLoadingTaskIds.has(editingTask.id)}
         />
       )}
 
@@ -338,7 +355,9 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
         <CreateTaskModal
           onClose={() => setShowCreateModal(false)}
           agents={assignmentAgents}
-          onCreate={(title, status, assignee, agentId) => handleCreate(title, status, assignee, agentId)}
+          onCreate={(title, status, assignee, agentId, agentPrompt, expectedOutput, successCriteria, priority) =>
+            handleCreate(title, status, assignee, agentId, agentPrompt, expectedOutput, successCriteria, priority)
+          }
         />
       )}
     </div>

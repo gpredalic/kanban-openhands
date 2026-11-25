@@ -7,21 +7,25 @@
  */
 
 import { useDroppable } from "@dnd-kit/core";
-import type { Column, Task, TaskStatus } from "../types/task";
-import type { Agent, EnrichedTask } from "../types/ai";
+import type { Column, Task, TaskStatus, DeletePhase } from "../types/task";
+import type { Agent } from "../types/ai";
 import { TaskCard } from "./TaskCard";
-import { AddTaskCard } from "./AddTaskCard";
 import { EmptyState } from "./EmptyState";
 
 interface KanbanColumnProps {
   column: Column;
   activeTaskId: string | null;
   agents?: Agent[];
-  onCreate: (title: string, status: TaskStatus) => void;
+  /** Task ids currently being deleted — shows a "Deleting…" overlay on those cards. */
+  deletingTaskIds?: Set<string>;
+  /** The current delete phase per task id — drives the phase-specific overlay text. */
+  deletePhases?: Map<string, DeletePhase>;
+  /** A delete failure reason per task id — shows the "Deletion Failed" state. */
+  deleteErrors?: Map<string, string>;
   onEdit?: (task: Task) => void;
   onDelete?: (taskId: string) => void;
-  onTaskRun?: (task: EnrichedTask) => void;
-  onTaskStop?: (task: EnrichedTask) => void;
+  onRetryDelete?: (taskId: string) => void;
+  onCancelDelete?: (taskId: string) => void;
 }
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
@@ -31,7 +35,7 @@ const STATUS_COLORS: Record<TaskStatus, string> = {
   done: "bg-emerald-500",
 };
 
-export function KanbanColumn({ column, activeTaskId, agents = [], onCreate, onEdit, onDelete, onTaskRun, onTaskStop }: KanbanColumnProps) {
+export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
   const dot = STATUS_COLORS[column.status];
 
@@ -67,22 +71,16 @@ export function KanbanColumn({ column, activeTaskId, agents = [], onCreate, onEd
               task={task}
               agents={agents}
               isDragging={activeTaskId === task.id}
+              deleting={deletingTaskIds?.has(task.id) ?? false}
+              deletePhase={deletePhases?.get(task.id)}
+              deleteError={deleteErrors?.get(task.id)}
               onEdit={onEdit}
               onDelete={onDelete}
-              onTaskRun={onTaskRun}
-              onTaskStop={onTaskStop}
+              onRetryDelete={onRetryDelete}
+              onCancelDelete={onCancelDelete}
             />
           ))
         )}
-      </div>
-
-      {/* Add task */}
-      <div className="mt-3">
-        <AddTaskCard
-          status={column.status}
-          columnTitle={column.title}
-          onCreate={onCreate}
-        />
       </div>
     </div>
   );

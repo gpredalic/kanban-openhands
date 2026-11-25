@@ -30,7 +30,7 @@ function clickText(container: HTMLElement, text: string) {
   return el as HTMLButtonElement;
 }
 
-function changeInput(input: HTMLInputElement, value: string) {
+function changeInput(input: HTMLInputElement | HTMLTextAreaElement, value: string) {
   assert.ok(input, "input exists before typing");
   const setter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(input), "value")?.set;
   setter?.call(input, value);
@@ -90,10 +90,13 @@ test("trash button deletes the task from DOM and persisted file", async () => {
   const container = fixture.trigger();
   await waitFor(() => container.textContent?.includes("Create Task") ?? false);
 
-  // Create a task through the real modal.
+  // Create a task through the real modal. The Create button is disabled until
+  // both the title and the agent prompt are filled (the prompt is its own
+  // required field, never derived from the title).
   clickText(container, "Create Task");
-  await waitFor(() => Boolean(container.querySelector('input[placeholder="What needs to be done?"]')));
-  changeInput(container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement, "Delete me task");
+  await waitFor(() => Boolean(container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]')));
+  changeInput(container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]') as HTMLInputElement, "Delete me task");
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Delete this task after verifying the trash button works.");
   clickText(container, "Create");
 
   // The task must appear in the DOM and be persisted.
@@ -131,8 +134,9 @@ test("detail modal Delete + Confirm Delete removes the task", async () => {
   await waitFor(() => container.textContent?.includes("Create Task") ?? false);
 
   clickText(container, "Create Task");
-  await waitFor(() => Boolean(container.querySelector('input[placeholder="What needs to be done?"]')));
-  changeInput(container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement, "Modal delete task");
+  await waitFor(() => Boolean(container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]')));
+  changeInput(container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]') as HTMLInputElement, "Modal delete task");
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Delete this task through the detail modal.");
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Modal delete task")), "created task renders");
 

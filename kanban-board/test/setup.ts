@@ -18,6 +18,10 @@ g.window = window;
 g.document = window.document;
 g.localStorage = window.localStorage;
 g.Blob = window.Blob;
+// Wire happy-dom's FormData too: saveTasks() builds a happy-dom Blob and
+// appends it to a FormData. If FormData stayed Node's built-in (undici), its
+// append() rejects the happy-dom Blob as "not an instance of Blob".
+g.FormData = window.FormData;
 g.URL = window.URL;
 g.HTMLElement = window.HTMLElement;
 g.HTMLButtonElement = window.HTMLButtonElement;

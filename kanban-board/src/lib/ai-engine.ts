@@ -16,7 +16,6 @@ import type {
   LLMModel,
   RoutingResolution,
   RoutingRule,
-  Workflow,
 } from "../types/ai";
 
 /* ------------------------------------------------------------------ *
@@ -203,11 +202,11 @@ export function computeDepths(deps: Record<string, string[]>): Record<string, nu
 }
 
 /* ------------------------------------------------------------------ *
- * Workflow DAG layout.
+ * Workflow graph layout.
  * ------------------------------------------------------------------ */
 
-/** A positioned node in a workflow DAG. */
-export interface DagNode {
+/** A positioned node in a workflow graph. */
+export interface PositionedNode {
   id: string;
   /** Column (depth) in the layered layout. */
   layer: number;
@@ -216,36 +215,78 @@ export interface DagNode {
 }
 
 /**
- * Lay out a workflow's nodes into a layered DAG (LangGraph-style).
+ * Compute a layered (Sugiyama-style) layout for a workflow graph.
  *
- * Nodes are assigned to layers by their dependency depth. Within a layer,
- * nodes are ordered by their input order. Returns the positioned nodes and
- * the total number of layers.
+ * Nodes are assigned to layers by their longest-path depth from a source,
+ * which preserves branch structure: nodes sharing a common ancestor land in
+ * the same layer. Within a layer, nodes are ordered by barycenter — the mean
+ * position of their neighbors in the adjacent layer — over several sweeps to
+ * minimize edge crossings. Returns the positioned nodes and the total number
+ * of layers. Used to auto-arrange a freshly created or imported graph before
+ * the user drags nodes into place.
  */
-export function layoutWorkflow(workflow: Workflow, tasks: EnrichedTask[]): { nodes: DagNode[]; layers: number } {
-  const taskById = new Map(tasks.map((t) => [t.id, t]));
-  // Build the dependency map restricted to the workflow's nodes.
+export function autoLayout(
+  nodes: { id: string }[],
+  edges: { from: string; to: string }[],
+): { nodes: PositionedNode[]; layers: number } {
+  const ids = new Set(nodes.map((n) => n.id));
+  // Build the dependency map: node -> the nodes it depends on (its inputs).
   const deps: Record<string, string[]> = {};
-  for (const id of workflow.nodeIds) {
-    const task = taskById.get(id);
-    deps[id] = (task?.ai.dependsOn ?? []).filter((d) => workflow.nodeIds.includes(d));
+  const outgoing: Record<string, string[]> = {};
+  for (const n of nodes) {
+    deps[n.id] = [];
+    outgoing[n.id] = [];
+  }
+  for (const e of edges) {
+    if (ids.has(e.from) && ids.has(e.to)) {
+      deps[e.to].push(e.from);
+      outgoing[e.from].push(e.to);
+    }
   }
   const depth = computeDepths(deps);
-  const maxLayer = workflow.nodeIds.reduce((m, id) => Math.max(m, depth[id] ?? 0), 0);
+  const maxLayer = nodes.reduce((m, n) => Math.max(m, depth[n.id] ?? 0), 0);
 
   // Group nodes by layer, preserving input order.
   const byLayer: string[][] = [];
   for (let i = 0; i <= maxLayer; i++) byLayer.push([]);
-  for (const id of workflow.nodeIds) {
-    byLayer[depth[id] ?? 0].push(id);
+  for (const n of nodes) {
+    byLayer[depth[n.id] ?? 0].push(n.id);
   }
 
-  const nodes: DagNode[] = [];
+  // ---- Barycenter ordering to minimize crossings ------------------------
+  // Track each node's current row; repeatedly reorder each layer by the mean
+  // row of its neighbors in the layer above (forward sweep) or below (backward
+  // sweep). A few sweeps converge to a low-crossing ordering.
+  const row = new Map<string, number>();
+  const seedRows = () => {
+    byLayer.forEach((layerNodes) => layerNodes.forEach((id, r) => row.set(id, r)));
+  };
+  seedRows();
+
+  for (let sweep = 0; sweep < 4; sweep++) {
+    const forward = sweep % 2 === 0;
+    const layerOrder = forward
+      ? byLayer.map((_, i) => i)
+      : byLayer.map((_, i) => i).reverse();
+    for (const layer of layerOrder) {
+      const neighborLayer = forward ? layer - 1 : layer + 1;
+      const neighborIds = new Set(neighborLayer >= 0 && neighborLayer <= maxLayer ? byLayer[neighborLayer] : []);
+      const barycenter = (id: string): number => {
+        const neighbors = (forward ? deps[id] : outgoing[id]).filter((n) => neighborIds.has(n));
+        if (neighbors.length === 0) return row.get(id) ?? 0;
+        return neighbors.reduce((sum, n) => sum + (row.get(n) ?? 0), 0) / neighbors.length;
+      };
+      byLayer[layer].sort((a, b) => barycenter(a) - barycenter(b) || a.localeCompare(b));
+      byLayer[layer].forEach((id, r) => row.set(id, r));
+    }
+  }
+
+  const positioned: PositionedNode[] = [];
   for (let layer = 0; layer <= maxLayer; layer++) {
-    byLayer[layer].forEach((id, row) => {
-      nodes.push({ id, layer, row });
+    byLayer[layer].forEach((id, rowIdx) => {
+      positioned.push({ id, layer, row: rowIdx });
     });
   }
-  return { nodes, layers: maxLayer + 1 };
+  return { nodes: positioned, layers: maxLayer + 1 };
 }
 

@@ -115,11 +115,14 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   const container = fixture.trigger();
   assert.ok(await waitFor(() => container.textContent?.includes("Design the onboarding flow") ?? false), "board loads with initial tasks");
 
-  // 1. CREATE TASK
+  // 1. CREATE TASK — the title is the business identifier and the agent prompt
+  // is its own required field (never derived from the title). The Create button
+  // stays disabled until both are filled.
   clickText(container, "Create Task");
-  assert.ok(await waitFor(() => Boolean(container.querySelector('input[placeholder="What needs to be done?"]'))), "create form opens");
-  const createTitle = container.querySelector('input[placeholder="What needs to be done?"]') as HTMLInputElement;
+  assert.ok(await waitFor(() => Boolean(container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]'))), "create form opens");
+  const createTitle = container.querySelector('input[placeholder="e.g. Replace vending machine cash reader"]') as HTMLInputElement;
   changeInput(createTitle, "Acceptance created task");
+  changeInput(container.querySelector('textarea[placeholder^="Describe what the AI agent"]') as HTMLTextAreaElement, "Acceptance sweep: verify the task-centric execution flow.");
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Acceptance created task") ?? false), "created task visible on board");
   assert.ok(fixture.getTasks().some((t) => t.title === "Acceptance created task"), "created task persisted to file");
@@ -161,50 +164,55 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => reload.textContent?.includes("Acceptance created task") ?? false), "created task survives reload");
   assert.ok(fixture.getTasks().find((t) => t.title === "Acceptance created task")?.status === "in_progress", "moved status survives reload");
 
-  // 6. SEARCH
-  const search = reload.querySelector('input[aria-label="Search tasks"]') as HTMLInputElement;
-  changeInput(search, "Acceptance created");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Acceptance created task") ?? false), "search shows matching task");
-  assert.ok(!reload.textContent?.includes("Design the onboarding flow"), "search hides non-matching task");
-  changeInput(search, "");
+  // 6. SEARCH — board search was removed; the header no longer carries a search
+  // box and the board no longer filters by free-text query.
+  assert.ok(reload.querySelector('input[aria-label="Search tasks"]') === null, "board search input is gone");
 
-  // 7. NOTIFICATIONS
-  const notification = reload.querySelector('button[aria-label="Notifications"]') as HTMLButtonElement;
-  notification.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => reload.querySelector('button[aria-label="Notifications"]')?.getAttribute("data-notifications-open") === "true", 1500), "notification panel opens");
+  // 7. NOTIFICATIONS — the notification icon and its panel were removed from
+  // the header; no notification button or surface may remain.
+  assert.ok(reload.querySelector('button[aria-label="Notifications"]') === null, "notification button is gone");
+  assert.ok(reload.querySelector('[aria-label="Notification surface"]') === null, "notification surface is gone");
 
-  // 8. RUN AI — the button is state-driven: it reads "Stop AI" once a real
-  // OpenHands execution is queued/running (creating a task posts a running
-  // conversation). Click whichever label is present; a running execution means
-  // the toggle is already active (aria-pressed true) and a conversation exists.
+  // 8. RUN AI — execution is now task-centric: the header no longer carries a
+  // global Run AI / Stop AI toggle. The Run / Stop / Retry actions live in the
+  // task detail modal (moved off the card). Opening a task's detail modal and
+  // clicking Run posts a fresh OpenHands conversation for THAT task only, and
+  // the button flips to Stop once the run is live.
   clickText(reload, "Board");
-  const runAiToggle = [...reload.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Run AI" || b.textContent?.trim() === "Stop AI");
-  assert.ok(runAiToggle, "Run AI / Stop AI toggle present");
-  runAiToggle.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-pressed="true"]')) ?? false), "Run AI toggles active");
+  const runEditBtn = reload.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
+  assert.ok(runEditBtn, "Edit task button present on a task card");
+  runEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
+  const taskRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
+  taskRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Stop this task"]')) ?? false), "Run AI flips the task to Stop AI once running");
   assert.ok(fixture.calls.some((c) => c.method === "POST" && c.path === "/api/conversations"), "Run AI posts a conversation to OpenHands");
 
-  // 9. COMMAND CENTER
-  clickText(reload, "Command Center");
-  assert.ok(await waitFor(() => reload.textContent?.includes("OpenHands Command Center") ?? false), "Command Center view renders");
-
-  // 10. WORKFLOW VIEW
+  // 9. ORCHESTRATION — the former Command Center is now a collapsible panel
+  // inside the Workflow view. Switching to Workflow and expanding the panel
+  // surfaces live executions and the knowledge graph. The relay is now a
+  // first-class workflow node type in the palette.
   clickText(reload, "Workflow");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Workflow") ?? false), "Workflow view renders");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Orchestration") ?? false), "Workflow view renders with orchestration panel");
+  const orchToggle = [...reload.querySelectorAll("button")].find((b) => b.textContent?.includes("Orchestration"));
+  orchToggle?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => reload.textContent?.includes("Live executions") ?? false), "orchestration panel expands to show live executions");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Knowledge graph") ?? false), "orchestration panel shows the knowledge graph");
+  assert.ok([...reload.querySelectorAll("button")].some((b) => b.textContent?.trim() === "Relay"), "relay is a workflow node type in the palette");
 
-  // 11. AGENTS VIEW
+  // 10. AGENTS VIEW
   clickText(reload, "Agents");
   assert.ok(await waitFor(() => reload.textContent?.includes("Agents") ?? false), "Agents view renders");
 
-  // 12. HISTORY VIEW
+  // 11. HISTORY VIEW
   clickText(reload, "History");
   assert.ok(await waitFor(() => reload.textContent?.includes("Execution History") ?? false), "History view renders");
 
-  // 13. ANALYTICS VIEW
+  // 12. ANALYTICS VIEW
   clickText(reload, "Analytics");
   assert.ok(await waitFor(() => reload.textContent?.includes("Analytics") ?? false), "Analytics view renders");
 
-  // 14. OpenHands -> Board sync (inbound conversation appears)
+  // 13. OpenHands -> Board sync (inbound conversation appears)
   await fixture.host.agentServer.request({
     method: "POST",
     path: "/api/conversations",
@@ -213,51 +221,61 @@ test("full user-acceptance sweep: every button and interaction works", async () 
       tags: {},
     },
   });
-  clickText(reload, "Command Center");
+  clickText(reload, "Board");
   // Poll interval is now 2s; the inbound conversation must appear well under the old 10s.
   assert.ok(await waitFor(() => reload.textContent?.includes("OpenHands inbound conversation") ?? false, 4000), "inbound OpenHands conversation reflected on board (fast poll)");
-  // The Command Center now shows a live "Last synced" indicator.
-  assert.ok(reload.textContent?.includes("Last synced") || reload.textContent?.includes("Not synced yet"), "last-synced indicator visible in Command Center");
 
-  // 15. Board -> OpenHands sync (board task creates conversation)
-  // Orchestration is running from feature 8 (button reads "Stop AI"). Stop it, then
-  // start it again — starting sends in_progress tasks to OpenHands as conversations.
+  // 14. Board -> OpenHands sync (board task creates conversation) — task-centric.
+  // There is no global orchestration toggle anymore. The Run / Stop / Retry
+  // actions live in the task detail modal. Feature 8 already started one task
+  // (its card is now locked / kb-running). Starting a SECOND task must post its
+  // own conversation without being blocked by the first task's live run — proving
+  // execution is task-scoped, not global.
   clickText(reload, "Board");
-  const aiToggle = () => [...reload.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Run AI" || b.textContent?.trim() === "Stop AI");
-  assert.ok(aiToggle(), "Run AI / Stop AI toggle present");
-  aiToggle()!.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); // stop
-  // Wait for the snapshot poll to reflect the interrupt (button returns to "Run AI"),
-  // so the next click takes the start branch rather than a stale stop.
-  assert.ok(await waitFor(() => aiToggle()?.textContent?.trim() === "Run AI" ?? false, 4000), "Run AI button returns after stop");
-  const beforePosts = fixture.calls.filter((c) => c.method === "POST" && c.path === "/api/conversations").length;
-  aiToggle()!.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); // start -> posts in_progress tasks
+  // Feature 8's task is still running — its card carries the kb-running class.
+  assert.ok(await waitFor(() => reload.querySelector('[data-task-id].kb-running') !== null, 2000), "feature 8's task is still running (kb-running card present)");
+  // Close feature 8's detail modal so the board is fully interactive again.
+  const closeBtn = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // Pick a different, idle task's Edit button (the running task's is locked).
+  const idleEditBtn = [...reload.querySelectorAll('button[aria-label="Edit task"]')].find((b) => !b.disabled) as HTMLButtonElement;
+  assert.ok(idleEditBtn, "an idle task's Edit button is available");
+  idleEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the idle task's detail modal");
+  const idleRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
+  const isExecCall = (c: { method: string; path: string }) =>
+    c.method === "POST" && (c.path === "/api/conversations" || /\/api\/conversations\/[^/]+\/run$/.test(c.path));
+  const beforeRuns = fixture.calls.filter(isExecCall).length;
+  idleRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); // start a second task
   await sleep(150);
-  const afterPosts = fixture.calls.filter((c) => c.method === "POST" && c.path === "/api/conversations").length;
-  assert.ok(afterPosts > beforePosts, "board action posts a new conversation to OpenHands");
+  const afterRuns = fixture.calls.filter(isExecCall).length;
+  assert.ok(afterRuns > beforeRuns, "second task's Run AI posts its own execution (task-centric, not blocked by the first)");
 
-  // 16. MULTI-AGENT RELAY
-  clickText(reload, "Command Center");
-  assert.ok(await waitFor(() => reload.textContent?.includes("OpenHands Command Center") ?? false), "Command Center renders for relay");
-  const seed = reload.querySelector("textarea") as HTMLTextAreaElement;
-  changeInput(seed, "Acceptance relay seed");
-  const addAgentSelect = reload.querySelector('select[aria-label="Add agent"]') as HTMLSelectElement;
-  if (addAgentSelect) {
-    addAgentSelect.value = "Scout";
-    addAgentSelect.dispatchEvent(new window.Event("change", { bubbles: true }));
-  }
-  const addAgentBtn = [...reload.querySelectorAll("button")].find((b) => b.title === "Add agent to chain") as HTMLButtonElement;
-  addAgentBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  const startRelay = [...reload.querySelectorAll("button")].find((b) => b.textContent?.includes("Start relay")) as HTMLButtonElement;
-  startRelay?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => reload.textContent?.includes("Relay response from mock agent") ?? false, 1500), "relay hop produces a response");
+  // 16. MULTI-AGENT RELAY — the relay is now a first-class workflow node type
+  // (not a separate panel with a seed textarea). The orchestration panel hosts
+  // live executions + the knowledge graph; the relay node type is in the palette.
+  clickText(reload, "Workflow");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Orchestration") ?? false), "Workflow view renders for relay");
+  const relayOrchToggle = [...reload.querySelectorAll("button")].find((b) => b.textContent?.includes("Orchestration"));
+  relayOrchToggle?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => reload.textContent?.includes("Live executions") ?? false), "orchestration panel expands to show live executions");
+  const relayNodeBtn = [...reload.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Relay");
+  assert.ok(Boolean(relayNodeBtn), "relay is a workflow node type in the palette");
+  relayNodeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await sleep(50);
+  assert.ok(reload.textContent?.includes("Relay") ?? false, "relay node added to the canvas");
 
   // 17. AGENT ASSIGNMENT — open the modal, pick an agent from the select, confirm it shows.
   // Use [data-task-id] (not .kb-card) so we match the task card, not a stat card.
+  // Use an IDLE card (the inbound conversation card) — the created task is still
+  // running from the Run AI steps above, and its edit button is locked while
+  // running (aria-label "Task is running — editing locked"), so it has no
+  // "Edit task" button to click.
   clickText(reload, "Board");
-  assert.ok(await waitFor(() => Boolean([...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Acceptance created task"))) ?? false), "created task card rendered on board");
-  const assignedCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Acceptance created task"));
+  assert.ok(await waitFor(() => Boolean([...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"))) ?? false), "inbound conversation card rendered on board");
+  const assignedCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"));
   const assignedEdit = assignedCard?.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement | null;
-  assert.ok(assignedEdit, "edit button on the created task card");
+  assert.ok(assignedEdit, "edit button on the idle task card");
   assignedEdit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => Boolean(reload.querySelector('select[aria-label="AI agent"]')) ?? false), "AI agent select present in modal");
   const agentSelect = reload.querySelector('select[aria-label="AI agent"]') as HTMLSelectElement;

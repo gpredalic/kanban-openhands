@@ -6,7 +6,7 @@
  * (token/cost tracking). The active tab gets a gradient background.
  */
 
-import { KanbanSquare, GitBranch, Bot, History, BarChart3, Radio } from "lucide-react";
+import { KanbanSquare, GitBranch, Bot, History, BarChart3 } from "lucide-react";
 import type { ViewId } from "../types/task";
 
 export type { ViewId };
@@ -18,7 +18,6 @@ interface ViewSwitcherProps {
 
 const VIEWS: { id: ViewId; label: string; icon: typeof KanbanSquare }[] = [
   { id: "board", label: "Board", icon: KanbanSquare },
-  { id: "command", label: "Command Center", icon: Radio },
   { id: "workflow", label: "Workflow", icon: GitBranch },
   { id: "agents", label: "Agents", icon: Bot },
   { id: "history", label: "History", icon: History },

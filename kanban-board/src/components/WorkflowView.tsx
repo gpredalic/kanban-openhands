@@ -1,320 +1,1256 @@
 /**
- * WorkflowView — a DAG visualization of task workflows (LangGraph-style).
+ * WorkflowView — visual node-graph workflow editor.
  *
- * Renders each workflow as a layered graph: nodes are positioned by their
- * dependency depth (layer) and input order (row). Edges are drawn as SVG
- * bezier curves connecting node centers. Node status is colour-coded by the
- * task's current status, and a running task pulses.
+ * Replaces the old form-based dependency editor with a canvas where each task
+ * (or agent / condition / approval / start / end / delay) is a node with an
+ * input port (left) and an output port (right). Users create dependencies by
+ * dragging from one node's output port to another node's input port. Edges are
+ * condition-labelled (IF_SUCCESS, IF_APPROVED, …) and editable. Nodes are
+ * draggable, and a node inspector assigns an OpenHands profile and shows the
+ * live execution state for task nodes.
+ *
+ * The persistence model is unchanged: the full workflow (nodes + edges) is
+ * written back through onUpdate, which the store uploads to workflows.json.
  */
 
-import { useMemo, useState } from "react";
-import { GitBranch, Circle } from "lucide-react";
-import { layoutWorkflow } from "../lib/ai-engine";
-import type { AiState, EnrichedTask, Workflow } from "../types/ai";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react";
+import {
+  Plus,
+  Play,
+  Trash2,
+  Wand2,
+  MousePointer2,
+  GitBranch,
+  Circle,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  ShieldCheck,
+  Zap,
+  Flag,
+  Square,
+  Loader2,
+  GitCommit,
+  Repeat,
+  RefreshCw,
+  Timer,
+  Ban,
+  UserCheck,
+  GitMerge,
+  RotateCcw,
+  Activity,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
+import type {
+  AiState,
+  Workflow,
+  WorkflowNode,
+  WorkflowEdge,
+  WorkflowNodeType,
+  WorkflowNodeConfig,
+  EdgeCondition,
+  EnrichedTask,
+  Agent,
+  BranchType,
+} from "../types/ai";
+import { branchTypeForCondition } from "../types/ai";
 import type { OpenHandsState } from "../types/openhands";
+import { autoLayout, formatCost, formatTokens } from "../lib/ai-engine";
+import {
+  computeRouting,
+  loopEdgeIds,
+  edgeGeometry,
+  NODE_W,
+  NODE_H,
+  type NodeStateInput,
+  type NodeExecState as EngineNodeExecState,
+} from "../lib/workflow-engine";
+import { Badge, statusBadge } from "../lib/badges";
+
+/* ------------------------------------------------------------------ *
+ * Geometry + node metadata.
+ * ------------------------------------------------------------------ */
+
+const PORT_R = 7;
+const CANVAS_W = 1600;
+const CANVAS_H = 900;
+
+interface NodeMeta {
+  label: string;
+  /** Tailwind classes for the type badge. */
+  badge: string;
+  /** Solid accent colour for the node's left bar. */
+  accent: string;
+  icon: typeof Circle;
+}
+
+const NODE_META: Record<WorkflowNodeType, NodeMeta> = {
+  task: { label: "Task", badge: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30", accent: "#6366f1", icon: Circle },
+  agent: { label: "Agent", badge: "bg-cyan-500/15 text-cyan-300 ring-cyan-400/30", accent: "#06b6d4", icon: Zap },
+  condition: { label: "Condition", badge: "bg-amber-500/15 text-amber-300 ring-amber-400/30", accent: "#f59e0b", icon: GitBranch },
+  approval: { label: "Approval", badge: "bg-rose-500/15 text-rose-300 ring-rose-400/30", accent: "#f43f5e", icon: ShieldCheck },
+  start: { label: "Start", badge: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30", accent: "#10b981", icon: Play },
+  end: { label: "End", badge: "bg-slate-500/15 text-slate-300 ring-slate-400/30", accent: "#64748b", icon: Flag },
+  delay: { label: "Delay", badge: "bg-violet-500/15 text-violet-300 ring-violet-400/30", accent: "#8b5cf6", icon: Clock },
+  relay: { label: "Relay", badge: "bg-sky-500/15 text-sky-300 ring-sky-400/30", accent: "#0ea5e9", icon: Repeat },
+  loop: { label: "Loop", badge: "bg-fuchsia-500/15 text-fuchsia-300 ring-fuchsia-400/30", accent: "#d946ef", icon: RefreshCw },
+};
+
+/** The eight branch types, each with a label and icon for the edge inspector. */
+const BRANCH_META: Record<BranchType, { label: string; icon: LucideIcon }> = {
+  success: { label: "Success", icon: CheckCircle2 },
+  failure: { label: "Failure", icon: XCircle },
+  retry: { label: "Retry", icon: RotateCcw },
+  timeout: { label: "Timeout", icon: Timer },
+  cancel: { label: "Cancel", icon: Ban },
+  manual_approval: { label: "Manual Approval", icon: UserCheck },
+  conditional: { label: "Conditional", icon: GitMerge },
+  loop: { label: "Loop", icon: RefreshCw },
+};
+
+/** All edge conditions, grouped by branch type for the inspector. */
+const CONDITION_OPTIONS: { value: EdgeCondition; label: string }[] = [
+  { value: "IF_SUCCESS", label: "On success" },
+  { value: "IF_FAILURE", label: "On failure" },
+  { value: "IF_RETRY_EXHAUSTED", label: "Retries exhausted" },
+  { value: "IF_TIMEOUT", label: "On timeout" },
+  { value: "IF_CANCEL", label: "On cancel" },
+  { value: "IF_MANUAL_APPROVAL", label: "Manual approval" },
+  { value: "IF_APPROVED", label: "On approval" },
+  { value: "IF_REJECTED", label: "On rejection" },
+  { value: "IF_TRUE", label: "Condition true" },
+  { value: "IF_FALSE", label: "Condition false" },
+  { value: "IF_LOOP", label: "Loop back" },
+  { value: "IF_ALWAYS", label: "Always" },
+];
+
+/** The execution state of a node, derived from the OpenHands snapshot. */
+type NodeExecState = "idle" | "pending" | "queued" | "running" | "completed" | "failed" | "cancelled";
+
+function nodeExecState(node: WorkflowNode, openHandsState: OpenHandsState): NodeExecState {
+  if (!node.taskId) return "idle";
+  const exec = openHandsState.snapshot.executions.find((e) => e.taskId === node.taskId);
+  if (!exec) return "idle";
+  return exec.status;
+}
+
+/**
+ * Map a node to the engine's NodeStateInput. The engine routes on this; the
+ * OpenHands snapshot supplies the raw execution status, and the node's config
+ * supplies the retry/approval context the branch types need.
+ */
+function nodeStateInput(node: WorkflowNode, openHandsState: OpenHandsState): NodeStateInput {
+  const state = nodeExecState(node, openHandsState);
+  // The engine's state set has no "pending"; treat it as queued.
+  const engineState: EngineNodeExecState = state === "pending" ? "queued" : state;
+  const input: NodeStateInput = { state: engineState };
+  if (node.config?.retryPolicy) {
+    input.retriesExhausted = state === "failed" && (node.config.retryPolicy.maxAttempts ?? 0) > 0;
+  }
+  if (node.type === "approval") {
+    input.approved = state === "completed";
+  }
+  return input;
+}
+
+const EXEC_META: Record<NodeExecState, { label: string; icon: typeof Circle; spin: boolean }> = {
+  idle: { label: "Idle", icon: Circle, spin: false },
+  pending: { label: "Pending", icon: Clock, spin: false },
+  queued: { label: "Queued", icon: Clock, spin: false },
+  running: { label: "Running", icon: Loader2, spin: true },
+  completed: { label: "Completed", icon: CheckCircle2, spin: false },
+  failed: { label: "Failed", icon: XCircle, spin: false },
+  cancelled: { label: "Cancelled", icon: Square, spin: false },
+};
+
+/* ------------------------------------------------------------------ *
+ * Drag state.
+ * ------------------------------------------------------------------ */
+
+type DragState =
+  | { kind: "node"; nodeId: string; offsetX: number; offsetY: number }
+  | { kind: "edge"; from: string; portIndex: number };
+
+interface PendingEdge {
+  from: string;
+  x: number;
+  y: number;
+  /** Which output port the drag started from (multi-way nodes). */
+  portIndex: number;
+}
+
+/* ------------------------------------------------------------------ *
+ * Props.
+ * ------------------------------------------------------------------ */
 
 interface WorkflowViewProps {
   aiState: AiState;
   tasks: EnrichedTask[];
+  openHandsState: OpenHandsState;
+  /** OpenHands profiles available for node assignment. */
+  profiles: Agent[];
+  /** Per-execution command (start / stop / retry) — task-centric, never global. */
+  onCommand: (command: "start" | "stop" | "retry", executionId: string) => void;
   onCreate: (workflow: Workflow) => void;
-  onUpdate?: (workflow: Workflow) => void;
-  onDelete?: (workflowId: string) => void;
-  openHandsState?: OpenHandsState;
+  onUpdate: (workflow: Workflow) => void;
+  onDelete: (workflowId: string) => void;
 }
 
-/** Node dimensions in the SVG coordinate space. */
-const NODE_W = 200;
-const NODE_H = 64;
-const LAYER_GAP = 120;
-const ROW_GAP = 28;
-const PAD = 24;
+/* ------------------------------------------------------------------ *
+ * Component.
+ * ------------------------------------------------------------------ */
 
-const STATUS_COLOR: Record<string, string> = {
-  todo: "#64748b",
-  in_progress: "#3b82f6",
-  review: "#f59e0b",
-  done: "#22c55e",
-};
+export function WorkflowView({
+  aiState,
+  tasks,
+  openHandsState,
+  profiles,
+  onCommand,
+  onCreate,
+  onUpdate,
+  onDelete,
+}: WorkflowViewProps) {
+  const workflows = aiState.config.workflows;
+  const [selectedId, setSelectedId] = useState<string | null>(workflows[0]?.id ?? null);
+  const workflow = workflows.find((w) => w.id === selectedId) ?? null;
 
-export function WorkflowView({ aiState, tasks, onCreate, onUpdate, onDelete, openHandsState }: WorkflowViewProps) {
-  const { workflows } = aiState.config;
-  const [creating, setCreating] = useState(false);
-  const [name, setName] = useState("");
+  // Local editing state for the selected workflow's graph.
+  const [nodes, setNodes] = useState<WorkflowNode[]>([]);
+  const [edges, setEdges] = useState<WorkflowEdge[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newName, setNewName] = useState("");
+
+  // Drag state.
+  const [drag, setDrag] = useState<DragState | null>(null);
+  const [pendingEdge, setPendingEdge] = useState<PendingEdge | null>(null);
+
+  const svgRef = useRef<SVGSVGElement | null>(null);
+
+  /* ------------------------- read-only status panel ------------------------- */
+
+  // The orchestration panel is now read-only: it surfaces the OpenHands
+  // snapshot (metrics, live executions, knowledge graph). Execution is driven
+  // by the engine from nodes + connections, not by a relay chain.
+  const [orchOpen, setOrchOpen] = useState(false);
+  const { executions, links } = openHandsState.snapshot;
+  const active = executions.filter((run) => run.status === "running").length;
+  const queued = executions.filter((run) => run.status === "queued").length;
+  const failed = executions.filter((run) => run.status === "failed").length;
+  const completed = executions.filter((run) => run.status === "completed").length;
+  const taskNames = new Map(tasks.map((task) => [task.id, task.title]));
+  const agentNames = new Map(profiles.map((agent) => [agent.id, agent.name]));
+
+  // Sync local state when the selected workflow changes.
+  useEffect(() => {
+    if (workflow) {
+      setNodes(workflow.nodes.map((n) => ({ ...n })));
+      setEdges(workflow.edges.map((e) => ({ ...e })));
+      setSelectedNodeId(null);
+      setSelectedEdgeId(null);
+    } else {
+      setNodes([]);
+      setEdges([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
   const taskById = useMemo(() => new Map(tasks.map((t) => [t.id, t])), [tasks]);
+  const nodeById = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes]);
+
+  /* ------------------------- routing (engine-driven) ------------------------- */
+
+  // The engine computes which edges are active from the node states. This is
+  // the single source of truth for "what is executing / what is next" — the
+  // old orchestration panel is gone; routing is derived purely from nodes,
+  // connections, and the OpenHands snapshot.
+  const nodeStates = useMemo(() => {
+    const map: Record<string, NodeStateInput> = {};
+    for (const node of nodes) map[node.id] = nodeStateInput(node, openHandsState);
+    return map;
+  }, [nodes, openHandsState]);
+
+  // Loops present in the graph (for the loop-limit badge + dashed rendering).
+  const loopEdgeSet = useMemo(() => new Set(loopEdgeIds(nodes, edges)), [nodes, edges]);
+
+  // How many times each loop edge has fired, derived from the real OpenHands
+  // execution history: a loop edge fires when its source node completes, so the
+  // count is the number of completed executions of that node's task. The engine
+  // reads this to enforce loop limits (a loop edge that has fired loopLimit
+  // times stops firing). This is the loop-limit proof — driven by real events,
+  // not a local counter.
+  const loopCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const edge of edges) {
+      if (edge.condition !== "IF_LOOP") continue;
+      const from = nodeById.get(edge.from);
+      if (!from?.taskId) continue;
+      counts[edge.id] = executions.filter((run) => run.taskId === from.taskId && run.status === "completed").length;
+    }
+    return counts;
+  }, [edges, nodeById, executions]);
+
+  const routing = useMemo(
+    () => computeRouting({ nodes, edges, states: nodeStates, loopCounts }),
+    [nodes, edges, nodeStates, loopCounts],
+  );
+
+  // Display values derived from the engine's routing. The engine is the source
+  // of truth; these are just the shapes the render code expects.
+  const currentNode = routing.currentNode;
+  const nextNode = routing.nextNode;
+  const path = routing.path;
+
+  // Edges that would fire from the current node (multi-way fan-out included).
+  const activeEdges = useMemo(() => new Set(routing.firingEdges.map((e) => e.id)), [routing]);
+  // Nodes the engine considers live: the current node and the next node.
+  const activeNodes = useMemo(() => {
+    const ids = new Set<string>();
+    if (routing.currentNode) ids.add(routing.currentNode.id);
+    if (routing.nextNode) ids.add(routing.nextNode.id);
+    return ids;
+  }, [routing]);
+
+  /** Persist the current graph back to the workflow. */
+  const persist = (nextNodes: WorkflowNode[], nextEdges: WorkflowEdge[]) => {
+    if (!workflow) return;
+    onUpdate({ ...workflow, nodes: nextNodes, edges: nextEdges });
+  };
+
+  /* ------------------------- node handlers ------------------------- */
+
+  const addNode = (type: WorkflowNodeType) => {
+    if (!workflow) return;
+    const id = `n-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const node: WorkflowNode = {
+      id,
+      type,
+      label: NODE_META[type].label,
+      x: 80 + (nodes.length % 4) * 240,
+      y: 80 + Math.floor(nodes.length / 4) * 140,
+    };
+    const next = [...nodes, node];
+    setNodes(next);
+    persist(next, edges);
+    setSelectedNodeId(id);
+    setSelectedEdgeId(null);
+  };
+
+  const deleteNode = (nodeId: string) => {
+    const nextNodes = nodes.filter((n) => n.id !== nodeId);
+    const nextEdges = edges.filter((e) => e.from !== nodeId && e.to !== nodeId);
+    setNodes(nextNodes);
+    setEdges(nextEdges);
+    persist(nextNodes, nextEdges);
+    if (selectedNodeId === nodeId) setSelectedNodeId(null);
+  };
+
+  const updateNode = (nodeId: string, patch: Partial<WorkflowNode>) => {
+    const next = nodes.map((n) => (n.id === nodeId ? { ...n, ...patch } : n));
+    setNodes(next);
+    persist(next, edges);
+  };
+
+  /* ------------------------- edge handlers ------------------------- */
+
+  const createEdge = (from: string, to: string) => {
+    if (from === to) return;
+    if (edges.some((e) => e.from === from && e.to === to)) return;
+    const edge: WorkflowEdge = {
+      id: `e-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      from,
+      to,
+      condition: "IF_SUCCESS",
+    };
+    const next = [...edges, edge];
+    setEdges(next);
+    persist(nodes, next);
+    setSelectedEdgeId(edge.id);
+    setSelectedNodeId(null);
+  };
+
+  const deleteEdge = (edgeId: string) => {
+    const next = edges.filter((e) => e.id !== edgeId);
+    setEdges(next);
+    persist(nodes, next);
+    if (selectedEdgeId === edgeId) setSelectedEdgeId(null);
+  };
+
+  const updateEdge = (edgeId: string, patch: Partial<WorkflowEdge>) => {
+    const next = edges.map((e) => (e.id === edgeId ? { ...e, ...patch } : e));
+    setEdges(next);
+    persist(nodes, next);
+  };
+
+  /* ------------------------- layout ------------------------- */
+
+  const autoArrange = () => {
+    const layout = autoLayout(nodes, edges);
+    const posById = new Map(layout.nodes.map((p) => [p.id, p]));
+    const next = nodes.map((n) => {
+      const p = posById.get(n.id);
+      return p ? { ...n, x: 80 + p.layer * 240, y: 80 + p.row * 140 } : n;
+    });
+    setNodes(next);
+    persist(next, edges);
+  };
+
+  /* ------------------------- workflow handlers ------------------------- */
+
+  const createWorkflow = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const id = `wf-${Date.now()}`;
+    const startNode: WorkflowNode = { id: `${id}-start`, type: "start", label: "Start", x: 80, y: 160 };
+    onCreate({ id, name: trimmed, description: "User-created workflow", nodes: [startNode], edges: [], status: "draft" });
+    setSelectedId(id);
+    setShowCreate(false);
+    setNewName("");
+  };
+
+  const deleteWorkflow = () => {
+    if (!workflow) return;
+    onDelete(workflow.id);
+    setSelectedId(workflows.find((w) => w.id !== workflow.id)?.id ?? null);
+  };
+
+  /* ------------------------- pointer handlers ------------------------- */
+
+  const svgPoint = (e: React.PointerEvent) => {
+    const svg = svgRef.current;
+    if (!svg) return { x: 0, y: 0 };
+    const rect = svg.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+
+  const onNodePointerDown = (e: React.PointerEvent, node: WorkflowNode) => {
+    e.stopPropagation();
+    const p = svgPoint(e);
+    setDrag({ kind: "node", nodeId: node.id, offsetX: p.x - node.x, offsetY: p.y - node.y });
+    setSelectedNodeId(node.id);
+    setSelectedEdgeId(null);
+  };
+
+  const onOutputPortPointerDown = (e: React.PointerEvent, node: WorkflowNode, portIndex = 0) => {
+    e.stopPropagation();
+    const portCount = Math.max(1, node.outputPorts ?? 1);
+    const portOffset = portCount > 1 ? (portIndex / (portCount - 1) - 0.5) * (NODE_H - 24) : 0;
+    setDrag({ kind: "edge", from: node.id, portIndex });
+    setPendingEdge({ from: node.id, x: node.x + NODE_W, y: node.y + NODE_H / 2 + portOffset, portIndex });
+  };
+
+  const onInputPortPointerUp = (e: React.PointerEvent, node: WorkflowNode) => {
+    e.stopPropagation();
+    if (pendingEdge && pendingEdge.from !== node.id) {
+      createEdge(pendingEdge.from, node.id);
+    }
+    setPendingEdge(null);
+    setDrag(null);
+  };
+
+  const onSvgPointerMove = (e: React.PointerEvent) => {
+    if (!drag) return;
+    const p = svgPoint(e);
+    if (drag.kind === "node") {
+      const x = Math.max(0, Math.min(CANVAS_W - NODE_W, p.x - drag.offsetX));
+      const y = Math.max(0, Math.min(CANVAS_H - NODE_H, p.y - drag.offsetY));
+      setNodes((current) => current.map((n) => (n.id === drag.nodeId ? { ...n, x, y } : n)));
+    } else if (drag.kind === "edge") {
+      setPendingEdge((current) => (current ? { ...current, x: p.x, y: p.y } : current));
+    }
+  };
+
+  const onSvgPointerUp = () => {
+    // Releasing over the background cancels a pending edge.
+    setPendingEdge(null);
+    setDrag(null);
+  };
+
+  // Persist the final node position when a node drag ends.
+  const onNodeDragEnd = () => {
+    if (drag?.kind === "node") {
+      persist(nodes, edges);
+    }
+    setDrag(null);
+  };
+
+  /* ------------------------- edge geometry (engine-driven) ------------------------- */
+
+  // Edge paths are computed by the engine's edgeGeometry, which handles
+  // forward (left→right) and backward (right→left, i.e. loop) routing with
+  // curved bezier paths and correct arrowhead direction. Multi-way nodes fan
+  // their outgoing edges out from distinct output ports.
+  const edgePath = (from: WorkflowNode, to: WorkflowNode, portIndex = 0, portCount = 1) => {
+    const geo = edgeGeometry(from, to, portIndex, portCount);
+    return geo.d;
+  };
+
+  // For a multi-way node, the port index an edge leaves from is its position
+  // among the node's outgoing edges (ordered by priority, then id).
+  const portIndexForEdge = (edge: WorkflowEdge): { index: number; count: number } => {
+    const from = nodeById.get(edge.from);
+    const count = Math.max(1, from?.outputPorts ?? 1);
+    if (count <= 1) return { index: 0, count: 1 };
+    const outgoing = edges
+      .filter((e) => e.from === edge.from)
+      .sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0) || a.id.localeCompare(b.id));
+    const idx = outgoing.findIndex((e) => e.id === edge.id);
+    return { index: Math.max(0, idx), count };
+  };
+
+  const selectedNode = selectedNodeId ? nodeById.get(selectedNodeId) ?? null : null;
+  const selectedEdge = selectedEdgeId ? edges.find((e) => e.id === selectedEdgeId) ?? null : null;
+
+  /* ------------------------- empty state ------------------------- */
 
   if (workflows.length === 0) {
     return (
-      <div className="kb-glass flex flex-col items-center justify-center gap-3 rounded-3xl p-12 text-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-700/30">
-          <GitBranch className="h-7 w-7 text-slate-500" strokeWidth={1.5} />
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
+        <div className="kb-glass flex h-16 w-16 items-center justify-center rounded-2xl">
+          <GitBranch className="h-8 w-8 text-indigo-300" strokeWidth={1.5} />
         </div>
-        <p className="text-sm font-medium text-slate-400">No workflows defined</p>
-        <p className="max-w-sm text-xs text-slate-500">
-          Workflows are DAGs of tasks with explicit dependencies. Create one in
-          the Agents view to see it rendered here.
-        </p>
-        {creating ? (
-          <div className="flex gap-2">
-            <input aria-label="Workflow name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Workflow name" className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white" />
-            <button type="button" onClick={() => {
-              if (!name.trim()) return;
-              onCreate({ id: `wf-${Date.now()}`, name: name.trim(), description: "User-created task workflow", nodeIds: tasks.map((task) => task.id), edges: [], status: "draft" });
-              setCreating(false); setName("");
-            }} className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white">Create</button>
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-white">No workflows defined</h2>
+          <p className="mt-1 text-sm text-slate-400">Create a workflow to design a node graph.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="kb-gradient kb-btn-glow flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white"
+        >
+          <Plus className="h-4 w-4" strokeWidth={2.5} />
+          Create workflow
+        </button>
+        {showCreate && (
+          <div className="kb-glass mt-2 flex w-72 flex-col gap-3 rounded-2xl p-4">
+            <input
+              type="text"
+              aria-label="Workflow name"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              placeholder="Workflow name"
+              className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            />
+            <button
+              type="button"
+              onClick={() => createWorkflow(newName)}
+              className="kb-gradient rounded-xl px-3 py-2 text-sm font-semibold text-white"
+            >
+              Create
+            </button>
           </div>
-        ) : (
-          <button type="button" onClick={() => setCreating(true)} className="rounded-lg bg-indigo-500/20 px-3 py-2 text-xs font-semibold text-indigo-300">Create workflow</button>
         )}
       </div>
     );
   }
 
-  return (
-    <div className="relative z-10 flex flex-col gap-5">
-      <div className="flex justify-end">
-        {creating ? (
-          <div className="flex gap-2">
-            <input aria-label="Workflow name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Workflow name" className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white" />
-            <button type="button" onClick={() => {
-              if (!name.trim()) return;
-              onCreate({ id: `wf-${Date.now()}`, name: name.trim(), description: "User-created task workflow", nodeIds: tasks.map((task) => task.id), edges: [], status: "draft" });
-              setCreating(false); setName("");
-            }} className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white">Create</button>
-          </div>
-        ) : (
-          <button type="button" onClick={() => setCreating(true)} className="rounded-lg bg-indigo-500/20 px-3 py-2 text-xs font-semibold text-indigo-300">Create workflow</button>
-        )}
-      </div>
-      {workflows.map((wf) => (
-        <WorkflowGraph
-          key={wf.id}
-          workflow={wf}
-          tasks={tasks}
-          taskById={taskById}
-          onUpdate={onUpdate}
-          onDelete={onDelete}
-          openHandsState={openHandsState}
-        />
-      ))}
-    </div>
-  );
-}
-
-interface WorkflowGraphProps {
-  workflow: Workflow;
-  tasks: EnrichedTask[];
-  taskById: Map<string, EnrichedTask>;
-  onUpdate?: (workflow: Workflow) => void;
-  onDelete?: (workflowId: string) => void;
-  openHandsState?: OpenHandsState;
-}
-
-function WorkflowGraph({ workflow, tasks, taskById, onUpdate, onDelete, openHandsState }: WorkflowGraphProps) {
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState(workflow.name);
-  const [status, setStatus] = useState<Workflow["status"]>(workflow.status);
-  const [nodeIds, setNodeIds] = useState<string[]>(workflow.nodeIds);
-  const [edges, setEdges] = useState<Workflow["edges"]>(workflow.edges);
-  const [edgeFrom, setEdgeFrom] = useState(workflow.nodeIds[0] ?? "");
-  const [edgeTo, setEdgeTo] = useState(workflow.nodeIds[1] ?? "");
-  const { nodes, layers } = useMemo(
-    () => layoutWorkflow(workflow, tasks),
-    [workflow, tasks],
-  );
-
-  // Compute the SVG canvas size.
-  const maxRow = nodes.reduce((m, n) => Math.max(m, n.row), 0);
-  const width = PAD * 2 + (layers - 1) * LAYER_GAP + NODE_W;
-  const height = PAD * 2 + maxRow * (NODE_H + ROW_GAP) + NODE_H;
-
-  // Node center positions.
-  const pos = new Map<string, { x: number; y: number }>();
-  for (const node of nodes) {
-    pos.set(node.id, {
-      x: PAD + node.layer * LAYER_GAP + NODE_W / 2,
-      y: PAD + node.row * (NODE_H + ROW_GAP) + NODE_H / 2,
-    });
-  }
+  /* ------------------------- main render ------------------------- */
 
   return (
-    <div className="kb-glass kb-fade-in rounded-3xl p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h3 className="text-base font-semibold tracking-tight text-white">
-            {workflow.name}
-          </h3>
-          <p className="mt-0.5 text-xs text-slate-400">{workflow.description}</p>
+    <div className="flex h-full flex-col gap-4 p-6">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <select
+            value={selectedId ?? ""}
+            onChange={(e) => setSelectedId(e.target.value)}
+            aria-label="Select workflow"
+            className="kb-glass-sm rounded-xl border-0 bg-transparent px-3 py-2 text-sm font-semibold text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          >
+            {workflows.map((w) => (
+              <option key={w.id} value={w.id} className="bg-slate-900">
+                {w.name}
+              </option>
+            ))}
+          </select>
+          {workflow && (
+            <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${workflow.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : workflow.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-amber-500/15 text-amber-300 ring-amber-400/30"}`}>
+              {workflow.status}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => setEditing((value) => !value)} className="rounded-lg bg-indigo-500/20 px-3 py-1.5 text-xs font-semibold text-indigo-300">
-            {editing ? "Close editor" : "Edit workflow"}
+          <button
+            type="button"
+            onClick={autoArrange}
+            className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+          >
+            <Wand2 className="h-3.5 w-3.5" strokeWidth={2} />
+            Auto-arrange
           </button>
-          {onDelete && <button type="button" onClick={() => onDelete(workflow.id)} className="rounded-lg bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-300">Delete</button>}
-          <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
-            workflow.status === "active"
-              ? "bg-blue-500/15 text-blue-400 ring-blue-400/25"
-              : workflow.status === "completed"
-                ? "bg-emerald-500/15 text-emerald-400 ring-emerald-400/25"
-                : "bg-slate-500/15 text-slate-400 ring-slate-400/25"
-          }`}
-        >
-            {workflow.status}
-          </span>
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+          >
+            <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+            Create workflow
+          </button>
+          {workflow && (
+            <button
+              type="button"
+              onClick={deleteWorkflow}
+              className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-300 hover:text-rose-200"
+            >
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
+              Delete
+            </button>
+          )}
         </div>
       </div>
 
-      {editing && (
-        <div className="mb-4 rounded-2xl border border-white/5 bg-slate-950/20 p-4">
-          <h4 className="mb-3 text-sm font-semibold text-white">Workflow Editor</h4>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <input aria-label="Workflow name" value={name} onChange={(event) => setName(event.target.value)} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white" />
-            <select aria-label="Workflow status" value={status} onChange={(event) => setStatus(event.target.value as Workflow["status"])} className="rounded-lg border border-white/10 bg-slate-900 px-3 py-2 text-xs text-white">
-              <option value="draft">draft</option><option value="active">active</option><option value="completed">completed</option>
-            </select>
+      {/* Routing display — current node, next node, execution path */}
+      {workflow && nodes.length > 0 && (
+        <div className="kb-glass rounded-2xl p-4">
+          <div className="mb-3 flex items-center gap-2">
+            <GitCommit className="h-4 w-4 text-indigo-400" strokeWidth={2} />
+            <h3 className="text-sm font-semibold text-white">Execution Routing</h3>
           </div>
-          <div className="mt-3">
-            <p className="mb-2 text-xs text-slate-400">Nodes</p>
-            <div className="flex flex-wrap gap-2">
-              {tasks.map((task) => (
-                <label key={task.id} className="flex items-center gap-2 rounded-lg bg-slate-800/50 px-2 py-1 text-xs text-slate-300">
-                  <input type="checkbox" checked={nodeIds.includes(task.id)} onChange={(event) => setNodeIds((current) => event.target.checked ? [...current, task.id] : current.filter((id) => id !== task.id))} />
-                  {task.title}
-                </label>
-              ))}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-xl bg-white/5 p-3">
+              <p className="text-[11px] font-medium text-slate-500">Current Node</p>
+              {currentNode ? (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
+                  <span className="text-sm font-medium text-white">{currentNode.label}</span>
+                  {(() => {
+                    const s = nodeExecState(currentNode, openHandsState);
+                    return statusBadge(s) ? <Badge style={statusBadge(s)!} pulse={s === "running"} /> : null;
+                  })()}
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-slate-500">No active node</p>
+              )}
+            </div>
+            <div className="rounded-xl bg-white/5 p-3">
+              <p className="text-[11px] font-medium text-slate-500">Next Node</p>
+              {nextNode ? (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-amber-400" />
+                  <span className="text-sm font-medium text-white">{nextNode.label}</span>
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-slate-500">No next node</p>
+              )}
+            </div>
+            <div className="rounded-xl bg-white/5 p-3">
+              <p className="text-[11px] font-medium text-slate-500">Execution Path</p>
+              {path.length > 0 ? (
+                <div className="mt-1 flex flex-wrap items-center gap-1">
+                  {path.map((n, i) => (
+                    <span key={n.id} className="flex items-center gap-1">
+                      <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${i === path.length - 1 ? "bg-blue-500/20 text-blue-300" : "bg-white/5 text-slate-400"}`}>
+                        {n.label}
+                      </span>
+                      {i < path.length - 1 && <span className="text-slate-600">→</span>}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-slate-500">No path yet</p>
+              )}
             </div>
           </div>
-          <div className="mt-3">
-            <p className="mb-2 text-xs text-slate-400">Node dependencies</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <select aria-label="Dependency from" value={edgeFrom} onChange={(event) => setEdgeFrom(event.target.value)} className="rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-xs text-white">
-                {nodeIds.map((id) => <option key={id} value={id}>{taskById.get(id)?.title ?? id}</option>)}
-              </select>
-              <span className="text-xs text-slate-500">depends on</span>
-              <select aria-label="Dependency to" value={edgeTo} onChange={(event) => setEdgeTo(event.target.value)} className="rounded-lg border border-white/10 bg-slate-900 px-2 py-1.5 text-xs text-white">
-                {nodeIds.map((id) => <option key={id} value={id}>{taskById.get(id)?.title ?? id}</option>)}
-              </select>
-              <button type="button" onClick={() => {
-                if (!edgeFrom || !edgeTo || edgeFrom === edgeTo) return;
-                if (!edges.some((edge) => edge.from === edgeFrom && edge.to === edgeTo)) setEdges((current) => [...current, { from: edgeFrom, to: edgeTo }]);
-              }} className="rounded-lg bg-indigo-500/20 px-2 py-1.5 text-xs text-indigo-300">Add dependency</button>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {edges.map((edge, index) => (
-                <button key={`${edge.from}-${edge.to}`} type="button" onClick={() => setEdges((current) => current.filter((_, i) => i !== index))} className="rounded-lg bg-slate-800 px-2 py-1 text-[11px] text-slate-300" title="Remove dependency">
-                  {taskById.get(edge.from)?.title ?? edge.from} → {taskById.get(edge.to)?.title ?? edge.to} ×
-                </button>
-              ))}
-            </div>
-          </div>
-          <button type="button" onClick={() => onUpdate?.({ ...workflow, name: name.trim() || workflow.name, status, nodeIds, edges })} className="mt-4 rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white">Save workflow</button>
         </div>
       )}
 
-      <div className="kb-scroll overflow-x-auto">
-        <svg
-          width={width}
-          height={height}
-          viewBox={`0 0 ${width} ${height}`}
-          className="min-w-full"
-          role="img"
-          aria-label={`${workflow.name} workflow graph`}
+      {/* Create workflow form */}
+      {showCreate && (
+        <div className="kb-glass flex items-center gap-3 rounded-2xl p-3">
+          <input
+            type="text"
+            aria-label="Workflow name"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Workflow name"
+            className="flex-1 rounded-xl border-0 bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          />
+          <button
+            type="button"
+            onClick={() => createWorkflow(newName)}
+            className="kb-gradient rounded-xl px-4 py-2 text-sm font-semibold text-white"
+          >
+            Create
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCreate(false)}
+            className="kb-glass-sm rounded-xl px-3 py-2 text-xs font-semibold text-slate-400 hover:text-white"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
+      {/* Orchestration panel — collapsible, hosts the former Command Center */}
+      <div className="kb-glass rounded-2xl">
+        <button
+          type="button"
+          onClick={() => setOrchOpen((open) => !open)}
+          className="flex w-full items-center justify-between px-4 py-3 text-left"
+          aria-expanded={orchOpen}
         >
-          <defs>
-            <marker
-              id={`arrow-${workflow.id}`}
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M 0 0 L 10 5 L 0 10 z" fill="#6366f1" />
-            </marker>
-          </defs>
+          <span className="flex items-center gap-2 text-sm font-semibold text-white">
+            <Activity className="h-4 w-4 text-indigo-400" strokeWidth={2} />
+            Orchestration
+            <span className="text-[11px] font-normal text-slate-500">
+              {openHandsState.lastSyncedAt === null ? "Not synced yet" : `Last synced ${Math.max(0, Math.floor((Date.now() - openHandsState.lastSyncedAt) / 1000))}s ago`}
+            </span>
+          </span>
+          {orchOpen ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
+        </button>
+        {orchOpen && (
+          <div className="flex flex-col gap-4 border-t border-white/5 p-4">
+            {openHandsState.error && <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{openHandsState.error}</div>}
 
-          {/* Edges */}
-          {workflow.edges.map((edge, i) => {
-            const from = pos.get(edge.from);
-            const to = pos.get(edge.to);
-            if (!from || !to) return null;
-            const x1 = from.x + NODE_W / 2;
-            const y1 = from.y;
-            const x2 = to.x - NODE_W / 2;
-            const y2 = to.y;
-            const midX = (x1 + x2) / 2;
-            const path = `M ${x1} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${x2} ${y2}`;
-            return (
-              <path
-                key={i}
-                d={path}
-                fill="none"
-                stroke="#6366f1"
-                strokeWidth={1.5}
-                strokeOpacity={0.6}
-                markerEnd={`url(#arrow-${workflow.id})`}
-              />
-            );
-          })}
+            {/* Metrics */}
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <OrchMetric label="Active jobs" value={active} accent="text-blue-400" />
+              <OrchMetric label="Queued jobs" value={queued} accent="text-amber-400" />
+              <OrchMetric label="Failed jobs" value={failed} accent="text-rose-400" />
+              <OrchMetric label="Completed jobs" value={completed} accent="text-emerald-400" />
+            </div>
 
-          {/* Nodes */}
-          {nodes.map((node) => {
-            const task = taskById.get(node.id);
-            if (!task) return null;
-            const p = pos.get(node.id)!;
-            const execution = openHandsState?.snapshot.executions.find((run) => run.taskId === task.id);
-            const executionStatus = execution?.status;
-            const color = executionStatus === "running"
-              ? "#3b82f6"
-              : executionStatus === "failed" || executionStatus === "cancelled"
-                ? "#f43f5e"
-                : executionStatus === "completed"
-                  ? "#22c55e"
-                  : executionStatus === "queued"
-                    ? "#a855f7"
-                    : STATUS_COLOR[task.status] ?? "#64748b";
-            const running = executionStatus === "running";
-            return (
-              <g key={node.id} transform={`translate(${p.x - NODE_W / 2}, ${p.y - NODE_H / 2})`}>
-                <rect
-                  width={NODE_W}
-                  height={NODE_H}
-                  rx={14}
-                  fill="rgba(30,41,59,0.7)"
-                  stroke={color}
-                  strokeWidth={1.5}
-                  strokeOpacity={0.7}
-                  className={running ? "kb-dag-running" : ""}
-                />
-                <circle cx={18} cy={NODE_H / 2} r={5} fill={color} />
-                <text x={34} y={NODE_H / 2 - 4} fill="#e2e8f0" fontSize={12} fontWeight={600}>
-                  {task.title.length > 22 ? task.title.slice(0, 22) + "…" : task.title}
-                </text>
-                <text x={34} y={NODE_H / 2 + 14} fill="#64748b" fontSize={10}>
-                  {executionStatus ?? task.status.replace("_", " ")}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
+            {/* Live executions */}
+            <section>
+              <OrchSectionTitle icon={Activity} label="Live executions" />
+              <div className="flex flex-col gap-2">
+                {openHandsState.loading && executions.length === 0 ? (
+                  <>
+                    <SkeletonRow />
+                    <SkeletonRow />
+                  </>
+                ) : executions.length === 0 ? (
+                  <OrchEmpty label="No executions reported yet." />
+                ) : (
+                  executions.map((run) => (
+                  <div key={run.id} className="kb-glass flex items-center gap-3 rounded-2xl px-4 py-3">
+                    {statusBadge(run.status) && (
+                      <Badge style={statusBadge(run.status)!} pulse={run.status === "running" || run.status === "queued"} />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-white">{run.title}</p>
+                      <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? run.taskId : "OpenHands execution"} · {agentNames.get(run.agentId ?? "") ?? run.agentId ?? "unassigned"}</p>
+                    </div>
+                    <span className="text-right text-[11px] text-slate-400">
+                      {run.tokensInReported === false && run.tokensOutReported === false
+                        ? "Tokens unavailable"
+                        : `${formatTokens(run.tokensIn + run.tokensOut)} tokens reported`}<br />
+                      {run.costReported === false ? "Cost unavailable" : `${formatCost(run.cost)} reported`}
+                    </span>
+                    <div className="flex gap-1">
+                      {run.status === "running" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Stop execution" onClick={() => onCommand("stop", run.id)}><Square className="h-3.5 w-3.5" /></button>}
+                      {run.status === "failed" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Retry execution" onClick={() => onCommand("retry", run.id)}><RotateCcw className="h-3.5 w-3.5" /></button>}
+                      {run.status === "queued" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Start execution" onClick={() => onCommand("start", run.id)}><Play className="h-3.5 w-3.5" /></button>}
+                    </div>
+                  </div>
+                  ))
+                )}
+              </div>
+            </section>
+
+            {/* Knowledge graph */}
+            <section>
+              <OrchSectionTitle icon={GitCommit} label="Knowledge graph" />
+              <div className="kb-glass rounded-2xl p-4">
+                <p className="mb-3 text-xs text-slate-500">Relationships discovered across tasks, agents, models, repositories, conversations, and executions.</p>
+                <div className="flex flex-wrap gap-2">
+                  {links.length === 0 && <OrchEmpty label="Relationships will appear as OpenHands work is reported." />}
+                  {links.slice(0, 40).map((link) => <span key={`${link.from.id}-${link.to.id}-${link.relation}`} className="rounded-lg bg-slate-800/70 px-3 py-2 text-[11px] text-slate-300">{link.from.label} <span className="text-indigo-400">→ {link.relation} →</span> {link.to.label}</span>)}
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
       </div>
 
-      {/* Legend */}
-      <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-400">
-        <span className="flex items-center gap-1.5">
-          <Circle className="h-3 w-3 fill-slate-400" /> To Do
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Circle className="h-3 w-3 fill-blue-500" /> In Progress
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Circle className="h-3 w-3 fill-amber-500" /> Review
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Circle className="h-3 w-3 fill-emerald-500" /> Done
-        </span>
+      {/* Main area: palette + canvas + inspector */}
+      <div className="flex min-h-0 flex-1 gap-4">
+        {/* Node palette */}
+        <div className="kb-glass flex w-40 shrink-0 flex-col gap-2 rounded-2xl p-3">
+          <p className="px-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Add node</p>
+          {(Object.keys(NODE_META) as WorkflowNodeType[]).map((type) => {
+            const meta = NODE_META[type];
+            const Icon = meta.icon;
+            return (
+              <button
+                key={type}
+                type="button"
+                onClick={() => addNode(type)}
+                className="kb-glass-sm flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+              >
+                <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+                {meta.label}
+              </button>
+            );
+          })}
+          <div className="mt-auto rounded-xl bg-white/5 p-2.5 text-[10px] leading-relaxed text-slate-500">
+            <MousePointer2 className="mb-1 h-3.5 w-3.5 text-indigo-300" strokeWidth={2} />
+            Drag a node to move it. Drag from an output port (right) to an input port (left) to connect.
+          </div>
+        </div>
+
+        {/* Canvas */}
+        <div className="kb-glass relative min-h-0 flex-1 overflow-auto rounded-2xl">
+          <svg
+            ref={svgRef}
+            width={CANVAS_W}
+            height={CANVAS_H}
+            className="block touch-none select-none"
+            onPointerMove={onSvgPointerMove}
+            onPointerUp={onSvgPointerUp}
+            onPointerLeave={onSvgPointerUp}
+          >
+            <defs>
+              <marker id="wf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#818cf8" />
+              </marker>
+              <marker id="wf-arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399" />
+              </marker>
+            </defs>
+
+            {/* Edges — active state comes from the engine's routing. */}
+            {edges.map((edge) => {
+              const from = nodeById.get(edge.from);
+              const to = nodeById.get(edge.to);
+              if (!from || !to) return null;
+              const isEngineActive = activeEdges.has(edge.id);
+              const isSelected = edge.id === selectedEdgeId;
+              const isLoop = loopEdgeSet.has(edge.id);
+              const stroke = isEngineActive ? "#34d399" : isSelected ? "#a5b4fc" : isLoop ? "#d946ef" : "#818cf8";
+              const { index: portIndex, count: portCount } = portIndexForEdge(edge);
+              return (
+                <g key={edge.id}>
+                  <path
+                    d={edgePath(from, to, portIndex, portCount)}
+                    fill="none"
+                    stroke={stroke}
+                    strokeWidth={isEngineActive || isSelected ? 2.5 : 1.75}
+                    strokeDasharray={isLoop ? "7 5" : undefined}
+                    markerEnd={isEngineActive ? "url(#wf-arrow-active)" : "url(#wf-arrow)"}
+                    className="cursor-pointer"
+                    onPointerDown={(e) => {
+                      e.stopPropagation();
+                      setSelectedEdgeId(edge.id);
+                      setSelectedNodeId(null);
+                    }}
+                  />
+                  <text
+                    x={(from.x + NODE_W + to.x) / 2}
+                    y={(from.y + to.y) / 2 + NODE_H / 2 - 6}
+                    textAnchor="middle"
+                    className={`text-[10px] ${isEngineActive ? "fill-emerald-300" : isLoop ? "fill-fuchsia-300" : "fill-slate-400"}`}
+                  >
+                    {edge.name || CONDITION_OPTIONS.find((c) => c.value === edge.condition)?.label}
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Pending edge (while dragging) */}
+            {pendingEdge && (() => {
+              const from = nodeById.get(pendingEdge.from);
+              if (!from) return null;
+              const sx = from.x + NODE_W;
+              const sy = from.y + NODE_H / 2;
+              const dx = Math.max(50, (pendingEdge.x - sx) / 2);
+              return (
+                <path
+                  d={`M ${sx} ${sy} C ${sx + dx} ${sy}, ${pendingEdge.x - dx} ${pendingEdge.y}, ${pendingEdge.x} ${pendingEdge.y}`}
+                  fill="none"
+                  stroke="#34d399"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                />
+              );
+            })()}
+
+            {/* Nodes — active state comes from the engine's routing. */}
+            {nodes.map((node) => {
+              const meta = NODE_META[node.type];
+              const Icon = meta.icon;
+              const isSelected = node.id === selectedNodeId;
+              const isEngineActive = activeNodes.has(node.id);
+              const exec = nodeExecState(node, openHandsState);
+              const execMeta = EXEC_META[exec];
+              const ExecIcon = execMeta.icon;
+              const isDragSource = pendingEdge?.from === node.id;
+              return (
+                <g
+                  key={node.id}
+                  transform={`translate(${node.x}, ${node.y})`}
+                  className="cursor-grab active:cursor-grabbing"
+                  onPointerDown={(e) => onNodePointerDown(e, node)}
+                  onPointerUp={onNodeDragEnd}
+                >
+                  {/* Node body */}
+                  <rect
+                    width={NODE_W}
+                    height={NODE_H}
+                    rx={14}
+                    fill={isSelected ? "rgba(99,102,241,0.18)" : isEngineActive ? "rgba(52,211,153,0.12)" : "rgba(15,23,42,0.85)"}
+                    stroke={isSelected ? "#818cf8" : isEngineActive ? "#34d399" : "rgba(148,163,184,0.25)"}
+                    strokeWidth={isSelected || isEngineActive ? 2 : 1}
+                  />
+                  {/* Accent bar */}
+                  <rect x={0} y={10} width={3} height={NODE_H - 20} rx={1.5} fill={meta.accent} />
+                  {/* Type icon + label */}
+                  <foreignObject x={14} y={10} width={NODE_W - 50} height={NODE_H - 20}>
+                    <div className="flex h-full flex-col justify-center gap-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <Icon className="h-3.5 w-3.5 text-slate-300" strokeWidth={2} />
+                        <span className="truncate text-xs font-semibold text-white">{node.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ring-1 ${meta.badge}`}>{meta.label}</span>
+                        <span className="flex items-center gap-1 text-[9px] text-slate-400">
+                          <ExecIcon className={`h-3 w-3 ${execMeta.spin ? "animate-spin" : ""}`} strokeWidth={2} />
+                          {execMeta.label}
+                        </span>
+                      </div>
+                    </div>
+                  </foreignObject>
+                  {/* Input port (left) */}
+                  <circle
+                    cx={0}
+                    cy={NODE_H / 2}
+                    r={PORT_R}
+                    fill={pendingEdge && !isDragSource ? "#34d399" : "#0f172a"}
+                    stroke={pendingEdge && !isDragSource ? "#34d399" : "#818cf8"}
+                    strokeWidth={2}
+                    className="cursor-crosshair"
+                    onPointerDown={(e) => e.stopPropagation()}
+                    onPointerUp={(e) => onInputPortPointerUp(e, node)}
+                  />
+                  {/* Output ports (right) — one per output port for multi-way nodes */}
+                  {Array.from({ length: Math.max(1, node.outputPorts ?? 1) }).map((_, portIndex) => {
+                    const portCount = Math.max(1, node.outputPorts ?? 1);
+                    const portOffset = portCount > 1 ? (portIndex / (portCount - 1) - 0.5) * (NODE_H - 24) : 0;
+                    return (
+                      <circle
+                        key={portIndex}
+                        cx={NODE_W}
+                        cy={NODE_H / 2 + portOffset}
+                        r={PORT_R}
+                        fill="#0f172a"
+                        stroke={isDragSource && pendingEdge?.portIndex === portIndex ? "#34d399" : "#818cf8"}
+                        strokeWidth={2}
+                        className="cursor-crosshair"
+                        onPointerDown={(e) => onOutputPortPointerDown(e, node, portIndex)}
+                      />
+                    );
+                  })}
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+
+        {/* Inspector */}
+        {(selectedNode || selectedEdge) && (
+          <div className="kb-glass flex w-64 shrink-0 flex-col gap-3 overflow-y-auto rounded-2xl p-4">
+            {selectedNode && (
+              <>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-white">Node</h3>
+                  <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ring-1 ${NODE_META[selectedNode.type].badge}`}>
+                    {NODE_META[selectedNode.type].label}
+                  </span>
+                </div>
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Label
+                  <input
+                    type="text"
+                    value={selectedNode.label}
+                    onChange={(e) => updateNode(selectedNode.id, { label: e.target.value })}
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  OpenHands profile
+                  <select
+                    value={selectedNode.profileId ?? ""}
+                    onChange={(e) => updateNode(selectedNode.id, { profileId: e.target.value || null })}
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  >
+                    <option value="" className="bg-slate-900">Unassigned</option>
+                    {profiles.map((p) => (
+                      <option key={p.id} value={p.id} className="bg-slate-900">
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {selectedNode.taskId && taskById.get(selectedNode.taskId) && (
+                  <div className="rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400">
+                    <p className="font-semibold text-slate-300">Board task</p>
+                    <p className="mt-0.5 truncate">{taskById.get(selectedNode.taskId)!.title}</p>
+                    <p className="mt-0.5 text-[10px] text-slate-500">Status: {taskById.get(selectedNode.taskId)!.status}</p>
+                  </div>
+                )}
+                <div className="rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400">
+                  <p className="font-semibold text-slate-300">Execution</p>
+                  <p className="mt-0.5">{EXEC_META[nodeExecState(selectedNode, openHandsState)].label}</p>
+                </div>
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Output ports (multi-way)
+                  <select
+                    value={selectedNode.outputPorts ?? 1}
+                    onChange={(e) => updateNode(selectedNode.id, { outputPorts: Math.max(1, Number(e.target.value) || 1) })}
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  >
+                    <option value={1} className="bg-slate-900">1 (single)</option>
+                    <option value={2} className="bg-slate-900">2 (2-way)</option>
+                    <option value={3} className="bg-slate-900">3 (3-way)</option>
+                    <option value={4} className="bg-slate-900">4 (4-way)</option>
+                    <option value={5} className="bg-slate-900">5 (N-way)</option>
+                  </select>
+                </label>
+                <NodeSettings
+                  node={selectedNode}
+                  onPatch={(patch) => updateNode(selectedNode.id, { config: { ...selectedNode.config, ...patch } })}
+                />
+                <button
+                  type="button"
+                  onClick={() => deleteNode(selectedNode.id)}
+                  className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-rose-500/15 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-500/25"
+                >
+                  <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
+                  Delete node
+                </button>
+              </>
+            )}
+            {selectedEdge && (
+              <>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-white">Connection</h3>
+                  <GitBranch className="h-4 w-4 text-indigo-300" strokeWidth={2} />
+                </div>
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Name
+                  <input
+                    type="text"
+                    value={selectedEdge.name ?? ""}
+                    onChange={(e) => updateEdge(selectedEdge.id, { name: e.target.value })}
+                    placeholder="e.g. Research Complete"
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Condition
+                  <select
+                    value={selectedEdge.condition}
+                    onChange={(e) => updateEdge(selectedEdge.id, { condition: e.target.value as EdgeCondition })}
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  >
+                    {CONDITION_OPTIONS.map((c) => (
+                      <option key={c.value} value={c.value} className="bg-slate-900">
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400">
+                  <p className="font-semibold text-slate-300">Branch type</p>
+                  {(() => {
+                    const branch = branchTypeForCondition(selectedEdge.condition);
+                    const meta = BRANCH_META[branch];
+                    const BranchIcon = meta.icon;
+                    return (
+                      <p className="mt-0.5 flex items-center gap-1.5 text-slate-200">
+                        <BranchIcon className="h-3.5 w-3.5 text-indigo-300" strokeWidth={2} />
+                        {meta.label}
+                      </p>
+                    );
+                  })()}
+                </div>
+                <div className="rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400">
+                  <p className="font-semibold text-slate-300">From → To</p>
+                  <p className="mt-0.5 truncate">
+                    {nodeById.get(selectedEdge.from)?.label ?? selectedEdge.from} → {nodeById.get(selectedEdge.to)?.label ?? selectedEdge.to}
+                  </p>
+                </div>
+                {selectedEdge.condition === "IF_LOOP" && (
+                  <div className="rounded-xl bg-fuchsia-500/10 p-2.5 text-[11px] text-slate-400 ring-1 ring-fuchsia-400/20">
+                    <p className="font-semibold text-fuchsia-300">Loop limit</p>
+                    <p className="mt-0.5">
+                      {loopCounts[selectedEdge.id] ?? 0} / {selectedEdge.loopLimit ?? 10} iterations
+                    </p>
+                    <label className="mt-2 flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                      Max iterations
+                      <input
+                        type="number"
+                        min={1}
+                        value={selectedEdge.loopLimit ?? 10}
+                        onChange={(e) => updateEdge(selectedEdge.id, { loopLimit: Math.max(1, Number(e.target.value) || 1) })}
+                        className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                      />
+                    </label>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => deleteEdge(selectedEdge.id)}
+                  className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-rose-500/15 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-500/25"
+                >
+                  <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
+                  Delete connection
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
+}
+
+/* ------------------------------------------------------------------ *
+ * Orchestration panel sub-components (former Command Center).
+ * ------------------------------------------------------------------ */
+
+function OrchMetric({ label, value, accent }: { label: string; value: number; accent: string }) {
+  return (
+    <div className="kb-glass rounded-2xl p-3">
+      <p className={`text-2xl font-bold ${accent}`}>{value}</p>
+      <p className="mt-1 text-[11px] text-slate-500">{label}</p>
+    </div>
+  );
+}
+
+function OrchSectionTitle({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+  return (
+    <div className="mb-2 flex items-center gap-2">
+      <Icon className="h-4 w-4 text-indigo-400" strokeWidth={2} />
+      <h3 className="text-sm font-semibold text-white">{label}</h3>
+    </div>
+  );
+}
+
+function OrchEmpty({ label }: { label: string }) {
+  return <p className="rounded-xl bg-white/5 px-4 py-6 text-center text-xs text-slate-500">{label}</p>;
+}
+
+function SkeletonRow() {
+  return (
+    <div className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-2.5">
+      <div className="h-3 w-3 animate-pulse rounded-full bg-slate-600/60" />
+      <div className="h-3 flex-1 animate-pulse rounded bg-slate-600/40" />
+      <div className="h-3 w-10 animate-pulse rounded bg-slate-600/40" />
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Node-specific settings.
+ *
+ * Each node type exposes a different set of settings in the inspector. The
+ * settings write into node.config (the type-specific WorkflowNodeConfig), so
+ * they persist with the workflow and are read by the engine at runtime.
+ * ------------------------------------------------------------------ */
+
+function NodeSettings({ node, onPatch }: { node: WorkflowNode; onPatch: (patch: Partial<WorkflowNodeConfig>) => void }) {
+  const config = node.config ?? {};
+  const set = (patch: Partial<WorkflowNodeConfig>) => onPatch(patch);
+
+  const field = (label: string, control: ReactNode) => (
+    <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+      {label}
+      {control}
+    </label>
+  );
+  const inputCls =
+    "rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50";
+
+  switch (node.type) {
+    case "agent":
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">Agent settings</p>
+          {field("Prompt", (
+            <textarea
+              value={config.prompt ?? ""}
+              onChange={(e) => set({ prompt: e.target.value })}
+              placeholder="Instruction sent to the agent"
+              className={`${inputCls} min-h-16 resize-y`}
+            />
+          ))}
+          {field("Memory", (
+            <select value={config.memory ?? "none"} onChange={(e) => set({ memory: e.target.value as "none" | "session" | "persistent" })} className={inputCls}>
+              <option value="none" className="bg-slate-900">None</option>
+              <option value="session" className="bg-slate-900">Session</option>
+              <option value="persistent" className="bg-slate-900">Persistent</option>
+            </select>
+          ))}
+          {field("Timeout (s)", (
+            <input type="number" min={0} value={config.timeoutSeconds ?? 0} onChange={(e) => set({ timeoutSeconds: Math.max(0, Number(e.target.value) || 0) })} className={inputCls} />
+          ))}
+          {field("Max retries", (
+            <input type="number" min={0} value={config.retryPolicy?.maxAttempts ?? 0} onChange={(e) => set({ retryPolicy: { maxAttempts: Math.max(0, Number(e.target.value) || 0), backoff: config.retryPolicy?.backoff ?? "fixed", delaySeconds: config.retryPolicy?.delaySeconds ?? 5 } })} className={inputCls} />
+          ))}
+        </div>
+      );
+    case "condition":
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-300">Condition settings</p>
+          {field("Expression", (
+            <input type="text" value={config.expression ?? ""} onChange={(e) => set({ expression: e.target.value })} placeholder="e.g. amount > 1000" className={inputCls} />
+          ))}
+          {config.validation && <p className="text-[11px] text-rose-300">{config.validation}</p>}
+        </div>
+      );
+    case "approval":
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-rose-300">Approval settings</p>
+          {field("Approver", (
+            <input type="text" value={config.approver ?? ""} onChange={(e) => set({ approver: e.target.value })} placeholder="Profile or user" className={inputCls} />
+          ))}
+          {field("SLA (hours)", (
+            <input type="number" min={0} value={config.slaHours ?? 0} onChange={(e) => set({ slaHours: Math.max(0, Number(e.target.value) || 0) })} className={inputCls} />
+          ))}
+        </div>
+      );
+    case "delay":
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-300">Delay settings</p>
+          {field("Duration (s)", (
+            <input type="number" min={0} value={config.durationSeconds ?? 0} onChange={(e) => set({ durationSeconds: Math.max(0, Number(e.target.value) || 0) })} className={inputCls} />
+          ))}
+          {field("Schedule", (
+            <input type="text" value={config.schedule ?? ""} onChange={(e) => set({ schedule: e.target.value })} placeholder="ISO 8601 or cron" className={inputCls} />
+          ))}
+        </div>
+      );
+    case "loop":
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">Loop settings</p>
+          {field("Max iterations", (
+            <input type="number" min={1} value={config.maxIterations ?? 3} onChange={(e) => set({ maxIterations: Math.max(1, Number(e.target.value) || 1) })} className={inputCls} />
+          ))}
+          {field("Guard expression", (
+            <input type="text" value={config.loopCondition ?? ""} onChange={(e) => set({ loopCondition: e.target.value })} placeholder="Exit when false" className={inputCls} />
+          ))}
+        </div>
+      );
+    case "task":
+      return (
+        <div className="flex flex-col gap-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">Task settings</p>
+          {field("Description", (
+            <textarea value={config.description ?? ""} onChange={(e) => set({ description: e.target.value })} placeholder="Task instructions" className={`${inputCls} min-h-16 resize-y`} />
+          ))}
+        </div>
+      );
+    default:
+      return null;
+  }
 }

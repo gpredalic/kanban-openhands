@@ -7,18 +7,25 @@
  * reported by the OpenHands agent server.
  */
 
-import { History, Loader2, CheckCircle2, XCircle, Clock, Bot, Cpu } from "lucide-react";
+import { useState } from "react";
+import { History, Loader2, CheckCircle2, XCircle, Clock, Bot, Cpu, RotateCcw } from "lucide-react";
 import type { OpenHandsExecution, OpenHandsState } from "../types/openhands";
 import type { AiState } from "../types/ai";
+import { Badge, statusBadge } from "../lib/badges";
+import { ConfirmResetModal } from "./ConfirmResetModal";
+import { SkeletonRow } from "./Skeleton";
 
 interface ExecutionHistoryProps {
   openHandsState: OpenHandsState;
   aiState: AiState;
+  /** Clear the surfaced executions and reset the history baseline to now. */
+  onReset: () => void;
 }
 
-export function ExecutionHistory({ openHandsState }: ExecutionHistoryProps) {
+export function ExecutionHistory({ openHandsState, onReset }: ExecutionHistoryProps) {
   const executions = openHandsState.snapshot.executions;
   const { loading, error } = openHandsState;
+  const [confirmReset, setConfirmReset] = useState(false);
   const active = executions.filter((e) => e.status === "running" || e.status === "queued");
   const completed = executions
     .filter((e) => e.status === "completed" || e.status === "failed" || e.status === "cancelled")
@@ -26,11 +33,21 @@ export function ExecutionHistory({ openHandsState }: ExecutionHistoryProps) {
 
   return (
     <div className="relative z-10 flex flex-col gap-6">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight text-white">Execution History</h2>
-        <p className="mt-0.5 text-xs text-slate-400">
-          {active.length} active · {completed.length} completed
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight text-white">Execution History</h2>
+          <p className="mt-0.5 text-xs text-slate-400">
+            {active.length} active · {completed.length} completed
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setConfirmReset(true)}
+          className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+        >
+          <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
+          <span>Clear History</span>
+        </button>
       </div>
 
       {error && (
@@ -43,13 +60,16 @@ export function ExecutionHistory({ openHandsState }: ExecutionHistoryProps) {
           <Loader2 className="h-4 w-4 animate-spin text-blue-400" /> Active Runs
         </h3>
         {active.length === 0 ? (
-          <EmptyState
-            label={
-              loading
-                ? "Connecting to OpenHands…"
-                : "No active runs — start orchestration from the Board header."
-            }
-          />
+          loading ? (
+            <div className="flex flex-col gap-2">
+              <SkeletonRow />
+              <SkeletonRow />
+            </div>
+          ) : (
+            <EmptyState
+              label="No active runs — start orchestration from the Board header."
+            />
+          )
         ) : (
           <div className="flex flex-col gap-2">
             {active.map((run) => (
@@ -65,7 +85,14 @@ export function ExecutionHistory({ openHandsState }: ExecutionHistoryProps) {
           <History className="h-4 w-4 text-slate-400" /> Completed Runs
         </h3>
         {completed.length === 0 ? (
-          <EmptyState label="No completed runs yet." />
+          loading ? (
+            <div className="flex flex-col gap-2">
+              <SkeletonRow />
+              <SkeletonRow />
+            </div>
+          ) : (
+            <EmptyState label="No completed runs yet." />
+          )
         ) : (
           <div className="flex flex-col gap-2">
             {completed.map((run) => (
@@ -74,6 +101,18 @@ export function ExecutionHistory({ openHandsState }: ExecutionHistoryProps) {
           </div>
         )}
       </section>
+
+      <ConfirmResetModal
+        open={confirmReset}
+        question="Clear execution history?"
+        detail="This clears the surfaced executions and resets the history baseline to now. Executions started before the reset will no longer be shown."
+        confirmLabel="Clear History"
+        onConfirm={() => {
+          onReset();
+          setConfirmReset(false);
+        }}
+        onCancel={() => setConfirmReset(false)}
+      />
     </div>
   );
 }
@@ -102,6 +141,9 @@ function RunRow({ run, active }: { run: OpenHandsExecution; active?: boolean }) 
         <p className="truncate text-sm font-medium text-white">{run.title}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
           <span className="font-mono text-slate-500">ID: {run.id}</span>
+          {statusBadge(run.status) && (
+            <Badge style={statusBadge(run.status)!} pulse={active} />
+          )}
           {run.agentId && (
             <span className="flex items-center gap-1">
               <Bot className="h-3 w-3 text-indigo-400" /> {run.agentId}
