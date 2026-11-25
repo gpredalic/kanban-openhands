@@ -201,7 +201,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
   /** Re-sync from OpenHands and report the outcome. */
   const resync = useCallback(
     async (ok: boolean, message: string) => {
-      setStatus({ kind: "working", message: "Syncing with OpenHands…" });
+      setStatus({ kind: "working", message: "Syncing…" });
       await sync();
       setStatus({ kind: ok ? "ok" : "error", message });
     },
@@ -393,7 +393,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
       {/* Header row */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-white">OpenHands Agents</h2>
+          <h2 className="text-lg font-bold tracking-tight text-white">Agents</h2>
           <p className="mt-0.5 text-xs text-slate-400">
             {profiles.length} agent profiles · full lifecycle management · updated live
           </p>
@@ -401,7 +401,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => void resync(true, "Synced with OpenHands")}
+            onClick={() => void resync(true, "Synced")}
             className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
           >
             <RefreshCw className="h-3.5 w-3.5" strokeWidth={2} />
@@ -739,7 +739,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
 
       {loading && (
         <p className="rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500">
-          Loading agents from OpenHands…
+          Loading agents…
         </p>
       )}
 
@@ -779,8 +779,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
               <h3 className="text-sm font-semibold text-white">Delete Agent</h3>
             </div>
             <p className="text-xs text-slate-400">
-              Delete agent <span className="font-semibold text-slate-200">{deletingName}</span> from
-              OpenHands? This cannot be undone.
+              Delete agent <span className="font-semibold text-slate-200">{deletingName}</span>? This cannot be undone.
             </p>
             <div className="mt-4 flex items-center justify-end gap-2">
               <button

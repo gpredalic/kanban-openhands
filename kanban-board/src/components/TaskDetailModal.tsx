@@ -453,7 +453,7 @@ export function TaskDetailModal({
             </select>
             {agentId && (
               <p className="mt-2 text-xs text-indigo-300">
-                Assigned agent: {agents.find((agent) => agent.id === agentId)?.name ?? agentId}
+                Assigned agent: {agents.find((agent) => agent.id === agentId)?.name ?? "Unassigned"}
               </p>
             )}
           </div>

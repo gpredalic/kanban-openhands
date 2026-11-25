@@ -117,9 +117,9 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
         setAssignmentAgents(profiles.map((profile) => ({
           id: profile.id,
           name: profile.name,
-          role: "OpenHands agent",
+          role: "AI agent",
           modelId: "",
-          description: `OpenHands profile: ${profile.name}`,
+          description: `Agent profile: ${profile.name}`,
           capabilities: [],
           maxConcurrent: 1,
           status: "idle",

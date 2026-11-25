@@ -575,8 +575,8 @@ export function WorkflowView({
             ))}
           </select>
           {workflow && (
-            <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${dirty ? "bg-amber-500/15 text-amber-300 ring-amber-400/30" : workflow.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : workflow.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-amber-500/15 text-amber-300 ring-amber-400/30"}`}>
-              {dirty ? "Draft" : workflow.status}
+            <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${dirty ? "bg-amber-500/15 text-amber-300 ring-amber-400/30" : workflow.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : workflow.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30"}`}>
+              {dirty ? "Unsaved" : workflow.status === "active" ? "Active" : workflow.status === "completed" ? "Completed" : "Ready"}
             </span>
           )}
         </div>
@@ -611,7 +611,7 @@ export function WorkflowView({
                 className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
               >
                 <Copy className="h-3.5 w-3.5" strokeWidth={2} />
-                Save As
+                Duplicate
               </button>
             </>
           )}
@@ -664,23 +664,23 @@ export function WorkflowView({
         </div>
       )}
 
-      {/* Save As form */}
+      {/* Duplicate form */}
       {showSaveAs && (
         <div className="kb-glass flex items-center gap-3 rounded-2xl p-3">
           <input
             type="text"
-            aria-label="New workflow name"
+            aria-label="Duplicate workflow name"
             value={saveAsName}
             onChange={(e) => setSaveAsName(e.target.value)}
-            placeholder="New workflow name"
+            placeholder={workflow ? `${workflow.name} (Copy)` : "Workflow name"}
             className="flex-1 rounded-xl border-0 bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
           />
           <button
             type="button"
-            onClick={() => saveAs(saveAsName)}
+            onClick={() => saveAs(saveAsName || (workflow ? `${workflow.name} (Copy)` : ""))}
             className="kb-gradient rounded-xl px-4 py-2 text-sm font-semibold text-white"
           >
-            Save As
+            Duplicate
           </button>
           <button
             type="button"

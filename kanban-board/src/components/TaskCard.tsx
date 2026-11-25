@@ -10,7 +10,7 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { memo, useState, useRef, useEffect } from "react";
+import { memo, useState, useRef, useEffect, type CSSProperties } from "react";
 import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, Bot, Lock } from "lucide-react";
 import type { Task, DeletePhase } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
@@ -38,7 +38,7 @@ interface TaskCardProps {
 /** Phase-specific overlay copy for the transaction-based delete flow. */
 const DELETE_PHASE_TEXT: Record<DeletePhase, string> = {
   deleting: "Deleting Task…",
-  removing_conversation: "Removing OpenHands conversation…",
+  removing_conversation: "Removing conversation…",
   syncing: "Synchronizing…",
   fading: "Removing…",
 };
@@ -129,6 +129,19 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
   // Shared badge styling for the execution status (dot + Title Case label).
   const statusStyle = statusBadge(executionStatus);
 
+  // Status-aware glow color — the card's ambient glow matches its status.
+  // done → green, review → orange, in_progress → blue, todo → slate,
+  // blocked → red, waiting → yellow. Falls back to neutral indigo.
+  const glowColor = (() => {
+    if (task.status === "done") return "var(--kb-glow-done)";
+    if (task.status === "review") return "var(--kb-glow-review)";
+    if (task.status === "in_progress") return "var(--kb-glow-progress)";
+    if (task.status === "todo") return "var(--kb-glow-todo)";
+    if (executionStatus === "failed") return "var(--kb-glow-blocked)";
+    if (executionStatus === "queued") return "var(--kb-glow-waiting)";
+    return "var(--kb-glow-neutral)";
+  })();
+
   // Lifecycle animation tracking: detect status changes, completions, and
   // failures so the card can flash the appropriate animation class.
   const prevStatus = useRef(task.status);
@@ -171,7 +184,7 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
     <div
       ref={setNodeRef}
       data-task-id={task.id}
-      style={style}
+      style={{ ...style, "--kb-card-glow": glowColor, "--kb-running-accent": glowColor } as unknown as CSSProperties}
       {...attributes}
       {...listeners}
       onPointerDown={(e) => {

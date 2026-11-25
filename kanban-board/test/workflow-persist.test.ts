@@ -143,7 +143,7 @@ test("workflow definitions persist across localStorage clear and fresh host remo
   freshContainer.remove();
 });
 
-test("save workflow: unsaved changes indicator, save, and save-as", async () => {
+test("save workflow: unsaved changes indicator, save, and duplicate", async () => {
   (globalThis as Record<string, unknown>).FormData = window.FormData;
   localStorage.clear();
 
@@ -203,38 +203,38 @@ test("save workflow: unsaved changes indicator, save, and save-as", async () => 
     "saved workflow has the start node plus the added agent node",
   );
 
-  // Save As: add another node to make it dirty again, then Save As.
+  // Duplicate: add another node to make it dirty again, then Duplicate.
   clickText(container, "Delay");
   await waitFor(() => container.textContent?.includes("Unsaved changes"));
 
-  const saveAsBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Save As");
-  assert.ok(saveAsBtn, "Save As button is visible when dirty");
-  saveAsBtn!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  const duplicateBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Duplicate");
+  assert.ok(duplicateBtn, "Duplicate button is visible when dirty");
+  duplicateBtn!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 
-  // The Save As form should appear. Find the input, then the form's own
-  // "Save As" button (a sibling of the input, not the toolbar button).
-  const saveAsInput = await waitFor(() =>
-    Boolean(container.querySelector('input[aria-label="New workflow name"]')),
-  ).then(() => container.querySelector('input[aria-label="New workflow name"]') as HTMLInputElement);
-  assert.ok(saveAsInput, "Save As name input exists");
-  changeInput(saveAsInput, "Save As Copy");
-  const formContainer = saveAsInput.parentElement!;
-  const saveAsConfirm = [...formContainer.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Save As");
-  assert.ok(saveAsConfirm, "form Save As button exists");
-  saveAsConfirm.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // The Duplicate form should appear. Find the input, then the form's own
+  // "Duplicate" button (a sibling of the input, not the toolbar button).
+  const duplicateInput = await waitFor(() =>
+    Boolean(container.querySelector('input[aria-label="Duplicate workflow name"]')),
+  ).then(() => container.querySelector('input[aria-label="Duplicate workflow name"]') as HTMLInputElement);
+  assert.ok(duplicateInput, "Duplicate name input exists");
+  changeInput(duplicateInput, "Duplicate Copy");
+  const formContainer = duplicateInput.parentElement!;
+  const duplicateConfirm = [...formContainer.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Duplicate");
+  assert.ok(duplicateConfirm, "form Duplicate button exists");
+  duplicateConfirm.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 
   // The new workflow should exist.
-  await waitFor(() => fixture.getWorkflows().some((w) => w.name === "Save As Copy"));
+  await waitFor(() => fixture.getWorkflows().some((w) => w.name === "Duplicate Copy"));
   assert.ok(
-    fixture.getWorkflows().some((w) => w.name === "Save As Copy"),
-    "Save As creates a new workflow with the given name",
+    fixture.getWorkflows().some((w) => w.name === "Duplicate Copy"),
+    "Duplicate creates a new workflow with the given name",
   );
 
-  // The dirty indicator should be cleared after Save As.
+  // The dirty indicator should be cleared after Duplicate.
   await waitFor(() => !container.textContent?.includes("Unsaved changes"));
   assert.ok(
     !container.textContent?.includes("Unsaved changes"),
-    "unsaved changes indicator clears after Save As",
+    "unsaved changes indicator clears after Duplicate",
   );
 
   cleanup();

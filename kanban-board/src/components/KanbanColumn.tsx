@@ -35,6 +35,14 @@ const STATUS_COLORS: Record<TaskStatus, string> = {
   done: "bg-emerald-500",
 };
 
+/* Status-aware dot glow — the dot's ambient glow matches its status color. */
+const STATUS_GLOW: Record<TaskStatus, string> = {
+  todo: "rgba(100, 116, 139, 0.55)",
+  in_progress: "rgba(59, 130, 246, 0.55)",
+  review: "rgba(245, 158, 11, 0.55)",
+  done: "rgba(34, 197, 94, 0.55)",
+};
+
 export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
   const dot = STATUS_COLORS[column.status];
@@ -50,8 +58,8 @@ export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskId
       {/* Column header */}
       <div className="mb-3 flex items-center justify-between px-1.5">
         <div className="flex items-center gap-2.5">
-          <span className={`h-2.5 w-2.5 rounded-full ${dot} shadow-[0_0_10px_rgba(99,102,241,0.55)]`} />
-          <h3 className="text-sm font-semibold tracking-tight text-slate-200">
+          <span className={`h-2.5 w-2.5 rounded-full ${dot}`} style={{ boxShadow: `0 0 10px ${STATUS_GLOW[column.status]}` }} />
+          <h3 className="text-sm font-bold tracking-tight text-slate-200">
             {column.title}
           </h3>
         </div>

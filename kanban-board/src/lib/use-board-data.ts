@@ -244,7 +244,7 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
         if (conversationId) {
           const gone = await verifyConversationGone(host, conversationId);
           if (!gone) {
-            fail("OpenHands conversation could not be confirmed deleted");
+            fail("Conversation could not be confirmed deleted");
             return;
           }
         }

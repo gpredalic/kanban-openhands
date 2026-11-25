@@ -284,7 +284,7 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
       id: asString(conversation.id) ?? "",
       taskId: tags.taskid,
       workflowId: tags.workflowid,
-      title: asString(conversation.title) ?? tags.tasktitle ?? "OpenHands conversation",
+      title: asString(conversation.title) ?? tags.tasktitle ?? "Untitled task",
       status,
       agentId: tags.agentprofileid ?? tags.agentid
         ?? asString(conversation.agent_profile_id)
@@ -1134,7 +1134,7 @@ export async function syncInboundConversations(host: Host, ignoreTaskIds?: Reado
       // the business title. The business title lives in tags.tasktitle. For
       // phantom tasks we prefer the tag; for existing tasks we never clobber
       // the title — it is the business identifier, not the AI instruction.
-      const conversationTitle = asString(conversation.title) ?? "OpenHands conversation";
+      const conversationTitle = asString(conversation.title) ?? "Untitled task";
       const businessTitle = tags.tasktitle ?? conversationTitle;
       const profileId = asString(conversation.agent_profile_id)
         ?? asString(asObject(conversation.launched_agent_profile)?.agent_profile_id)
@@ -1199,7 +1199,7 @@ async function createConversation(
     body,
   });
   const conversation = asObject(response);
-  if (!conversation) throw new Error("OpenHands did not return a conversation");
+  if (!conversation) throw new Error("No conversation was returned");
   return { conversation, profileId: agentProfileId };
 }
 
@@ -1315,7 +1315,7 @@ export async function commandExecution(
 
   const { conversation, profileId } = await createConversation(host, input);
   const conversationId = asString(conversation.id);
-  if (!conversationId) throw new Error("OpenHands conversation has no id");
+  if (!conversationId) throw new Error("Conversation has no id");
   // Persist the execution identity immediately so the board mirrors OpenHands
   // the moment the run is created, not only after the next inbound poll.
   if (input.taskId) {
@@ -1605,7 +1605,7 @@ export class OpenHandsStateStore {
         lastSyncedAt: Date.now(),
       };
     } catch (error) {
-      const message = error instanceof Error ? error.message : "OpenHands agent server unavailable";
+      const message = error instanceof Error ? error.message : "Agent server unavailable";
       const prev = this.state;
       // Only notify when the error/loading state actually changed, so a
       // repeated failure on every poll does not re-render the board.

@@ -42,11 +42,11 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
   const perAgent = useMemo(() => {
     const map = new Map<string, Breakdown>();
     for (const run of executions) {
-      const agentId = run.agentId ?? "unknown";
+      const agentId = run.agentId ?? "unassigned";
       const agent = config.agents.find((a) => a.id === agentId);
       const entry = map.get(agentId) ?? {
         id: agentId,
-        name: agent?.name ?? agentId,
+        name: agent?.name ?? "Unassigned Agent",
         tokensIn: 0,
         tokensOut: 0,
         cost: 0,
@@ -64,11 +64,11 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
   const perModel = useMemo(() => {
     const map = new Map<string, Breakdown>();
     for (const run of executions) {
-      const modelId = run.modelId ?? "unknown";
+      const modelId = run.modelId ?? "unassigned";
       const model = config.models.find((m) => m.id === modelId);
       const entry = map.get(modelId) ?? {
         id: modelId,
-        name: model?.name ?? modelId,
+        name: model?.name ?? "Unassigned Model",
         tokensIn: 0,
         tokensOut: 0,
         cost: 0,
@@ -100,9 +100,9 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
     <div className="relative z-10 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-white">Analytics</h2>
+          <h2 className="text-lg font-bold tracking-tight text-white">Analytics</h2>
           <p className="mt-0.5 text-xs text-slate-400">
-            Token & cost tracking across all OpenHands executions
+            Token and cost usage across all executions
           </p>
         </div>
         <button
@@ -128,19 +128,19 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
           <TotalCard
             icon={Activity}
             label="Total Tokens In"
-            value={reportedTokenIn.length ? formatTokens(totalTokensIn) : "Unavailable"}
+            value={reportedTokenIn.length ? formatTokens(totalTokensIn) : "—"}
             accent="from-blue-500 to-indigo-500"
           />
           <TotalCard
             icon={Activity}
             label="Total Tokens Out"
-            value={reportedTokenOut.length ? formatTokens(totalTokensOut) : "Unavailable"}
+            value={reportedTokenOut.length ? formatTokens(totalTokensOut) : "—"}
             accent="from-violet-500 to-purple-500"
           />
           <TotalCard
             icon={Coins}
             label="Total Cost"
-            value={reportedCost.length ? formatCost(totalCost) : "Unavailable"}
+            value={reportedCost.length ? formatCost(totalCost) : "—"}
             accent="from-emerald-500 to-teal-500"
           />
           <TotalCard

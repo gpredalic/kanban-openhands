@@ -24,11 +24,19 @@
   --kb-status-progress: #3b82f6;
   --kb-status-review: #f59e0b;
   --kb-status-done: #22c55e;
+  /* Status-aware glow colors — the card's ambient glow matches its status. */
+  --kb-glow-todo: 100, 116, 139;
+  --kb-glow-progress: 59, 130, 246;
+  --kb-glow-review: 245, 158, 11;
+  --kb-glow-done: 34, 197, 94;
+  --kb-glow-waiting: 234, 179, 8;
+  --kb-glow-blocked: 239, 68, 68;
+  --kb-glow-neutral: 99, 102, 241;
   /* Premium shadow tokens. */
   --kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
   --kb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
   --kb-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.25);
-  --kb-shadow-glow: 0 0 0 1px rgba(99, 102, 241, 0.25), 0 8px 24px rgba(99, 102, 241, 0.18);
+  --kb-shadow-glow: 0 0 0 1px rgba(var(--kb-glow-neutral), 0.25), 0 8px 24px rgba(var(--kb-glow-neutral), 0.18);
   /* Self-contained height floor (does not depend on the host height chain). */
   min-height: 100vh;
   margin: 0;
@@ -197,11 +205,15 @@
  * remains stable.
  * ------------------------------------------------------------------ */
 .kb-card {
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  --kb-card-glow: var(--kb-glow-neutral);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 .kb-card:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: var(--kb-shadow-glow);
+  border-color: rgba(var(--kb-card-glow), 0.35);
+  box-shadow:
+    0 0 0 1px rgba(var(--kb-card-glow), 0.2),
+    0 4px 16px rgba(var(--kb-card-glow), 0.12),
+    0 12px 32px rgba(var(--kb-card-glow), 0.1);
 }
 
 /* Button hover — glow + slight lift. */
@@ -331,19 +343,7 @@
   animation: kb-shimmer 1.6s linear infinite;
 }
 
-/* Running task — pulsing indigo glow to signal active execution. */
-@keyframes kb-running-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.3), 0 0 12px rgba(99, 102, 241, 0.15);
-  }
-  50% {
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5), 0 0 24px rgba(99, 102, 241, 0.3);
-  }
-}
-.kb-running {
-  animation: kb-running-pulse 2s ease-in-out infinite;
-  border-color: rgba(99, 102, 241, 0.4);
-}
+/* Running task — pulsing glow (status-aware, defined at the bottom of this file). */
 
 /* Thin custom scrollbar. */
 .kb-scroll::-webkit-scrollbar {
@@ -514,4 +514,96 @@
 }
 .kb-sync-dot {
   animation: kb-sync-pulse 1.5s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------ *
+ * Bento grid — clean, balanced sections with strong hierarchy.
+ * Used by Dashboard, Analytics, Reports, and Activity views.
+ * ------------------------------------------------------------------ */
+.kb-bento {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.kb-bento--2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+.kb-bento--3col {
+  grid-template-columns: repeat(3, 1fr);
+}
+.kb-bento--4col {
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 768px) {
+  .kb-bento--2col,
+  .kb-bento--3col,
+  .kb-bento--4col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Bento cell — a glass panel with generous padding and a subtle
+   inner highlight that gives depth without a hard border. */
+.kb-bento-cell {
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.kb-bento-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Page transition — smooth fade + slide when switching views.
+ * Applied to the Suspense fallback and the view container.
+ * ------------------------------------------------------------------ */
+@keyframes kb-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.kb-page-enter {
+  animation: kb-page-enter 0.3s ease-out both;
+}
+
+/* Dialog open/close — scale + fade. */
+@keyframes kb-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.kb-dialog-in {
+  animation: kb-dialog-in 0.2s ease-out both;
+}
+
+/* ------------------------------------------------------------------ *
+ * Running task — pulsing glow that matches the status color.
+ * The accent is set inline as --kb-running-accent by the component.
+ * ------------------------------------------------------------------ */
+@keyframes kb-running-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.3), 0 0 12px rgba(var(--kb-running-accent, 99, 102, 241), 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(var(--kb-running-accent, 99, 102, 241), 0.5), 0 0 24px rgba(var(--kb-running-accent, 99, 102, 241), 0.3);
+  }
+}
+.kb-running {
+  animation: kb-running-pulse 2s ease-in-out infinite;
+  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.4);
 }

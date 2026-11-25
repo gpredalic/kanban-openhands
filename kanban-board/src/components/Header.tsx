@@ -42,7 +42,7 @@ export function Header({ onCreate, syncing = false }: HeaderProps) {
           {/* Sync indicator — always visible, pulses while syncing */}
           <div
             className="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-medium ring-1 ring-white/10"
-            title={syncing ? "Syncing with OpenHands…" : "Synced"}
+            title={syncing ? "Syncing…" : "Synced"}
           >
             <span
               className={`h-2 w-2 rounded-full ${
