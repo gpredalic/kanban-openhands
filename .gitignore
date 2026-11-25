@@ -22,3 +22,8 @@ credentials*
 
 # Agent workspace / memory
 .openhands/
+
+# Harness audit artifacts (screenshots + probe scripts)
+kanban-board/harness/*.png
+kanban-board/harness/*.mjs
+!kanban-board/harness/server.mjs

@@ -67,7 +67,7 @@ export function ExecutionHistory({ openHandsState, onReset }: ExecutionHistoryPr
             </div>
           ) : (
             <EmptyState
-              label="No active runs — start orchestration from the Board header."
+              label="No active runs — run a task from its detail view to see it here."
             />
           )
         ) : (

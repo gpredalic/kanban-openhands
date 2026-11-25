@@ -9230,9 +9230,9 @@ function Av({ onCreate: e, syncing: t = !1 }) {
         /* @__PURE__ */ o.jsx("p", { className: "mt-1 text-sm text-slate-400", children: "Plan, track and ship work across your team — in one place." }),
         /* @__PURE__ */ o.jsxs("p", { className: "mt-1.5 font-mono text-[10px] leading-tight text-slate-600", children: [
           "Build: ",
-          "2026-11-25 17:28",
+          "2026-11-25 18:56",
           " · Commit: ",
-          "85ef55d"
+          "5a7fdf5"
         ] })
       ] })
     ] }),
@@ -13084,7 +13084,7 @@ function z1({
   const T = h.useMemo(() => new Map(t.map((E) => [E.id, E])), [t]), L = h.useMemo(() => new Map(d.map((E) => [E.id, E])), [d]), { activeEdges: K, activeNodes: re, loopEdgeSet: $, loopCounts: we } = Bm(d, v, n), ce = (E, P) => {
     j(!0);
   }, D = () => {
-    !f || !y || (l({ ...f, nodes: d, edges: v }), j(!1));
+    !f || !y || (l({ ...f, nodes: d, edges: v, status: "active" }), j(!1));
   }, I = (E) => {
     const P = E.trim();
     if (!P || !f) return;
@@ -13095,7 +13095,8 @@ function z1({
       description: f.description,
       nodes: d.map((H) => ({ ...H })),
       edges: v.map((H) => ({ ...H })),
-      status: "draft"
+      // Save As writes the graph immediately, so the new workflow is active.
+      status: "active"
     }), u(U), _(!1), G(""), j(!1);
   }, z = (E) => {
     if (!f) return;
@@ -13246,7 +13247,7 @@ function z1({
             children: a.map((E) => /* @__PURE__ */ o.jsx("option", { value: E.id, className: "bg-slate-900", children: E.name }, E.id))
           }
         ),
-        f && /* @__PURE__ */ o.jsx("span", { className: `rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${f.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : f.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-amber-500/15 text-amber-300 ring-amber-400/30"}`, children: f.status })
+        f && /* @__PURE__ */ o.jsx("span", { className: `rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${y ? "bg-amber-500/15 text-amber-300 ring-amber-400/30" : f.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : f.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-amber-500/15 text-amber-300 ring-amber-400/30"}`, children: y ? "Draft" : f.status })
       ] }),
       /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-2", children: [
         y && /* @__PURE__ */ o.jsxs("span", { className: "flex items-center gap-1.5 rounded-full bg-amber-500/15 px-2.5 py-1 text-[10px] font-semibold text-amber-300 ring-1 ring-amber-400/30", children: [
@@ -13599,7 +13600,7 @@ function z1({
             )
           ] }),
           te.type === "agent" && /* @__PURE__ */ o.jsxs("label", { className: "flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500", children: [
-            "OpenHands Profile",
+            "Agent profile",
             /* @__PURE__ */ o.jsxs(
               "select",
               {
@@ -13625,7 +13626,7 @@ function z1({
             /* @__PURE__ */ o.jsx("p", { className: "mt-0.5 truncate", children: T.get(te.taskId).title })
           ] }),
           /* @__PURE__ */ o.jsxs("label", { className: "flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500", children: [
-            "Output ports",
+            "Outputs",
             /* @__PURE__ */ o.jsxs(
               "select",
               {
@@ -13820,7 +13821,7 @@ function $1({ node: e, onPatch: t }) {
       return /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-3", children: [
         /* @__PURE__ */ o.jsx("p", { className: "text-[10px] font-semibold uppercase tracking-wider text-cyan-300", children: "Loop settings" }),
         s("Max iterations", /* @__PURE__ */ o.jsx("input", { type: "number", min: 1, value: n.maxIterations ?? 3, onChange: (i) => r({ maxIterations: Math.max(1, Number(i.target.value) || 1) }), className: l })),
-        s("Guard expression", /* @__PURE__ */ o.jsx("input", { type: "text", value: n.loopCondition ?? "", onChange: (i) => r({ loopCondition: i.target.value }), placeholder: "Exit when false", className: l }))
+        s("Exit condition", /* @__PURE__ */ o.jsx("input", { type: "text", value: n.loopCondition ?? "", onChange: (i) => r({ loopCondition: i.target.value }), placeholder: "Stop looping when false", className: l }))
       ] });
     case "task":
       return /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-3", children: [
@@ -13844,7 +13845,7 @@ const F1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   WorkflowView: z1
 }, Symbol.toStringTag, { value: "Module" }));
 function U1(e) {
-  return e.workflowId ? { label: "Workflow Run", icon: _v, cls: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30" } : e.taskId ? { label: "Task", icon: Sm, cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" } : { label: "Workflow", icon: Iv, cls: "bg-amber-500/15 text-amber-300 ring-amber-400/30" };
+  return e.workflowId ? { label: "Workflow", icon: _v, cls: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30" } : e.taskId ? { label: "Task", icon: Sm, cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" } : { label: "Workflow", icon: Iv, cls: "bg-amber-500/15 text-amber-300 ring-amber-400/30" };
 }
 function W1({
   workflows: e,
@@ -13925,8 +13926,8 @@ function W1({
           children: [
             /* @__PURE__ */ o.jsxs("span", { className: "flex items-center gap-2 text-sm font-semibold text-white", children: [
               /* @__PURE__ */ o.jsx(Xn, { className: "h-4 w-4 text-indigo-400", strokeWidth: 2 }),
-              "Orchestration",
-              /* @__PURE__ */ o.jsx("span", { className: "text-[11px] font-normal text-slate-500", children: r.lastSyncedAt === null ? "Not synced yet" : `Last synced ${Math.max(0, Math.floor((Date.now() - r.lastSyncedAt) / 1e3))}s ago` })
+              "Activity",
+              /* @__PURE__ */ o.jsx("span", { className: "text-[11px] font-normal text-slate-500", children: r.lastSyncedAt === null ? "Not synced yet" : `Updated ${Math.max(0, Math.floor((Date.now() - r.lastSyncedAt) / 1e3))}s ago` })
             ] }),
             u ? /* @__PURE__ */ o.jsx(jm, { className: "h-4 w-4 text-slate-400" }) : /* @__PURE__ */ o.jsx(Nm, { className: "h-4 w-4 text-slate-400" })
           ]
@@ -13935,10 +13936,10 @@ function W1({
       u && /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-4 border-t border-white/5 p-4", children: [
         r.error && /* @__PURE__ */ o.jsx("div", { className: "rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300", children: r.error }),
         /* @__PURE__ */ o.jsxs("div", { className: "grid grid-cols-2 gap-3 lg:grid-cols-4", children: [
-          /* @__PURE__ */ o.jsx(Sl, { label: "Active jobs", value: R, accent: "text-blue-400" }),
-          /* @__PURE__ */ o.jsx(Sl, { label: "Queued jobs", value: x, accent: "text-amber-400" }),
-          /* @__PURE__ */ o.jsx(Sl, { label: "Failed jobs", value: g, accent: "text-rose-400" }),
-          /* @__PURE__ */ o.jsx(Sl, { label: "Completed jobs", value: p, accent: "text-emerald-400" })
+          /* @__PURE__ */ o.jsx(Sl, { label: "Active", value: R, accent: "text-blue-400" }),
+          /* @__PURE__ */ o.jsx(Sl, { label: "Queued", value: x, accent: "text-amber-400" }),
+          /* @__PURE__ */ o.jsx(Sl, { label: "Failed", value: g, accent: "text-rose-400" }),
+          /* @__PURE__ */ o.jsx(Sl, { label: "Completed", value: p, accent: "text-emerald-400" })
         ] }),
         /* @__PURE__ */ o.jsxs("section", { children: [
           /* @__PURE__ */ o.jsx(Pd, { icon: Xn, label: "Live executions" }),
@@ -13958,15 +13959,15 @@ function W1({
                   ] })
                 ] }),
                 /* @__PURE__ */ o.jsxs("p", { className: "text-[11px] text-slate-500", children: [
-                  y.taskId ? w.get(y.taskId) ?? y.taskId : "OpenHands execution",
+                  y.taskId ? w.get(y.taskId) ?? y.taskId : "Workflow execution",
                   " · ",
                   k.get(y.agentId ?? "") ?? y.agentId ?? "unassigned"
                 ] })
               ] }),
               /* @__PURE__ */ o.jsxs("span", { className: "text-right text-[11px] text-slate-400", children: [
-                y.tokensInReported === !1 && y.tokensOutReported === !1 ? "Tokens unavailable" : `${Br(y.tokensIn + y.tokensOut)} tokens reported`,
+                y.tokensInReported === !1 && y.tokensOutReported === !1 ? "Usage not reported" : `${Br(y.tokensIn + y.tokensOut)} tokens`,
                 /* @__PURE__ */ o.jsx("br", {}),
-                y.costReported === !1 ? "Cost unavailable" : `${Ho(y.cost)} reported`
+                y.costReported === !1 ? "Cost not reported" : Ho(y.cost)
               ] }),
               /* @__PURE__ */ o.jsxs("div", { className: "flex gap-1", children: [
                 y.status === "running" && /* @__PURE__ */ o.jsx("button", { className: "kb-glass-sm rounded-lg p-2 text-slate-300", title: "Stop execution", onClick: () => i("stop", y.id), children: /* @__PURE__ */ o.jsx(Zs, { className: "h-3.5 w-3.5" }) }),
@@ -13977,11 +13978,11 @@ function W1({
           }) })
         ] }),
         /* @__PURE__ */ o.jsxs("section", { children: [
-          /* @__PURE__ */ o.jsx(Pd, { icon: ad, label: "Knowledge graph" }),
+          /* @__PURE__ */ o.jsx(Pd, { icon: ad, label: "Connections" }),
           /* @__PURE__ */ o.jsxs("div", { className: "kb-glass rounded-2xl p-4", children: [
-            /* @__PURE__ */ o.jsx("p", { className: "mb-3 text-xs text-slate-500", children: "Relationships discovered across tasks, agents, models, repositories, conversations, and executions." }),
+            /* @__PURE__ */ o.jsx("p", { className: "mb-3 text-xs text-slate-500", children: "How your tasks, agents, and conversations relate to each other." }),
             /* @__PURE__ */ o.jsxs("div", { className: "flex flex-wrap gap-2", children: [
-              b.length === 0 && /* @__PURE__ */ o.jsx(Dd, { label: "Relationships will appear as OpenHands work is reported." }),
+              b.length === 0 && /* @__PURE__ */ o.jsx(Dd, { label: "Connections will appear as work is reported." }),
               b.slice(0, 40).map((y) => /* @__PURE__ */ o.jsxs("span", { className: "rounded-lg bg-slate-800/70 px-3 py-2 text-[11px] text-slate-300", children: [
                 y.from.label,
                 " ",
@@ -14161,7 +14162,7 @@ function K1({ host: e, openHandsState: t }) {
         /* @__PURE__ */ o.jsx("h2", { className: "text-lg font-semibold tracking-tight text-white", children: "OpenHands Agents" }),
         /* @__PURE__ */ o.jsxs("p", { className: "mt-0.5 text-xs text-slate-400", children: [
           n.length,
-          " agent profiles · full lifecycle management · sourced live from the OpenHands API"
+          " agent profiles · full lifecycle management · updated live"
         ] })
       ] }),
       /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-2", children: [
@@ -14482,7 +14483,7 @@ function K1({ host: e, openHandsState: t }) {
       ] })
     ] }),
     c && /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500", children: "Loading agents from OpenHands…" }),
-    !c && n.length === 0 && /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500", children: "No agents are visible from the OpenHands API." }),
+    !c && n.length === 0 && /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500", children: "No agents are available yet. They will appear once an agent profile is created." }),
     n.length > 0 && /* @__PURE__ */ o.jsxs("section", { children: [
       /* @__PURE__ */ o.jsx(Y1, { icon: cn, label: "Agent Profiles" }),
       /* @__PURE__ */ o.jsx("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3", children: n.map((C) => /* @__PURE__ */ o.jsx(
@@ -14940,7 +14941,7 @@ function X1({ openHandsState: e, onReset: t }) {
       ] }) : /* @__PURE__ */ o.jsx(
         zd,
         {
-          label: "No active runs — start orchestration from the Board header."
+          label: "No active runs — run a task from its detail view to see it here."
         }
       ) : /* @__PURE__ */ o.jsx("div", { className: "flex flex-col gap-2", children: a.map((u) => /* @__PURE__ */ o.jsx(Ld, { run: u, active: !0 }, u.id)) })
     ] }),
@@ -15133,7 +15134,7 @@ function Z1({ aiState: e, openHandsState: t, onReset: n }) {
       l ? /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-2", children: [
         /* @__PURE__ */ o.jsx(Sn, {}),
         /* @__PURE__ */ o.jsx(Sn, {})
-      ] }) : c.length === 0 ? /* @__PURE__ */ o.jsx(Fd, { label: "No agent usage yet — start orchestration to populate analytics." }) : /* @__PURE__ */ o.jsx("div", { className: "kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4", children: c.map((p) => /* @__PURE__ */ o.jsx(
+      ] }) : c.length === 0 ? /* @__PURE__ */ o.jsx(Fd, { label: "No agent usage yet — run a task to populate analytics." }) : /* @__PURE__ */ o.jsx("div", { className: "kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4", children: c.map((p) => /* @__PURE__ */ o.jsx(
         $d,
         {
           name: p.name,

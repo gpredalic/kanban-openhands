@@ -395,8 +395,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-white">OpenHands Agents</h2>
           <p className="mt-0.5 text-xs text-slate-400">
-            {profiles.length} agent profiles · full lifecycle management · sourced live from the
-            OpenHands API
+            {profiles.length} agent profiles · full lifecycle management · updated live
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -746,7 +745,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
 
       {!loading && profiles.length === 0 && (
         <p className="rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500">
-          No agents are visible from the OpenHands API.
+          No agents are available yet. They will appear once an agent profile is created.
         </p>
       )}
 

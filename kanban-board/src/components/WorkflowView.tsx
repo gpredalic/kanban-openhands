@@ -276,10 +276,11 @@ export function WorkflowView({
   };
 
   /** Write the current graph back to the selected workflow and clear the
-   *  dirty flag. */
+   *  dirty flag. Saving a workflow makes it active — "Draft" means unsaved
+   *  changes only, so a saved workflow must not keep a draft status. */
   const save = () => {
     if (!workflow || !dirty) return;
-    onUpdate({ ...workflow, nodes, edges });
+    onUpdate({ ...workflow, nodes, edges, status: "active" });
     setDirty(false);
   };
 
@@ -294,7 +295,8 @@ export function WorkflowView({
       description: workflow.description,
       nodes: nodes.map((n) => ({ ...n })),
       edges: edges.map((e) => ({ ...e })),
-      status: "draft",
+      // Save As writes the graph immediately, so the new workflow is active.
+      status: "active",
     });
     setSelectedId(id);
     setShowSaveAs(false);
@@ -573,8 +575,8 @@ export function WorkflowView({
             ))}
           </select>
           {workflow && (
-            <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${workflow.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : workflow.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-amber-500/15 text-amber-300 ring-amber-400/30"}`}>
-              {workflow.status}
+            <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ring-1 ${dirty ? "bg-amber-500/15 text-amber-300 ring-amber-400/30" : workflow.status === "active" ? "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" : workflow.status === "completed" ? "bg-slate-500/15 text-slate-300 ring-slate-400/30" : "bg-amber-500/15 text-amber-300 ring-amber-400/30"}`}>
+              {dirty ? "Draft" : workflow.status}
             </span>
           )}
         </div>
@@ -929,10 +931,10 @@ export function WorkflowView({
                     className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                   />
                 </label>
-                {/* Agent: OpenHands Profile (node-level property) */}
+                {/* Agent: profile assignment (node-level property) */}
                 {selectedNode.type === "agent" && (
                   <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                    OpenHands Profile
+                    Agent profile
                     <select
                       value={selectedNode.profileId ?? ""}
                       onChange={(e) => updateNode(selectedNode.id, { profileId: e.target.value || null })}
@@ -959,9 +961,9 @@ export function WorkflowView({
                     <p className="mt-0.5 truncate">{taskById.get(selectedNode.taskId)!.title}</p>
                   </div>
                 )}
-                {/* Multi-way output ports */}
+                {/* Multi-way outputs */}
                 <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                  Output ports
+                  Outputs
                   <select
                     value={selectedNode.outputPorts ?? 1}
                     onChange={(e) => updateNode(selectedNode.id, { outputPorts: Math.max(1, Number(e.target.value) || 1) })}
@@ -1181,8 +1183,8 @@ function NodeSettings({ node, onPatch }: { node: WorkflowNode; onPatch: (patch: 
           {field("Max iterations", (
             <input type="number" min={1} value={config.maxIterations ?? 3} onChange={(e) => set({ maxIterations: Math.max(1, Number(e.target.value) || 1) })} className={inputCls} />
           ))}
-          {field("Guard expression", (
-            <input type="text" value={config.loopCondition ?? ""} onChange={(e) => set({ loopCondition: e.target.value })} placeholder="Exit when false" className={inputCls} />
+          {field("Exit condition", (
+            <input type="text" value={config.loopCondition ?? ""} onChange={(e) => set({ loopCondition: e.target.value })} placeholder="Stop looping when false" className={inputCls} />
           ))}
         </div>
       );

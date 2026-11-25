@@ -163,7 +163,7 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
             <SkeletonRow />
           </div>
         ) : perAgent.length === 0 ? (
-          <EmptyState label="No agent usage yet — start orchestration to populate analytics." />
+          <EmptyState label="No agent usage yet — run a task to populate analytics." />
         ) : (
           <div className="kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4">
             {perAgent.map((a) => (

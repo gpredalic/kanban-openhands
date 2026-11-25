@@ -33,7 +33,7 @@ import { useWorkflowRouting, nodeExecState } from "../hooks/useWorkflowRouting";
 
 /** Derive the execution type label from its identifiers. */
 function executionType(run: OpenHandsExecution): { label: string; icon: LucideIcon; cls: string } {
-  if (run.workflowId) return { label: "Workflow Run", icon: Zap, cls: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30" };
+  if (run.workflowId) return { label: "Workflow", icon: Zap, cls: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30" };
   if (run.taskId) return { label: "Task", icon: FileText, cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" };
   return { label: "Workflow", icon: WorkflowIcon, cls: "bg-amber-500/15 text-amber-300 ring-amber-400/30" };
 }
@@ -173,7 +173,7 @@ export function MonitoringView({
         </div>
       )}
 
-      {/* Orchestration panel — metrics, live executions, knowledge graph */}
+      {/* Activity panel — metrics, live executions, connections */}
       <div className="kb-glass rounded-2xl">
         <button
           type="button"
@@ -183,9 +183,9 @@ export function MonitoringView({
         >
           <span className="flex items-center gap-2 text-sm font-semibold text-white">
             <Activity className="h-4 w-4 text-indigo-400" strokeWidth={2} />
-            Orchestration
+            Activity
             <span className="text-[11px] font-normal text-slate-500">
-              {openHandsState.lastSyncedAt === null ? "Not synced yet" : `Last synced ${Math.max(0, Math.floor((Date.now() - openHandsState.lastSyncedAt) / 1000))}s ago`}
+              {openHandsState.lastSyncedAt === null ? "Not synced yet" : `Updated ${Math.max(0, Math.floor((Date.now() - openHandsState.lastSyncedAt) / 1000))}s ago`}
             </span>
           </span>
           {orchOpen ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
@@ -196,10 +196,10 @@ export function MonitoringView({
 
             {/* Metrics */}
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <OrchMetric label="Active jobs" value={active} accent="text-blue-400" />
-              <OrchMetric label="Queued jobs" value={queued} accent="text-amber-400" />
-              <OrchMetric label="Failed jobs" value={failed} accent="text-rose-400" />
-              <OrchMetric label="Completed jobs" value={completed} accent="text-emerald-400" />
+              <OrchMetric label="Active" value={active} accent="text-blue-400" />
+              <OrchMetric label="Queued" value={queued} accent="text-amber-400" />
+              <OrchMetric label="Failed" value={failed} accent="text-rose-400" />
+              <OrchMetric label="Completed" value={completed} accent="text-emerald-400" />
             </div>
 
             {/* Live executions */}
@@ -230,13 +230,13 @@ export function MonitoringView({
                             {etype.label}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? run.taskId : "OpenHands execution"} · {agentNames.get(run.agentId ?? "") ?? run.agentId ?? "unassigned"}</p>
+                        <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? run.taskId : "Workflow execution"} · {agentNames.get(run.agentId ?? "") ?? run.agentId ?? "unassigned"}</p>
                       </div>
                       <span className="text-right text-[11px] text-slate-400">
                         {run.tokensInReported === false && run.tokensOutReported === false
-                          ? "Tokens unavailable"
-                          : `${formatTokens(run.tokensIn + run.tokensOut)} tokens reported`}<br />
-                        {run.costReported === false ? "Cost unavailable" : `${formatCost(run.cost)} reported`}
+                          ? "Usage not reported"
+                          : `${formatTokens(run.tokensIn + run.tokensOut)} tokens`}<br />
+                        {run.costReported === false ? "Cost not reported" : formatCost(run.cost)}
                       </span>
                       <div className="flex gap-1">
                         {run.status === "running" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Stop execution" onClick={() => onCommand("stop", run.id)}><Square className="h-3.5 w-3.5" /></button>}
@@ -250,13 +250,13 @@ export function MonitoringView({
               </div>
             </section>
 
-            {/* Knowledge graph */}
+            {/* Connections */}
             <section>
-              <OrchSectionTitle icon={GitCommit} label="Knowledge graph" />
+              <OrchSectionTitle icon={GitCommit} label="Connections" />
               <div className="kb-glass rounded-2xl p-4">
-                <p className="mb-3 text-xs text-slate-500">Relationships discovered across tasks, agents, models, repositories, conversations, and executions.</p>
+                <p className="mb-3 text-xs text-slate-500">How your tasks, agents, and conversations relate to each other.</p>
                 <div className="flex flex-wrap gap-2">
-                  {links.length === 0 && <OrchEmpty label="Relationships will appear as OpenHands work is reported." />}
+                  {links.length === 0 && <OrchEmpty label="Connections will appear as work is reported." />}
                   {links.slice(0, 40).map((link) => <span key={`${link.from.id}-${link.to.id}-${link.relation}`} className="rounded-lg bg-slate-800/70 px-3 py-2 text-[11px] text-slate-300">{link.from.label} <span className="text-indigo-400">→ {link.relation} →</span> {link.to.label}</span>)}
                 </div>
               </div>
