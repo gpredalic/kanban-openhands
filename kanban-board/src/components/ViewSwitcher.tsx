@@ -20,7 +20,7 @@ interface ViewSwitcherProps {
 const VIEWS: { id: ViewId; label: string; icon: typeof KanbanSquare }[] = [
   { id: "board", label: "Board", icon: KanbanSquare },
   { id: "workflow", label: "Workflow", icon: GitBranch },
-  { id: "monitoring", label: "Monitoring", icon: Activity },
+  { id: "monitoring", label: "Activity", icon: Activity },
   { id: "agents", label: "Agents", icon: Bot },
   { id: "history", label: "History", icon: History },
   { id: "analytics", label: "Analytics", icon: BarChart3 },

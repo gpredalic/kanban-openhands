@@ -34,9 +34,6 @@ export function Header({ onCreate, syncing = false }: HeaderProps) {
             <p className="mt-1 text-sm text-slate-400">
               Plan, track and ship work across your team — in one place.
             </p>
-            <p className="mt-1.5 font-mono text-[10px] leading-tight text-slate-600">
-              Build: {__BUILD_TIME__} · Commit: {__COMMIT__}
-            </p>
           </div>
         </div>
 

@@ -86,8 +86,8 @@ export function MonitoringView({
           <Activity className="h-8 w-8 text-indigo-300" strokeWidth={1.5} />
         </div>
         <div className="text-center">
-          <h2 className="text-lg font-semibold text-white">Nothing to monitor yet</h2>
-          <p className="mt-1 text-sm text-slate-400">Create a workflow in the Workflow view to see its live routing and executions here.</p>
+          <h2 className="text-lg font-semibold text-white">Nothing to track yet</h2>
+          <p className="mt-1 text-sm text-slate-400">Create a workflow to see its progress and executions here.</p>
         </div>
       </div>
     );
@@ -118,16 +118,16 @@ export function MonitoringView({
         </div>
       </div>
 
-      {/* Execution Routing — current node, next node, execution path */}
+      {/* Current Activity — now working on, up next, progress */}
       {workflow && workflow.nodes.length > 0 && (
         <div className="kb-glass rounded-2xl p-4">
           <div className="mb-3 flex items-center gap-2">
             <GitCommit className="h-4 w-4 text-indigo-400" strokeWidth={2} />
-            <h3 className="text-sm font-semibold text-white">Execution Routing</h3>
+            <h3 className="text-sm font-semibold text-white">Current Activity</h3>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Current Node</p>
+              <p className="text-[11px] font-medium text-slate-500">Now Working On</p>
               {currentNode ? (
                 <div className="mt-1 flex items-center gap-2">
                   <span className={`h-2 w-2 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
@@ -138,22 +138,22 @@ export function MonitoringView({
                   })()}
                 </div>
               ) : (
-                <p className="mt-1 text-sm text-slate-500">No active node</p>
+                <p className="mt-1 text-sm text-slate-500">Nothing in progress</p>
               )}
             </div>
             <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Next Node</p>
+              <p className="text-[11px] font-medium text-slate-500">Up Next</p>
               {nextNode ? (
                 <div className="mt-1 flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-amber-400" />
                   <span className="text-sm font-medium text-white">{nextNode.label}</span>
                 </div>
               ) : (
-                <p className="mt-1 text-sm text-slate-500">No next node</p>
+                <p className="mt-1 text-sm text-slate-500">Nothing queued</p>
               )}
             </div>
             <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Execution Path</p>
+              <p className="text-[11px] font-medium text-slate-500">Progress</p>
               {path.length > 0 ? (
                 <div className="mt-1 flex flex-wrap items-center gap-1">
                   {path.map((n, i) => (
@@ -166,7 +166,7 @@ export function MonitoringView({
                   ))}
                 </div>
               ) : (
-                <p className="mt-1 text-sm text-slate-500">No path yet</p>
+                <p className="mt-1 text-sm text-slate-500">No progress yet</p>
               )}
             </div>
           </div>
@@ -202,9 +202,9 @@ export function MonitoringView({
               <OrchMetric label="Completed" value={completed} accent="text-emerald-400" />
             </div>
 
-            {/* Live executions */}
+            {/* Active work */}
             <section>
-              <OrchSectionTitle icon={Activity} label="Live executions" />
+              <OrchSectionTitle icon={Activity} label="Active Work" />
               <div className="flex flex-col gap-2">
                 {openHandsState.loading && executions.length === 0 ? (
                   <>
@@ -230,7 +230,7 @@ export function MonitoringView({
                             {etype.label}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? run.taskId : "Workflow execution"} · {agentNames.get(run.agentId ?? "") ?? run.agentId ?? "unassigned"}</p>
+                        <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? "Untitled task" : "Workflow execution"} · {agentNames.get(run.agentId ?? "") ?? "Unassigned"}</p>
                       </div>
                       <span className="text-right text-[11px] text-slate-400">
                         {run.tokensInReported === false && run.tokensOutReported === false
@@ -250,13 +250,13 @@ export function MonitoringView({
               </div>
             </section>
 
-            {/* Connections */}
+            {/* Workflow structure */}
             <section>
-              <OrchSectionTitle icon={GitCommit} label="Connections" />
+              <OrchSectionTitle icon={GitCommit} label="Workflow Structure" />
               <div className="kb-glass rounded-2xl p-4">
-                <p className="mb-3 text-xs text-slate-500">How your tasks, agents, and conversations relate to each other.</p>
+                <p className="mb-3 text-xs text-slate-500">How your tasks and agents relate to each other.</p>
                 <div className="flex flex-wrap gap-2">
-                  {links.length === 0 && <OrchEmpty label="Connections will appear as work is reported." />}
+                  {links.length === 0 && <OrchEmpty label="Workflow structure will appear as work is reported." />}
                   {links.slice(0, 40).map((link) => <span key={`${link.from.id}-${link.to.id}-${link.relation}`} className="rounded-lg bg-slate-800/70 px-3 py-2 text-[11px] text-slate-300">{link.from.label} <span className="text-indigo-400">→ {link.relation} →</span> {link.to.label}</span>)}
                 </div>
               </div>

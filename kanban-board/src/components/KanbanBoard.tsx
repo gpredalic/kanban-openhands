@@ -407,7 +407,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
           ) : view === "agents" ? (
             <AgentRoster host={host} openHandsState={openHandsState} />
           ) : view === "history" ? (
-            <ExecutionHistory openHandsState={openHandsState} aiState={aiState} onReset={resetOpenHands} />
+            <ExecutionHistory openHandsState={openHandsState} aiState={aiState} profiles={assignmentAgents} onReset={resetOpenHands} />
           ) : (
             <AnalyticsView aiState={aiState} openHandsState={openHandsState} onReset={resetOpenHands} />
           )}

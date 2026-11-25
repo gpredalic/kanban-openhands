@@ -1,16 +1,16 @@
 /**
  * ExecutionHistory — the "History" view.
  *
- * Shows real OpenHands executions from the live snapshot: active runs (with a
- * pulsing indicator) and completed runs (most recent first). Each run shows the
- * task, the agent profile, the model, the status, and the real token/cost
- * reported by the OpenHands agent server.
+ * Shows real executions from the live snapshot: active runs (with a pulsing
+ * indicator) and completed runs (most recent first). Each run shows the task
+ * title, status, start time, duration, agent display name, and cost — all
+ * business information, no raw identifiers.
  */
 
 import { useState } from "react";
-import { History, Loader2, CheckCircle2, XCircle, Clock, Bot, Cpu, RotateCcw } from "lucide-react";
+import { History, Loader2, CheckCircle2, XCircle, Clock, Bot, RotateCcw } from "lucide-react";
 import type { OpenHandsExecution, OpenHandsState } from "../types/openhands";
-import type { AiState } from "../types/ai";
+import type { AiState, Agent } from "../types/ai";
 import { Badge, statusBadge } from "../lib/badges";
 import { ConfirmResetModal } from "./ConfirmResetModal";
 import { SkeletonRow } from "./Skeleton";
@@ -18,11 +18,12 @@ import { SkeletonRow } from "./Skeleton";
 interface ExecutionHistoryProps {
   openHandsState: OpenHandsState;
   aiState: AiState;
+  profiles: Agent[];
   /** Clear the surfaced executions and reset the history baseline to now. */
   onReset: () => void;
 }
 
-export function ExecutionHistory({ openHandsState, onReset }: ExecutionHistoryProps) {
+export function ExecutionHistory({ openHandsState, profiles, onReset }: ExecutionHistoryProps) {
   const executions = openHandsState.snapshot.executions;
   const { loading, error } = openHandsState;
   const [confirmReset, setConfirmReset] = useState(false);
@@ -73,7 +74,7 @@ export function ExecutionHistory({ openHandsState, onReset }: ExecutionHistoryPr
         ) : (
           <div className="flex flex-col gap-2">
             {active.map((run) => (
-              <RunRow key={run.id} run={run} active />
+              <RunRow key={run.id} run={run} profiles={profiles} active />
             ))}
           </div>
         )}
@@ -96,7 +97,7 @@ export function ExecutionHistory({ openHandsState, onReset }: ExecutionHistoryPr
         ) : (
           <div className="flex flex-col gap-2">
             {completed.map((run) => (
-              <RunRow key={run.id} run={run} />
+              <RunRow key={run.id} run={run} profiles={profiles} />
             ))}
           </div>
         )}
@@ -117,7 +118,29 @@ export function ExecutionHistory({ openHandsState, onReset }: ExecutionHistoryPr
   );
 }
 
-function RunRow({ run, active }: { run: OpenHandsExecution; active?: boolean }) {
+/** Format a duration in milliseconds as a human-friendly string. */
+function formatDuration(ms: number): string {
+  if (ms < 0) return "—";
+  const totalSec = Math.floor(ms / 1000);
+  if (totalSec < 60) return `${totalSec}s`;
+  const min = Math.floor(totalSec / 60);
+  if (min < 60) return `${min}m ${totalSec % 60}s`;
+  const hr = Math.floor(min / 60);
+  return `${hr}h ${min % 60}m`;
+}
+
+/** Format a timestamp as a short business-friendly date-time. */
+function formatDateTime(ts: number): string {
+  const d = new Date(ts);
+  const day = d.getDate();
+  const month = d.toLocaleString("en", { month: "short" });
+  const year = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${day} ${month} ${year} ${hh}:${mm}`;
+}
+
+function RunRow({ run, profiles, active }: { run: OpenHandsExecution; profiles: Agent[]; active?: boolean }) {
   const StatusIcon =
     run.status === "completed" ? CheckCircle2 : run.status === "failed" ? XCircle : Loader2;
   const statusColor =
@@ -126,6 +149,18 @@ function RunRow({ run, active }: { run: OpenHandsExecution; active?: boolean }) 
       : run.status === "failed"
         ? "text-rose-400"
         : "text-blue-400";
+
+  // Resolve agent display name from the profile list.
+  const agentName = run.agentId
+    ? profiles.find((p) => p.id === run.agentId || p.name === run.agentId)?.name ?? "Unassigned"
+    : null;
+
+  // Duration: only show when both start and finish are known.
+  const duration =
+    run.startedAt && run.finishedAt ? formatDuration(run.finishedAt - run.startedAt) : null;
+
+  // Cost: show only when reported.
+  const cost = run.costReported === false ? null : `$${run.cost.toFixed(4)}`;
 
   return (
     <div
@@ -139,37 +174,28 @@ function RunRow({ run, active }: { run: OpenHandsExecution; active?: boolean }) 
       />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-white">{run.title}</p>
-        <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
-          <span className="font-mono text-slate-500">ID: {run.id}</span>
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
           {statusBadge(run.status) && (
             <Badge style={statusBadge(run.status)!} pulse={active} />
           )}
-          {run.agentId && (
+          {run.startedAt && (
             <span className="flex items-center gap-1">
-              <Bot className="h-3 w-3 text-indigo-400" /> {run.agentId}
+              <Clock className="h-3 w-3" />
+              {formatDateTime(run.startedAt)}
             </span>
           )}
-          {run.modelId && (
+          {duration && <span>Duration: {duration}</span>}
+          {agentName && (
             <span className="flex items-center gap-1">
-              <Cpu className="h-3 w-3 text-violet-400" /> {run.modelId}
+              <Bot className="h-3 w-3 text-indigo-400" /> {agentName}
             </span>
           )}
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {run.startedAt ? `Started ${new Date(run.startedAt).toLocaleString()}` : "Start time unavailable"}
-            {run.finishedAt ? ` · Finished ${new Date(run.finishedAt).toLocaleString()}` : ""}
-          </span>
-          {typeof run.retries === "number" && <span>Retries: {run.retries}</span>}
+          {typeof run.retries === "number" && run.retries > 0 && <span>Retries: {run.retries}</span>}
           {run.error && <span className="text-rose-400">Error: {run.error}</span>}
         </div>
       </div>
       <div className="shrink-0 text-right text-xs">
-        <p className="font-medium text-slate-300">
-          {run.tokensInReported !== false && run.tokensOutReported !== false
-            ? `${run.tokensIn.toLocaleString()} in · ${run.tokensOut.toLocaleString()} out`
-            : "Tokens unavailable"}
-        </p>
-        <p className="text-slate-500">{run.costReported === false ? "Cost unavailable" : `$${run.cost.toFixed(4)} reported`}</p>
+        {cost !== null && <p className="font-medium text-slate-300">{cost}</p>}
       </div>
     </div>
   );

@@ -288,13 +288,13 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   const relayNodeButton = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Relay");
   relayNodeButton?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await sleep(50);
-  // The operational sections now live in the Monitoring view.
-  clickText(container, "Monitoring");
+  // The operational sections now live in the Activity view.
+  clickText(container, "Activity");
   evidence.relay = {
     relayNodeTypeInPalette: Boolean(relayNodeButton),
     relayNodeAdded: container.textContent?.includes("Relay") ?? false,
-    liveExecutionsSection: container.textContent?.includes("Live executions"),
-    knowledgeGraphSection: container.textContent?.includes("Knowledge graph"),
+    activeWorkSection: container.textContent?.includes("Active Work"),
+    workflowStructureSection: container.textContent?.includes("Workflow Structure"),
   };
 
   await fixture.host.agentServer.request({

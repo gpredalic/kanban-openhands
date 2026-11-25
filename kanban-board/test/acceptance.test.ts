@@ -197,13 +197,13 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(!reload.textContent?.includes("Live executions"), "Workflow builder no longer hosts the orchestration panel");
   assert.ok([...reload.querySelectorAll("button")].some((b) => b.textContent?.trim() === "Relay"), "relay is a workflow node type in the palette");
 
-  // 9b. MONITORING VIEW — the operational area. Switching to Monitoring
-  // surfaces the orchestration panel with live executions and the knowledge
-  // graph, plus the engine-driven execution routing readout.
-  clickText(reload, "Monitoring");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Orchestration") ?? false), "Monitoring view renders the orchestration panel");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Live executions") ?? false), "orchestration panel shows live executions");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Knowledge graph") ?? false), "orchestration panel shows the knowledge graph");
+  // 9b. ACTIVITY VIEW — the operational area. Switching to Activity
+  // surfaces the activity panel with active work and the workflow structure,
+  // plus the engine-driven current activity readout.
+  clickText(reload, "Activity");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Current Activity") ?? false), "Activity view renders the activity panel");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Active Work") ?? false), "activity panel shows active work");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Workflow Structure") ?? false), "activity panel shows the workflow structure");
 
   // 10. AGENTS VIEW
   clickText(reload, "Agents");

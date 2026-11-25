@@ -288,21 +288,21 @@ test("F5: workflow routing shows current node, next node, and execution path", a
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Click the Monitoring tab — the Execution Routing readout now lives in the
-  // dedicated Monitoring view, not the Workflow builder.
-  const monitoringTab = Array.from(container.querySelectorAll("button")).find(
-    (b) => b.textContent?.includes("Monitoring"),
+  // Click the Activity tab — the Current Activity readout now lives in the
+  // dedicated Activity view, not the Workflow builder.
+  const activityTab = Array.from(container.querySelectorAll("button")).find(
+    (b) => b.textContent?.includes("Activity"),
   );
-  assert.ok(monitoringTab, "Monitoring tab must exist");
-  monitoringTab!.click();
+  assert.ok(activityTab, "Activity tab must exist");
+  activityTab!.click();
 
-  const routingShown = await waitFor(() => container.innerHTML.includes("Execution Routing"));
-  assert.ok(routingShown, "Monitoring view must show the Execution Routing section");
+  const routingShown = await waitFor(() => container.innerHTML.includes("Current Activity"));
+  assert.ok(routingShown, "Activity view must show the Current Activity section");
 
   const html = container.innerHTML;
-  assert.match(html, /Current Node/, "must show Current Node");
-  assert.match(html, /Next Node/, "must show Next Node");
-  assert.match(html, /Execution Path/, "must show Execution Path");
+  assert.match(html, /Now Working On/, "must show Now Working On");
+  assert.match(html, /Up Next/, "must show Up Next");
+  assert.match(html, /Progress/, "must show Progress");
 
   // The running task node must be the current node.
   assert.match(html, /Running task/, "current node must be the running task");
