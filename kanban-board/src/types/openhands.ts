@@ -28,6 +28,8 @@ export interface OpenHandsEvent {
 export interface OpenHandsExecution {
   id: string;
   taskId?: string;
+  /** The workflow this execution belongs to, if any. */
+  workflowId?: string;
   title: string;
   status: "pending" | "queued" | "running" | "completed" | "failed" | "cancelled";
   agentId?: string;

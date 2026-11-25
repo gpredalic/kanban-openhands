@@ -206,6 +206,8 @@ export interface WorkflowNodeConfig {
   tools?: string[];
   /** Memory mode: none, session, or persistent. */
   memory?: "none" | "session" | "persistent";
+  /** Context mode: none, task, or workflow. */
+  context?: "none" | "task" | "workflow";
   /** Timeout in seconds before the node is considered timed out. */
   timeoutSeconds?: number;
   /** Retry policy. */
@@ -214,6 +216,8 @@ export interface WorkflowNodeConfig {
   /* ---- Task ---- */
   /** Task description (beyond the label). */
   description?: string;
+  /** Declared expected output. */
+  expectedOutput?: string;
   /** Declared input variables (name → description). */
   inputs?: NodeVariable[];
   /** Declared output variables (name → description). */

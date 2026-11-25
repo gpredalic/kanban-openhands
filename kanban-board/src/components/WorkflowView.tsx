@@ -27,9 +27,6 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  ShieldCheck,
-  Zap,
-  Flag,
   Square,
   Loader2,
   Repeat,
@@ -41,6 +38,9 @@ import {
   RotateCcw,
   Save,
   Copy,
+  Bot,
+  Diamond,
+  User,
 } from "lucide-react";
 import type {
   AiState,
@@ -82,15 +82,15 @@ interface NodeMeta {
 }
 
 const NODE_META: Record<WorkflowNodeType, NodeMeta> = {
-  task: { label: "Task", badge: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30", accent: "#6366f1", icon: Circle },
-  agent: { label: "Agent", badge: "bg-cyan-500/15 text-cyan-300 ring-cyan-400/30", accent: "#06b6d4", icon: Zap },
-  condition: { label: "Condition", badge: "bg-amber-500/15 text-amber-300 ring-amber-400/30", accent: "#f59e0b", icon: GitBranch },
-  approval: { label: "Approval", badge: "bg-rose-500/15 text-rose-300 ring-rose-400/30", accent: "#f43f5e", icon: ShieldCheck },
+  task: { label: "Task", badge: "bg-blue-500/15 text-blue-300 ring-blue-400/30", accent: "#3b82f6", icon: CheckCircle2 },
+  agent: { label: "Agent", badge: "bg-purple-500/15 text-purple-300 ring-purple-400/30", accent: "#a855f7", icon: Bot },
+  condition: { label: "Condition", badge: "bg-orange-500/15 text-orange-300 ring-orange-400/30", accent: "#f97316", icon: Diamond },
+  approval: { label: "Approval", badge: "bg-yellow-500/15 text-yellow-300 ring-yellow-400/30", accent: "#eab308", icon: User },
   start: { label: "Start", badge: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30", accent: "#10b981", icon: Play },
-  end: { label: "End", badge: "bg-slate-500/15 text-slate-300 ring-slate-400/30", accent: "#64748b", icon: Flag },
+  end: { label: "End", badge: "bg-red-500/15 text-red-300 ring-red-400/30", accent: "#ef4444", icon: Square },
   delay: { label: "Delay", badge: "bg-violet-500/15 text-violet-300 ring-violet-400/30", accent: "#8b5cf6", icon: Clock },
   relay: { label: "Relay", badge: "bg-sky-500/15 text-sky-300 ring-sky-400/30", accent: "#0ea5e9", icon: Repeat },
-  loop: { label: "Loop", badge: "bg-fuchsia-500/15 text-fuchsia-300 ring-fuchsia-400/30", accent: "#d946ef", icon: RefreshCw },
+  loop: { label: "Loop", badge: "bg-cyan-500/15 text-cyan-300 ring-cyan-400/30", accent: "#06b6d4", icon: RefreshCw },
 };
 
 /** The eight branch types, each with a label and icon for the edge inspector. */
@@ -120,6 +120,40 @@ const CONDITION_OPTIONS: { value: EdgeCondition; label: string }[] = [
   { value: "IF_LOOP", label: "Loop back" },
   { value: "IF_ALWAYS", label: "Always" },
 ];
+
+/**
+ * Resolve the display label for an edge. Default/success edges show no label
+ * to reduce visual noise. Only meaningful branch labels are shown:
+ *   IF_TRUE → "True", IF_FALSE → "False", IF_APPROVED → "Approved",
+ *   IF_REJECTED → "Rejected", IF_FAILURE → "Error", IF_TIMEOUT → "Timeout".
+ * A custom edge.name always wins.
+ */
+function edgeLabel(edge: WorkflowEdge): string {
+  if (edge.name) return edge.name;
+  switch (edge.condition) {
+    case "IF_TRUE": return "True";
+    case "IF_FALSE": return "False";
+    case "IF_APPROVED": return "Approved";
+    case "IF_REJECTED": return "Rejected";
+    case "IF_FAILURE": return "Error";
+    case "IF_TIMEOUT": return "Timeout";
+    default: return "";
+  }
+}
+
+/**
+ * Auto-assign the edge condition based on the source node type and the output
+ * port the user dragged from. This moves routing ownership into the node:
+ *   condition  → port 0 = IF_TRUE, port 1 = IF_FALSE
+ *   approval   → port 0 = IF_APPROVED, port 1 = IF_REJECTED
+ *   everything else → IF_SUCCESS (no label shown)
+ */
+function autoConditionFor(node: WorkflowNode | undefined, portIndex: number): EdgeCondition {
+  if (!node) return "IF_SUCCESS";
+  if (node.type === "condition") return portIndex === 0 ? "IF_TRUE" : "IF_FALSE";
+  if (node.type === "approval") return portIndex === 0 ? "IF_APPROVED" : "IF_REJECTED";
+  return "IF_SUCCESS";
+}
 
 /** The execution state of a node, derived from the OpenHands snapshot. */
 type NodeExecState = "idle" | "pending" | "queued" | "running" | "completed" | "failed" | "cancelled";
@@ -279,6 +313,9 @@ export function WorkflowView({
       label: NODE_META[type].label,
       x: 80 + (nodes.length % 4) * 240,
       y: 80 + Math.floor(nodes.length / 4) * 140,
+      // Condition and approval nodes own their routing: they expose two
+      // output ports (True/False, Approved/Rejected) by default.
+      outputPorts: type === "condition" || type === "approval" ? 2 : 1,
     };
     const next = [...nodes, node];
     setNodes(next);
@@ -304,14 +341,16 @@ export function WorkflowView({
 
   /* ------------------------- edge handlers ------------------------- */
 
-  const createEdge = (from: string, to: string) => {
+  const createEdge = (from: string, to: string, sourcePort = 0) => {
     if (from === to) return;
     if (edges.some((e) => e.from === from && e.to === to)) return;
+    const sourceNode = nodes.find((n) => n.id === from);
+    const condition = autoConditionFor(sourceNode, sourcePort);
     const edge: WorkflowEdge = {
       id: `e-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       from,
       to,
-      condition: "IF_SUCCESS",
+      condition,
     };
     const next = [...edges, edge];
     setEdges(next);
@@ -393,7 +432,7 @@ export function WorkflowView({
   const onInputPortPointerUp = (e: React.PointerEvent, node: WorkflowNode) => {
     e.stopPropagation();
     if (pendingEdge && pendingEdge.from !== node.id) {
-      createEdge(pendingEdge.from, node.id);
+      createEdge(pendingEdge.from, node.id, pendingEdge.portIndex);
     }
     setPendingEdge(null);
     setDrag(null);
@@ -704,14 +743,16 @@ export function WorkflowView({
                       setSelectedNodeId(null);
                     }}
                   />
-                  <text
-                    x={(from.x + NODE_W + to.x) / 2}
-                    y={(from.y + to.y) / 2 + NODE_H / 2 - 6}
-                    textAnchor="middle"
-                    className={`text-[10px] ${isEngineActive ? "fill-emerald-300" : isLoop ? "fill-fuchsia-300" : "fill-slate-400"}`}
-                  >
-                    {edge.name || CONDITION_OPTIONS.find((c) => c.value === edge.condition)?.label}
-                  </text>
+                  {edgeLabel(edge) && (
+                    <text
+                      x={(from.x + NODE_W + to.x) / 2}
+                      y={(from.y + to.y) / 2 + NODE_H / 2 - 6}
+                      textAnchor="middle"
+                      className={`text-[10px] ${isEngineActive ? "fill-emerald-300" : isLoop ? "fill-fuchsia-300" : "fill-slate-400"}`}
+                    >
+                      {edgeLabel(edge)}
+                    </text>
+                  )}
                 </g>
               );
             })}
@@ -826,8 +867,9 @@ export function WorkflowView({
                     {NODE_META[selectedNode.type].label}
                   </span>
                 </div>
+                {/* Common: Name */}
                 <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                  Label
+                  Name
                   <input
                     type="text"
                     value={selectedNode.label}
@@ -835,34 +877,71 @@ export function WorkflowView({
                     className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                   />
                 </label>
+                {/* Common: Description */}
                 <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                  OpenHands profile
-                  <select
-                    value={selectedNode.profileId ?? ""}
-                    onChange={(e) => updateNode(selectedNode.id, { profileId: e.target.value || null })}
-                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-                  >
-                    <option value="" className="bg-slate-900">Unassigned</option>
-                    {profiles.map((p) => (
-                      <option key={p.id} value={p.id} className="bg-slate-900">
-                        {p.name}
-                      </option>
-                    ))}
-                  </select>
+                  Description
+                  <textarea
+                    value={selectedNode.config?.description ?? ""}
+                    onChange={(e) => updateNode(selectedNode.id, { config: { ...selectedNode.config, description: e.target.value } })}
+                    placeholder="What this node does"
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-14 resize-y"
+                  />
                 </label>
+                {/* Common: Timeout */}
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Timeout (s)
+                  <input
+                    type="number"
+                    min={0}
+                    value={selectedNode.config?.timeoutSeconds ?? 0}
+                    onChange={(e) => updateNode(selectedNode.id, { config: { ...selectedNode.config, timeoutSeconds: Math.max(0, Number(e.target.value) || 0) } })}
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  />
+                </label>
+                {/* Common: Retry Policy */}
+                <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                  Max retries
+                  <input
+                    type="number"
+                    min={0}
+                    value={selectedNode.config?.retryPolicy?.maxAttempts ?? 0}
+                    onChange={(e) => updateNode(selectedNode.id, { config: { ...selectedNode.config, retryPolicy: { maxAttempts: Math.max(0, Number(e.target.value) || 0), backoff: selectedNode.config?.retryPolicy?.backoff ?? "fixed", delaySeconds: selectedNode.config?.retryPolicy?.delaySeconds ?? 5 } } })}
+                    className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                  />
+                </label>
+                {/* Agent: OpenHands Profile (node-level property) */}
+                {selectedNode.type === "agent" && (
+                  <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+                    OpenHands Profile
+                    <select
+                      value={selectedNode.profileId ?? ""}
+                      onChange={(e) => updateNode(selectedNode.id, { profileId: e.target.value || null })}
+                      className="rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    >
+                      <option value="" className="bg-slate-900">Unassigned</option>
+                      {profiles.map((p) => (
+                        <option key={p.id} value={p.id} className="bg-slate-900">
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+                {/* Type-specific settings */}
+                <NodeSettings
+                  node={selectedNode}
+                  onPatch={(patch) => updateNode(selectedNode.id, { config: { ...selectedNode.config, ...patch } })}
+                />
+                {/* Linked board task (read-only context) */}
                 {selectedNode.taskId && taskById.get(selectedNode.taskId) && (
                   <div className="rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400">
                     <p className="font-semibold text-slate-300">Board task</p>
                     <p className="mt-0.5 truncate">{taskById.get(selectedNode.taskId)!.title}</p>
-                    <p className="mt-0.5 text-[10px] text-slate-500">Status: {taskById.get(selectedNode.taskId)!.status}</p>
                   </div>
                 )}
-                <div className="rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400">
-                  <p className="font-semibold text-slate-300">Execution</p>
-                  <p className="mt-0.5">{EXEC_META[nodeExecState(selectedNode, openHandsState)].label}</p>
-                </div>
+                {/* Multi-way output ports */}
                 <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-                  Output ports (multi-way)
+                  Output ports
                   <select
                     value={selectedNode.outputPorts ?? 1}
                     onChange={(e) => updateNode(selectedNode.id, { outputPorts: Math.max(1, Number(e.target.value) || 1) })}
@@ -875,10 +954,6 @@ export function WorkflowView({
                     <option value={5} className="bg-slate-900">5 (N-way)</option>
                   </select>
                 </label>
-                <NodeSettings
-                  node={selectedNode}
-                  onPatch={(patch) => updateNode(selectedNode.id, { config: { ...selectedNode.config, ...patch } })}
-                />
                 <button
                   type="button"
                   onClick={() => deleteNode(selectedNode.id)}
@@ -999,7 +1074,7 @@ function NodeSettings({ node, onPatch }: { node: WorkflowNode; onPatch: (patch: 
     case "agent":
       return (
         <div className="flex flex-col gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">Agent settings</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-purple-300">Agent settings</p>
           {field("Prompt", (
             <textarea
               value={config.prompt ?? ""}
@@ -1015,34 +1090,56 @@ function NodeSettings({ node, onPatch }: { node: WorkflowNode; onPatch: (patch: 
               <option value="persistent" className="bg-slate-900">Persistent</option>
             </select>
           ))}
-          {field("Timeout (s)", (
-            <input type="number" min={0} value={config.timeoutSeconds ?? 0} onChange={(e) => set({ timeoutSeconds: Math.max(0, Number(e.target.value) || 0) })} className={inputCls} />
-          ))}
-          {field("Max retries", (
-            <input type="number" min={0} value={config.retryPolicy?.maxAttempts ?? 0} onChange={(e) => set({ retryPolicy: { maxAttempts: Math.max(0, Number(e.target.value) || 0), backoff: config.retryPolicy?.backoff ?? "fixed", delaySeconds: config.retryPolicy?.delaySeconds ?? 5 } })} className={inputCls} />
+          {field("Context", (
+            <select value={config.context ?? "none"} onChange={(e) => set({ context: e.target.value as "none" | "task" | "workflow" })} className={inputCls}>
+              <option value="none" className="bg-slate-900">None</option>
+              <option value="task" className="bg-slate-900">Task context</option>
+              <option value="workflow" className="bg-slate-900">Workflow context</option>
+            </select>
           ))}
         </div>
       );
     case "condition":
       return (
         <div className="flex flex-col gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-300">Condition settings</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-orange-300">Condition settings</p>
           {field("Expression", (
-            <input type="text" value={config.expression ?? ""} onChange={(e) => set({ expression: e.target.value })} placeholder="e.g. amount > 1000" className={inputCls} />
+            <input type="text" value={config.expression ?? ""} onChange={(e) => set({ expression: e.target.value })} placeholder='e.g. status == "approved"' className={inputCls} />
           ))}
           {config.validation && <p className="text-[11px] text-rose-300">{config.validation}</p>}
+          <div className="flex items-center gap-2 text-[11px] text-slate-400">
+            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300 ring-1 ring-emerald-400/30">True</span>
+            <span className="text-slate-500">→</span>
+            <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-rose-300 ring-1 ring-rose-400/30">False</span>
+          </div>
         </div>
       );
     case "approval":
       return (
         <div className="flex flex-col gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-rose-300">Approval settings</p>
-          {field("Approver", (
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-yellow-300">Approval settings</p>
+          {field("Reviewer", (
             <input type="text" value={config.approver ?? ""} onChange={(e) => set({ approver: e.target.value })} placeholder="Profile or user" className={inputCls} />
           ))}
-          {field("SLA (hours)", (
-            <input type="number" min={0} value={config.slaHours ?? 0} onChange={(e) => set({ slaHours: Math.max(0, Number(e.target.value) || 0) })} className={inputCls} />
+          {field("Approval rules", (
+            <textarea
+              value={(config.escalationRules ?? []).map((r) => `${r.afterHours}h → ${r.escalateTo}`).join("\n")}
+              onChange={(e) => {
+                const rules = e.target.value.split("\n").filter(Boolean).map((line) => {
+                  const [after, to] = line.split("→").map((s) => s.trim());
+                  return { afterHours: Number(after?.replace("h", "")) || 0, escalateTo: to ?? "" };
+                });
+                set({ escalationRules: rules });
+              }}
+              placeholder={"24h → team-lead\n48h → manager"}
+              className={`${inputCls} min-h-14 resize-y`}
+            />
           ))}
+          <div className="flex items-center gap-2 text-[11px] text-slate-400">
+            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300 ring-1 ring-emerald-400/30">Approved</span>
+            <span className="text-slate-500">→</span>
+            <span className="rounded-full bg-rose-500/15 px-2 py-0.5 text-rose-300 ring-1 ring-rose-400/30">Rejected</span>
+          </div>
         </div>
       );
     case "delay":
@@ -1060,7 +1157,7 @@ function NodeSettings({ node, onPatch }: { node: WorkflowNode; onPatch: (patch: 
     case "loop":
       return (
         <div className="flex flex-col gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-fuchsia-300">Loop settings</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">Loop settings</p>
           {field("Max iterations", (
             <input type="number" min={1} value={config.maxIterations ?? 3} onChange={(e) => set({ maxIterations: Math.max(1, Number(e.target.value) || 1) })} className={inputCls} />
           ))}
@@ -1072,9 +1169,14 @@ function NodeSettings({ node, onPatch }: { node: WorkflowNode; onPatch: (patch: 
     case "task":
       return (
         <div className="flex flex-col gap-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-indigo-300">Task settings</p>
-          {field("Description", (
-            <textarea value={config.description ?? ""} onChange={(e) => set({ description: e.target.value })} placeholder="Task instructions" className={`${inputCls} min-h-16 resize-y`} />
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-blue-300">Task settings</p>
+          {field("Expected output", (
+            <textarea
+              value={config.expectedOutput ?? ""}
+              onChange={(e) => set({ expectedOutput: e.target.value })}
+              placeholder="What a successful task produces"
+              className={`${inputCls} min-h-14 resize-y`}
+            />
           ))}
         </div>
       );

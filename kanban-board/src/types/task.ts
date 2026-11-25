@@ -116,11 +116,12 @@ export interface BoardState {
 }
 
 /**
- * The five top-level views of the orchestration platform. The board view is
- * the Kanban board; the other four are AI views (workflow — the orchestration
- * center, agent roster, execution history, token/cost analytics).
+ * The top-level views of the orchestration platform. The board view is the
+ * Kanban board; the others are AI views (workflow — the pure node-graph
+ * builder, monitoring — the operational/observability area, agent roster,
+ * execution history, token/cost analytics).
  */
-export type ViewId = "board" | "workflow" | "agents" | "history" | "analytics";
+export type ViewId = "board" | "workflow" | "monitoring" | "agents" | "history" | "analytics";
 
 /** The host API surface injected by Agent Canvas. */
 export interface HostApi {

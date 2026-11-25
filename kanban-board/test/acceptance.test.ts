@@ -188,17 +188,22 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Stop this task"]')) ?? false), "Run AI flips the task to Stop AI once running");
   assert.ok(fixture.calls.some((c) => c.method === "POST" && c.path === "/api/conversations"), "Run AI posts a conversation to OpenHands");
 
-  // 9. ORCHESTRATION — the former Command Center is now a collapsible panel
-  // inside the Workflow view. Switching to Workflow and expanding the panel
-  // surfaces live executions and the knowledge graph. The relay is now a
-  // first-class workflow node type in the palette.
+  // 9. WORKFLOW BUILDER — the Workflow view is now a pure node-graph builder.
+  // The operational sections (orchestration metrics, live executions, knowledge
+  // graph) moved to the dedicated Monitoring view, so the builder stays clean.
+  // The relay is a first-class workflow node type in the palette.
   clickText(reload, "Workflow");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Orchestration") ?? false), "Workflow view renders with orchestration panel");
-  const orchToggle = [...reload.querySelectorAll("button")].find((b) => b.textContent?.includes("Orchestration"));
-  orchToggle?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => reload.textContent?.includes("Live executions") ?? false), "orchestration panel expands to show live executions");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Knowledge graph") ?? false), "orchestration panel shows the knowledge graph");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Add node") ?? false), "Workflow view renders the node palette");
+  assert.ok(!reload.textContent?.includes("Live executions"), "Workflow builder no longer hosts the orchestration panel");
   assert.ok([...reload.querySelectorAll("button")].some((b) => b.textContent?.trim() === "Relay"), "relay is a workflow node type in the palette");
+
+  // 9b. MONITORING VIEW — the operational area. Switching to Monitoring
+  // surfaces the orchestration panel with live executions and the knowledge
+  // graph, plus the engine-driven execution routing readout.
+  clickText(reload, "Monitoring");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Orchestration") ?? false), "Monitoring view renders the orchestration panel");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Live executions") ?? false), "orchestration panel shows live executions");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Knowledge graph") ?? false), "orchestration panel shows the knowledge graph");
 
   // 10. AGENTS VIEW
   clickText(reload, "Agents");
@@ -252,13 +257,11 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(afterRuns > beforeRuns, "second task's Run AI posts its own execution (task-centric, not blocked by the first)");
 
   // 16. MULTI-AGENT RELAY — the relay is now a first-class workflow node type
-  // (not a separate panel with a seed textarea). The orchestration panel hosts
-  // live executions + the knowledge graph; the relay node type is in the palette.
+  // (not a separate panel with a seed textarea). The orchestration panel
+  // (live executions + knowledge graph) moved to the Monitoring view; the
+  // relay node type is in the Workflow builder's palette.
   clickText(reload, "Workflow");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Orchestration") ?? false), "Workflow view renders for relay");
-  const relayOrchToggle = [...reload.querySelectorAll("button")].find((b) => b.textContent?.includes("Orchestration"));
-  relayOrchToggle?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => reload.textContent?.includes("Live executions") ?? false), "orchestration panel expands to show live executions");
+  assert.ok(await waitFor(() => reload.textContent?.includes("Add node") ?? false), "Workflow view renders for relay");
   const relayNodeBtn = [...reload.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Relay");
   assert.ok(Boolean(relayNodeBtn), "relay is a workflow node type in the palette");
   relayNodeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));

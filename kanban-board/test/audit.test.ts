@@ -279,17 +279,17 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   };
 
   // The relay is now a workflow node type (not a separate panel). The
-  // orchestration panel hosts live executions + the knowledge graph, and the
-  // node palette exposes the relay as a first-class node type.
+  // orchestration panel (live executions + knowledge graph) moved to the
+  // dedicated Monitoring view, so the Workflow builder stays a pure node-graph
+  // editor. The node palette still exposes the relay as a first-class node type.
   clickText(container, "Workflow");
-  assert.ok(await waitFor(() => container.textContent?.includes("Orchestration") ?? false));
-  const orchToggle = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Orchestration"));
-  orchToggle?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => container.textContent?.includes("Live executions") ?? false));
+  assert.ok(await waitFor(() => container.textContent?.includes("Add node") ?? false));
   // The relay is a node type in the palette.
   const relayNodeButton = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Relay");
   relayNodeButton?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await sleep(50);
+  // The operational sections now live in the Monitoring view.
+  clickText(container, "Monitoring");
   evidence.relay = {
     relayNodeTypeInPalette: Boolean(relayNodeButton),
     relayNodeAdded: container.textContent?.includes("Relay") ?? false,

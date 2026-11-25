@@ -558,7 +558,11 @@ test("OpenHandsStateStore refresh, subscribe, unsubscribe, and dispose lifecycle
   await store.refresh();
   assert.equal(store.get().loading, false);
   assert.equal(store.get().error, null);
-  assert.equal(notifications, 2);
+  // The constructor fires one refresh (loading → loaded) and the test fires a
+  // second. Both fetch the identical empty snapshot, so the second is a
+  // content no-op and does not notify. Exactly one notification is the
+  // content-aware contract: an unchanged poll must not re-render the board.
+  assert.equal(notifications, 1);
   unsubscribe();
   store.dispose();
   await store.refresh();

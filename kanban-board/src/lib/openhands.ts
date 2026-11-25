@@ -13,6 +13,27 @@ import { fetchTasks, saveTasks, updateTask, withBoardLock, dedupeTasks } from ".
 const POLL_INTERVAL_MS = 2_000;
 const EMPTY_SNAPSHOT: OpenHandsSnapshot = { executions: [], events: [], links: [], updatedAt: 0 };
 
+/**
+ * Fingerprint the *content* of a snapshot, excluding `updatedAt` (which is
+ * refreshed on every poll and would defeat the comparison). Two snapshots with
+ * identical executions, events, and links produce the same fingerprint even
+ * though their `updatedAt` differs. This is what lets the 2-second poll skip
+ * the notify when nothing actually changed, stopping the board from
+ * re-rendering 30 times a minute for no reason.
+ */
+function snapshotFingerprint(snapshot: OpenHandsSnapshot): string {
+  const execs = snapshot.executions
+    .map((e) => `${e.id}|${e.status}|${e.taskId ?? ""}|${e.agentId ?? ""}|${e.modelId ?? ""}|${e.startedAt ?? 0}|${e.updatedAt ?? 0}|${e.finishedAt ?? 0}|${e.tokensIn}|${e.tokensOut}|${e.cost}|${e.retries ?? 0}|${e.error ?? ""}`)
+    .join(";");
+  const events = snapshot.events
+    .map((e) => `${e.id}|${e.type}|${e.status ?? ""}|${e.at}|${e.taskId ?? ""}|${e.executionId ?? ""}`)
+    .join(";");
+  const links = snapshot.links
+    .map((l) => `${l.from.id}->${l.to.id}:${l.relation}`)
+    .join(";");
+  return `${execs}||${events}||${links}`;
+}
+
 function asObject(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
 }
@@ -262,6 +283,7 @@ export function normalizeSnapshot(value: unknown): OpenHandsSnapshot {
     return {
       id: asString(conversation.id) ?? "",
       taskId: tags.taskid,
+      workflowId: tags.workflowid,
       title: asString(conversation.title) ?? tags.tasktitle ?? "OpenHands conversation",
       status,
       agentId: tags.agentprofileid ?? tags.agentid
@@ -1508,6 +1530,12 @@ export class OpenHandsStateStore {
    * baseline survives polling and re-applies on each fetch.
    */
   private resetAt: number | null = null;
+  /**
+   * Fingerprint of the last snapshot we actually surfaced. The 2-second poll
+   * re-fetches the snapshot on every tick; when the content is unchanged we
+   * skip the notify so the board does not re-render. See snapshotFingerprint.
+   */
+  private lastFingerprint: string | null = null;
   private readonly handleFocus = (): void => {
     void this.refresh();
   };
@@ -1554,17 +1582,38 @@ export class OpenHandsStateStore {
       const executions = resetAt
         ? snapshot.executions.filter((execution) => (execution.startedAt ?? 0) >= resetAt)
         : snapshot.executions;
+      const nextSnapshot: OpenHandsSnapshot = { ...snapshot, executions, updatedAt: Date.now() };
+      const fingerprint = snapshotFingerprint(nextSnapshot);
+      const prev = this.state;
+      // Content-aware notify: the snapshot's `updatedAt` is refreshed on every
+      // poll, so a naive object comparison would always differ and the board
+      // would re-render 30 times a minute for no reason. We only replace the
+      // state and notify when the *content* (executions/events/links) changed,
+      // or when the loading/error flag flipped. An unchanged poll is a no-op.
+      const contentChanged = fingerprint !== this.lastFingerprint;
+      const flagChanged = prev.loading !== false || prev.error !== null;
+      if (!contentChanged && !flagChanged) {
+        // Nothing to surface — keep the existing state object so React's
+        // useSyncExternalStore sees an identical reference and skips the render.
+        return;
+      }
+      this.lastFingerprint = fingerprint;
       this.state = {
-        snapshot: { ...snapshot, executions, updatedAt: Date.now() },
+        snapshot: nextSnapshot,
         loading: false,
         error: null,
         lastSyncedAt: Date.now(),
       };
     } catch (error) {
+      const message = error instanceof Error ? error.message : "OpenHands agent server unavailable";
+      const prev = this.state;
+      // Only notify when the error/loading state actually changed, so a
+      // repeated failure on every poll does not re-render the board.
+      if (prev.error === message && prev.loading === false) return;
       this.state = {
-        ...this.state,
+        ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : "OpenHands agent server unavailable",
+        error: message,
       };
     }
     for (const listener of this.listeners) listener();

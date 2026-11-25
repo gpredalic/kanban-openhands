@@ -62,20 +62,25 @@ function accentFor(status: string | null): string {
 interface CardRect {
   left: number;
   top: number;
+  /** The column (`data-drop-status`) the card currently sits in. */
+  status: string | null;
 }
 
 /**
  * Capture the bounding box of every `[data-task-id]` card relative to the
- * board container. Returns a map of task id → rect.
+ * board container, together with the column it sits in. Returns a map of
+ * task id → { rect, status }.
  */
 function captureCardRects(container: HTMLElement): Map<string, CardRect> {
   const rects = new Map<string, CardRect>();
   const containerRect = container.getBoundingClientRect();
   for (const el of container.querySelectorAll<HTMLElement>("[data-task-id]")) {
     const r = el.getBoundingClientRect();
+    const status = (el.closest("[data-drop-status]") as HTMLElement | null)?.dataset.dropStatus ?? null;
     rects.set(el.dataset.taskId!, {
       left: r.left - containerRect.left,
       top: r.top - containerRect.top,
+      status,
     });
   }
   return rects;
@@ -106,11 +111,20 @@ export function useFlipAnimation(boardRef: React.RefObject<HTMLElement | null>):
 
     const nextRects = captureCardRects(container);
 
-    // Find cards that moved between columns (their position changed).
+    // Find cards that moved BETWEEN columns. The decisive signal is the
+    // column (`data-drop-status`) the card sits in, not its pixel position.
+    // A card that shifts a few pixels within the same column — because a
+    // sibling grew (a progress indicator appeared, a badge changed height) —
+    // is NOT a column move and must not trigger the FLIP glide. Treating any
+    // ≥1px shift as a move is what caused the spurious "reflash" the user
+    // reported: every poll that changed a card's height made the cards below
+    // it glide and flash.
     const moved: { el: HTMLElement; dx: number; dy: number; toStatus: string | null }[] = [];
     for (const [taskId, next] of nextRects) {
       const prev = prevRects.current.get(taskId);
       if (!prev) continue; // new card — no FLIP, the kb-fade-in entrance handles it
+      // Same column → intra-column reflow, not a move. Skip.
+      if (prev.status === next.status) continue;
       const dx = prev.left - next.left;
       const dy = prev.top - next.top;
       if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue; // didn't move
@@ -118,8 +132,7 @@ export function useFlipAnimation(boardRef: React.RefObject<HTMLElement | null>):
       if (!el) continue;
       // Skip cards that are currently being dragged — dnd-kit owns their transform.
       if (el.classList.contains("kb-dragging")) continue;
-      const toStatus = (el.closest("[data-drop-status]") as HTMLElement | null)?.dataset.dropStatus ?? null;
-      moved.push({ el, dx, dy, toStatus });
+      moved.push({ el, dx, dy, toStatus: next.status });
     }
 
     // Update the captured rects for the next render.

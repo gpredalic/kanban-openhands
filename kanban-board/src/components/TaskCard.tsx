@@ -10,7 +10,7 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useState, useRef, useEffect } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, Bot, Lock } from "lucide-react";
 import type { Task, DeletePhase } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
@@ -72,7 +72,7 @@ function formatDue(iso: string): string {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export function TaskCard({ task, agents = [], isDragging, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
+function TaskCardInner({ task, agents = [], isDragging, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
   // Disable dragging while a delete is in flight or has failed — the card is
   // locked to its column during the transaction.
   const locked = deleting || Boolean(deleteError);
@@ -413,3 +413,17 @@ export function TaskCard({ task, agents = [], isDragging, deleting = false, dele
     </div>
   );
 }
+
+/**
+ * Memoized TaskCard. The board re-renders on every poll and every state change,
+ * but a card whose task object, drag state, and delete state are unchanged
+ * should not re-render. This is what makes the identity-stabilization in
+ * applyAiOverlay / enrichedTasks pay off: unchanged cards skip the render
+ * entirely, so their CSS animations (progress shimmer, status pulse) are not
+ * restarted and the board does not visibly reflash.
+ *
+ * Props are compared by reference. The task object is identity-stable (see
+ * applyAiOverlay), the callback props are useCallback-stable (see KanbanBoard),
+ * and the boolean/phase props only change for the affected card.
+ */
+export const TaskCard = memo(TaskCardInner);

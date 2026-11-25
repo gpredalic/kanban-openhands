@@ -1,12 +1,13 @@
 /**
  * ViewSwitcher — top-level navigation tabs for the orchestration platform.
  *
- * Switches between the five views: Board (Kanban), Workflow (DAG), Agents
- * (roster + teams + routing), History (execution runs), and Analytics
- * (token/cost tracking). The active tab gets a gradient background.
+ * Switches between the views: Board (Kanban), Workflow (pure node-graph
+ * builder), Monitoring (operational/observability), Agents (roster + teams +
+ * routing), History (execution runs), and Analytics (token/cost tracking).
+ * The active tab gets a gradient background.
  */
 
-import { KanbanSquare, GitBranch, Bot, History, BarChart3 } from "lucide-react";
+import { KanbanSquare, GitBranch, Activity, Bot, History, BarChart3 } from "lucide-react";
 import type { ViewId } from "../types/task";
 
 export type { ViewId };
@@ -19,6 +20,7 @@ interface ViewSwitcherProps {
 const VIEWS: { id: ViewId; label: string; icon: typeof KanbanSquare }[] = [
   { id: "board", label: "Board", icon: KanbanSquare },
   { id: "workflow", label: "Workflow", icon: GitBranch },
+  { id: "monitoring", label: "Monitoring", icon: Activity },
   { id: "agents", label: "Agents", icon: Bot },
   { id: "history", label: "History", icon: History },
   { id: "analytics", label: "Analytics", icon: BarChart3 },

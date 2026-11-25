@@ -5,7 +5,7 @@
  * columns inside a DndContext. Applies the active filter.
  */
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DndContext } from "@dnd-kit/core";
 import { Header } from "./Header";
 import { StatsCards } from "./StatsCards";
@@ -14,6 +14,7 @@ import { KanbanColumn } from "./KanbanColumn";
 import { ViewSwitcher } from "./ViewSwitcher";
 import type { ViewId } from "./ViewSwitcher";
 import { WorkflowView } from "./WorkflowView";
+import { MonitoringView } from "./MonitoringView";
 import { AgentRoster } from "./AgentRoster";
 import { ExecutionHistory } from "./ExecutionHistory";
 import { AnalyticsView } from "./AnalyticsView";
@@ -60,6 +61,9 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
   const { state: aiState, store: aiStore } = useAiState(host);
   const { state: openHandsState, reset: resetOpenHands } = useOpenHandsState(host);
   const [view, setView] = useState<ViewId>("board");
+  // Which workflow the Monitoring view is observing. Defaults to the first
+  // workflow; the user can switch from the Monitoring toolbar.
+  const [monitoringWorkflowId, setMonitoringWorkflowId] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [assignmentAgents, setAssignmentAgents] = useState<Agent[]>([]);
@@ -111,15 +115,37 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
 
   // Enrich the board tasks with their AI overlay so the orchestration loop and
   // the AI views (workflow, agents, history, analytics) operate on live data.
-  const enrichedTasks = useMemo(
-    () => applyAiOverlay(allTasks, aiState.overlay).map((task) => {
+  //
+  // Identity is stable: a task whose execution status/id is unchanged returns
+  // the SAME EnrichedTask object it returned last time. This is what lets
+  // React.memo(TaskCard) skip re-rendering unchanged cards when the memo
+  // recomputes after a real change (one task's execution advanced). Without
+  // this, every recompute spread every task with an execution and the whole
+  // board re-rendered, restarting card animations.
+  const enrichedCacheRef = useRef<Map<string, { base: EnrichedTask; status: string | undefined; execId: string | undefined }>>(new Map());
+  const enrichedTasks = useMemo(() => {
+    const cache = enrichedCacheRef.current;
+    const seen = new Set<string>();
+    const result = applyAiOverlay(allTasks, aiState.overlay).map((task) => {
+      seen.add(task.id);
       const execution = openHandsState.snapshot.executions.find((run) => run.taskId === task.id);
-      return execution
+      const status = execution?.status;
+      const execId = execution?.id;
+      const cached = cache.get(task.id);
+      if (cached && cached.base === task && cached.status === status && cached.execId === execId) {
+        return cached.base;
+      }
+      const enriched: EnrichedTask = execution
         ? { ...task, ai: { ...task.ai, executionStatus: execution.status, executionId: execution.id } }
         : task;
-    }),
-    [allTasks, aiState.overlay, openHandsState.snapshot.executions],
-  );
+      cache.set(task.id, { base: enriched, status, execId });
+      return enriched;
+    });
+    for (const id of cache.keys()) {
+      if (!seen.has(id)) cache.delete(id);
+    }
+    return result;
+  }, [allTasks, aiState.overlay, openHandsState.snapshot.executions]);
 
   // Feed the AI store with the current enriched tasks on every data change.
   useEffect(() => {
@@ -140,24 +166,24 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     void controller.create(title, status, assignee, undefined, agentId, agentPrompt, expectedOutput, successCriteria, priority);
   };
 
-  const handleEditSave = (taskId: string, patch: { title?: string; assignee?: string | null; agentId?: string | null; agentPrompt?: string; expectedOutput?: string; successCriteria?: string; priority?: TaskPriority }) => {
+  const handleEditSave = useCallback((taskId: string, patch: { title?: string; assignee?: string | null; agentId?: string | null; agentPrompt?: string; expectedOutput?: string; successCriteria?: string; priority?: TaskPriority }) => {
     void controller.update(taskId, patch);
-  };
+  }, [controller]);
 
-  const handleDelete = (taskId: string) => {
+  const handleDelete = useCallback((taskId: string) => {
     void controller.remove(taskId);
-  };
+  }, [controller]);
 
   // Retry a failed delete: re-runs the transaction from the top. The task is
   // still on disk (it was never removed on failure), so the flow can proceed.
-  const handleRetryDelete = (taskId: string) => {
+  const handleRetryDelete = useCallback((taskId: string) => {
     void controller.remove(taskId);
-  };
+  }, [controller]);
 
   // Cancel a failed delete: clear the error state and return the card to normal.
-  const handleCancelDelete = (taskId: string) => {
+  const handleCancelDelete = useCallback((taskId: string) => {
     controller.cancelDelete(taskId);
-  };
+  }, [controller]);
 
   // Per-task Run: routes to THIS task's own conversation. If the task already
   // has a linked conversation (task.ai.executionId / task.conversationId) it is
@@ -304,7 +330,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
           tasks={enrichedTasks}
           openHandsState={openHandsState}
           profiles={assignmentAgents}
-          onCommand={handleOpenHandsCommand}
           onCreate={(workflow) => aiStore.setConfig({
             ...aiState.config,
             workflows: [...aiState.config.workflows, workflow],
@@ -317,6 +342,16 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
             ...aiState.config,
             workflows: aiState.config.workflows.filter((item) => item.id !== workflowId),
           })}
+        />
+      ) : view === "monitoring" ? (
+        <MonitoringView
+          workflows={aiState.config.workflows}
+          selectedId={monitoringWorkflowId ?? aiState.config.workflows[0]?.id ?? null}
+          onSelectId={setMonitoringWorkflowId}
+          openHandsState={openHandsState}
+          tasks={enrichedTasks}
+          profiles={assignmentAgents}
+          onCommand={handleOpenHandsCommand}
         />
       ) : view === "agents" ? (
         <AgentRoster host={host} openHandsState={openHandsState} />

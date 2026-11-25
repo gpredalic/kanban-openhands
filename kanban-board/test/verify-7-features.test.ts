@@ -287,15 +287,16 @@ test("F5: workflow routing shows current node, next node, and execution path", a
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Click the Workflow tab.
-  const workflowTab = Array.from(container.querySelectorAll("button")).find(
-    (b) => b.textContent?.includes("Workflow"),
+  // Click the Monitoring tab — the Execution Routing readout now lives in the
+  // dedicated Monitoring view, not the Workflow builder.
+  const monitoringTab = Array.from(container.querySelectorAll("button")).find(
+    (b) => b.textContent?.includes("Monitoring"),
   );
-  assert.ok(workflowTab, "Workflow tab must exist");
-  workflowTab!.click();
+  assert.ok(monitoringTab, "Monitoring tab must exist");
+  monitoringTab!.click();
 
   const routingShown = await waitFor(() => container.innerHTML.includes("Execution Routing"));
-  assert.ok(routingShown, "Workflow view must show the Execution Routing section");
+  assert.ok(routingShown, "Monitoring view must show the Execution Routing section");
 
   const html = container.innerHTML;
   assert.match(html, /Current Node/, "must show Current Node");

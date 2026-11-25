@@ -259,15 +259,63 @@ export function saveAiOverlay(overlay: Record<string, TaskAiOverlay>): void {
 /**
  * Merge the AI overlay onto a flat task list, producing EnrichedTask[].
  * Tasks with no overlay entry get an empty `ai` object (still valid).
+ *
+ * Identity is stable: a task whose content and overlay entry are unchanged
+ * returns the SAME EnrichedTask object it returned last time. This is what
+ * lets React.memo(TaskCard) skip re-rendering unchanged cards when the
+ * enrichedTasks memo recomputes after a real change (a task moved, a new task
+ * appeared). Without this, every recompute produced fresh objects for every
+ * task and the whole board re-rendered.
  */
+const enrichedCache = new Map<string, { taskRef: Task; overlayFingerprint: string; enriched: EnrichedTask }>();
+
+/** Fingerprint a task's content + its overlay entry (ignores object identity). */
+function enrichedFingerprint(task: Task, overlayEntry: TaskAiOverlay | undefined): string {
+  const ai = overlayEntry ?? {};
+  return [
+    task.id,
+    task.title,
+    task.status,
+    task.assignee ?? "",
+    task.agentId ?? "",
+    ai.agentId ?? "",
+    ai.modelId ?? "",
+    ai.teamId ?? "",
+    ai.executionStatus ?? "",
+    ai.executionId ?? "",
+    ai.lastRunAt ?? 0,
+    ai.tokensIn ?? 0,
+    ai.tokensOut ?? 0,
+    ai.cost ?? 0,
+    (ai.dependsOn ?? []).join(","),
+  ].join("|");
+}
+
 export function applyAiOverlay(tasks: Task[], overlay: Record<string, TaskAiOverlay>): EnrichedTask[] {
-  return tasks.map((task) => ({
-    ...task,
-    ai: {
-      ...(task.agentId ? { agentId: task.agentId } : {}),
-      ...(overlay[task.id] ?? {}),
-    },
-  }));
+  const seen = new Set<string>();
+  const result: EnrichedTask[] = tasks.map((task) => {
+    seen.add(task.id);
+    const overlayEntry = overlay[task.id];
+    const fingerprint = enrichedFingerprint(task, overlayEntry);
+    const cached = enrichedCache.get(task.id);
+    if (cached && cached.taskRef === task && cached.overlayFingerprint === fingerprint) {
+      return cached.enriched;
+    }
+    const enriched: EnrichedTask = {
+      ...task,
+      ai: {
+        ...(task.agentId ? { agentId: task.agentId } : {}),
+        ...(overlayEntry ?? {}),
+      },
+    };
+    enrichedCache.set(task.id, { taskRef: task, overlayFingerprint: fingerprint, enriched });
+    return enriched;
+  });
+  // Prune cache entries for tasks that no longer exist so the map stays bounded.
+  for (const id of enrichedCache.keys()) {
+    if (!seen.has(id)) enrichedCache.delete(id);
+  }
+  return result;
 }
 
 /**

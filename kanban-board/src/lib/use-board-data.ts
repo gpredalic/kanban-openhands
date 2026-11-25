@@ -13,12 +13,40 @@
 import { BoardStateStore, groupTasksByStatus } from "./board-state";
 import { applyOverlay, loadOverlay, setTaskOverlay, clearTaskOverlay, type TaskOverlayEntry } from "./task-overlay";
 import { buildExport, downloadExport, importFromFile, type ImportResult } from "./import-export";
-import type { Host, TaskStatus, BoardUiState, TaskPriority, DeletePhase } from "../types/task";
+import type { Host, Task, TaskStatus, BoardUiState, TaskPriority, DeletePhase } from "../types/task";
 import { syncBoardAction, syncInboundConversations, deleteConversation, verifyConversationGone, createConversationForTask } from "./openhands";
 import { moveTask, updateTask, deleteTask, createTask, fetchTasks, dedupeTasks } from "./task-store";
 
 /** Poll interval for reconciling with the live backend (ms). */
 const POLL_INTERVAL_MS = 15_000;
+
+/**
+ * Fingerprint a flat task list by its *content*, ignoring object identity.
+ * The 15-second poll re-fetches the board on every tick; when the backend
+ * returns the same tasks we want to skip the column recompute and the React
+ * re-render entirely. Comparing the serialized content (not the object
+ * reference) is what lets an unchanged poll be a no-op.
+ */
+function tasksFingerprint(tasks: Task[]): string {
+  return tasks
+    .map((t) =>
+      [
+        t.id,
+        t.title,
+        t.status,
+        t.assignee ?? "",
+        t.projectId ?? "",
+        t.agentId ?? "",
+        t.conversationId ?? "",
+        t.priority ?? "",
+        (t.tags ?? []).join(","),
+        t.dueDate ?? "",
+        t.scheduledAt ?? "",
+        (t.waitingOn ?? []).join(","),
+      ].join("|"),
+    )
+    .join(";;");
+}
 
 /**
  * The board data controller. Owns the fetch/reconcile lifecycle and the
@@ -78,6 +106,14 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
     return ignore;
   }
 
+  /**
+   * Fingerprint of the last task list we actually pushed into the store. The
+   * 15-second poll re-fetches the board on every tick; when the content is
+   * unchanged we skip setColumns/markLoaded so the columns array keeps its
+   * reference and React.memo'd cards do not re-render. See tasksFingerprint.
+   */
+  let lastTasksFingerprint: string | null = null;
+
   async function load(): Promise<void> {
     if (disposed) return;
     store.setUiState({ syncing: true });
@@ -89,8 +125,17 @@ export function createBoardDataController(host: Host, store: BoardStateStore): B
       const unique = dedupeTasks(tasks);
       // Phase 2: merge the localStorage overlay (tags/dueDate) onto fetched tasks.
       const overlaid = applyOverlay(unique, loadOverlay());
-      store.setColumns(groupTasksByStatus(overlaid));
-      store.markLoaded();
+      const fingerprint = tasksFingerprint(overlaid);
+      // Content-aware reconcile: if the backend returned the same tasks we
+      // already have, skip the column recompute and the notify. The columns
+      // array keeps its reference, so memoized cards and columns do not
+      // re-render and no FLIP/entrance animation restarts. This is what stops
+      // the board from repainting on every 15-second poll when nothing changed.
+      if (fingerprint !== lastTasksFingerprint) {
+        lastTasksFingerprint = fingerprint;
+        store.setColumns(groupTasksByStatus(overlaid));
+        store.markLoaded();
+      }
     } catch (err) {
       // Leave the board in its last-known state; the next poll will retry.
       console.error("[kanban-board] failed to load tasks:", err);
