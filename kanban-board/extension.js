@@ -1,4 +1,4 @@
-const __kb_css=".\\!container{width:100%!important}.container{width:100%}@media (min-width: 640px){.\\!container{max-width:640px!important}.container{max-width:640px}}@media (min-width: 768px){.\\!container{max-width:768px!important}.container{max-width:768px}}@media (min-width: 1024px){.\\!container{max-width:1024px!important}.container{max-width:1024px}}@media (min-width: 1280px){.\\!container{max-width:1280px!important}.container{max-width:1280px}}@media (min-width: 1536px){.\\!container{max-width:1536px!important}.container{max-width:1536px}}#kanban-extension-root .visible{visibility:visible}#kanban-extension-root .invisible{visibility:hidden}#kanban-extension-root .collapse{visibility:collapse}#kanban-extension-root .fixed{position:fixed}#kanban-extension-root .absolute{position:absolute}#kanban-extension-root .relative{position:relative}#kanban-extension-root .inset-0{top:0;right:0;bottom:0;left:0}#kanban-extension-root .-right-6{right:-1.5rem}#kanban-extension-root .-right-8{right:-2rem}#kanban-extension-root .-top-6{top:-1.5rem}#kanban-extension-root .-top-8{top:-2rem}#kanban-extension-root .z-10{z-index:10}#kanban-extension-root .z-50{z-index:50}#kanban-extension-root .z-\\[80\\]{z-index:80}#kanban-extension-root .col-span-3{grid-column:span 3 / span 3}#kanban-extension-root .mb-1{margin-bottom:.25rem}#kanban-extension-root .mb-1\\.5{margin-bottom:.375rem}#kanban-extension-root .mb-2{margin-bottom:.5rem}#kanban-extension-root .mb-2\\.5{margin-bottom:.625rem}#kanban-extension-root .mb-3{margin-bottom:.75rem}#kanban-extension-root .mb-4{margin-bottom:1rem}#kanban-extension-root .mb-5{margin-bottom:1.25rem}#kanban-extension-root .ml-1{margin-left:.25rem}#kanban-extension-root .mt-0\\.5{margin-top:.125rem}#kanban-extension-root .mt-1{margin-top:.25rem}#kanban-extension-root .mt-1\\.5{margin-top:.375rem}#kanban-extension-root .mt-2{margin-top:.5rem}#kanban-extension-root .mt-3{margin-top:.75rem}#kanban-extension-root .mt-4{margin-top:1rem}#kanban-extension-root .mt-5{margin-top:1.25rem}#kanban-extension-root .mt-6{margin-top:1.5rem}#kanban-extension-root .mt-auto{margin-top:auto}#kanban-extension-root .line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}#kanban-extension-root .line-clamp-3{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}#kanban-extension-root .line-clamp-4{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4}#kanban-extension-root .block{display:block}#kanban-extension-root .inline-block{display:inline-block}#kanban-extension-root .inline{display:inline}#kanban-extension-root .flex{display:flex}#kanban-extension-root .inline-flex{display:inline-flex}#kanban-extension-root .grid{display:grid}#kanban-extension-root .contents{display:contents}#kanban-extension-root .hidden{display:none}#kanban-extension-root .h-1{height:.25rem}#kanban-extension-root .h-1\\.5{height:.375rem}#kanban-extension-root .h-10{height:2.5rem}#kanban-extension-root .h-11{height:2.75rem}#kanban-extension-root .h-12{height:3rem}#kanban-extension-root .h-14{height:3.5rem}#kanban-extension-root .h-16{height:4rem}#kanban-extension-root .h-2{height:.5rem}#kanban-extension-root .h-2\\.5{height:.625rem}#kanban-extension-root .h-20{height:5rem}#kanban-extension-root .h-24{height:6rem}#kanban-extension-root .h-3{height:.75rem}#kanban-extension-root .h-3\\.5{height:.875rem}#kanban-extension-root .h-4{height:1rem}#kanban-extension-root .h-5{height:1.25rem}#kanban-extension-root .h-6{height:1.5rem}#kanban-extension-root .h-64{height:16rem}#kanban-extension-root .h-7{height:1.75rem}#kanban-extension-root .h-8{height:2rem}#kanban-extension-root .h-9{height:2.25rem}#kanban-extension-root .h-full{height:100%}#kanban-extension-root .max-h-48{max-height:12rem}#kanban-extension-root .max-h-\\[90vh\\]{max-height:90vh}#kanban-extension-root .min-h-0{min-height:0px}#kanban-extension-root .min-h-14{min-height:3.5rem}#kanban-extension-root .min-h-16{min-height:4rem}#kanban-extension-root .w-1\\.5{width:.375rem}#kanban-extension-root .w-1\\/2{width:50%}#kanban-extension-root .w-1\\/3{width:33.333333%}#kanban-extension-root .w-10{width:2.5rem}#kanban-extension-root .w-11{width:2.75rem}#kanban-extension-root .w-12{width:3rem}#kanban-extension-root .w-14{width:3.5rem}#kanban-extension-root .w-16{width:4rem}#kanban-extension-root .w-2{width:.5rem}#kanban-extension-root .w-2\\.5{width:.625rem}#kanban-extension-root .w-20{width:5rem}#kanban-extension-root .w-24{width:6rem}#kanban-extension-root .w-3{width:.75rem}#kanban-extension-root .w-3\\.5{width:.875rem}#kanban-extension-root .w-3\\/4{width:75%}#kanban-extension-root .w-32{width:8rem}#kanban-extension-root .w-4{width:1rem}#kanban-extension-root .w-40{width:10rem}#kanban-extension-root .w-5{width:1.25rem}#kanban-extension-root .w-6{width:1.5rem}#kanban-extension-root .w-64{width:16rem}#kanban-extension-root .w-7{width:1.75rem}#kanban-extension-root .w-72{width:18rem}#kanban-extension-root .w-8{width:2rem}#kanban-extension-root .w-\\[80vw\\]{width:80vw}#kanban-extension-root .w-full{width:100%}#kanban-extension-root .min-w-0{min-width:0px}#kanban-extension-root .min-w-6{min-width:1.5rem}#kanban-extension-root .max-w-\\[1200px\\]{max-width:1200px}#kanban-extension-root .max-w-full{max-width:100%}#kanban-extension-root .max-w-sm{max-width:24rem}#kanban-extension-root .flex-1{flex:1 1 0%}#kanban-extension-root .shrink-0{flex-shrink:0}#kanban-extension-root .transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}#kanban-extension-root .animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}@keyframes spin{to{transform:rotate(360deg)}}#kanban-extension-root .animate-spin{animation:spin 1s linear infinite}#kanban-extension-root .cursor-crosshair{cursor:crosshair}#kanban-extension-root .cursor-grab{cursor:grab}#kanban-extension-root .cursor-pointer{cursor:pointer}#kanban-extension-root .touch-none{touch-action:none}#kanban-extension-root .select-none{-webkit-user-select:none;-moz-user-select:none;user-select:none}#kanban-extension-root .resize-y{resize:vertical}#kanban-extension-root .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}#kanban-extension-root .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}#kanban-extension-root .grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}#kanban-extension-root .flex-col{flex-direction:column}#kanban-extension-root .flex-wrap{flex-wrap:wrap}#kanban-extension-root .items-start{align-items:flex-start}#kanban-extension-root .items-end{align-items:flex-end}#kanban-extension-root .items-center{align-items:center}#kanban-extension-root .justify-end{justify-content:flex-end}#kanban-extension-root .justify-center{justify-content:center}#kanban-extension-root .justify-between{justify-content:space-between}#kanban-extension-root .gap-0\\.5{gap:.125rem}#kanban-extension-root .gap-1{gap:.25rem}#kanban-extension-root .gap-1\\.5{gap:.375rem}#kanban-extension-root .gap-2{gap:.5rem}#kanban-extension-root .gap-2\\.5{gap:.625rem}#kanban-extension-root .gap-3{gap:.75rem}#kanban-extension-root .gap-4{gap:1rem}#kanban-extension-root .gap-5{gap:1.25rem}#kanban-extension-root .gap-6{gap:1.5rem}#kanban-extension-root .gap-x-3{-moz-column-gap:.75rem;column-gap:.75rem}#kanban-extension-root .gap-y-1{row-gap:.25rem}#kanban-extension-root .overflow-auto{overflow:auto}#kanban-extension-root .overflow-hidden{overflow:hidden}#kanban-extension-root .overflow-y-auto{overflow-y:auto}#kanban-extension-root .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#kanban-extension-root .whitespace-pre-wrap{white-space:pre-wrap}#kanban-extension-root .break-words{overflow-wrap:break-word}#kanban-extension-root .rounded{border-radius:.25rem}#kanban-extension-root .rounded-2xl{border-radius:1rem}#kanban-extension-root .rounded-\\[14px\\]{border-radius:14px}#kanban-extension-root .rounded-\\[20px\\]{border-radius:20px}#kanban-extension-root .rounded-full{border-radius:9999px}#kanban-extension-root .rounded-lg{border-radius:.5rem}#kanban-extension-root .rounded-md{border-radius:.375rem}#kanban-extension-root .rounded-xl{border-radius:.75rem}#kanban-extension-root .border{border-width:1px}#kanban-extension-root .border-0{border-width:0px}#kanban-extension-root .border-2{border-width:2px}#kanban-extension-root .border-t{border-top-width:1px}#kanban-extension-root .border-dashed{border-style:dashed}#kanban-extension-root .border-slate-600{--tw-border-opacity: 1;border-color:rgb(71 85 105 / var(--tw-border-opacity, 1))}#kanban-extension-root .border-white\\/10{border-color:#ffffff1a}#kanban-extension-root .border-white\\/5{border-color:#ffffff0d}#kanban-extension-root .border-t-transparent{border-top-color:transparent}#kanban-extension-root .bg-amber-400{--tw-bg-opacity: 1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-amber-500{--tw-bg-opacity: 1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-amber-500\\/10{background-color:#f59e0b1a}#kanban-extension-root .bg-amber-500\\/15{background-color:#f59e0b26}#kanban-extension-root .bg-amber-500\\/20{background-color:#f59e0b33}#kanban-extension-root .bg-black\\/60{background-color:#0009}#kanban-extension-root .bg-blue-400{--tw-bg-opacity: 1;background-color:rgb(96 165 250 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-blue-400\\/70{background-color:#60a5fab3}#kanban-extension-root .bg-blue-500{--tw-bg-opacity: 1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-blue-500\\/10{background-color:#3b82f61a}#kanban-extension-root .bg-blue-500\\/15{background-color:#3b82f626}#kanban-extension-root .bg-blue-500\\/20{background-color:#3b82f633}#kanban-extension-root .bg-cyan-500\\/10{background-color:#06b6d41a}#kanban-extension-root .bg-cyan-500\\/15{background-color:#06b6d426}#kanban-extension-root .bg-emerald-400{--tw-bg-opacity: 1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-emerald-500{--tw-bg-opacity: 1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-emerald-500\\/10{background-color:#10b9811a}#kanban-extension-root .bg-emerald-500\\/15{background-color:#10b98126}#kanban-extension-root .bg-emerald-500\\/20{background-color:#10b98133}#kanban-extension-root .bg-emerald-500\\/\\[0\\.06\\]{background-color:#10b9810f}#kanban-extension-root .bg-fuchsia-500\\/10{background-color:#d946ef1a}#kanban-extension-root .bg-indigo-400{--tw-bg-opacity: 1;background-color:rgb(129 140 248 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-indigo-500\\/10{background-color:#6366f11a}#kanban-extension-root .bg-indigo-500\\/15{background-color:#6366f126}#kanban-extension-root .bg-indigo-500\\/20{background-color:#6366f133}#kanban-extension-root .bg-indigo-500\\/80{background-color:#6366f1cc}#kanban-extension-root .bg-orange-500\\/15{background-color:#f9731626}#kanban-extension-root .bg-purple-500\\/15{background-color:#a855f726}#kanban-extension-root .bg-red-500{--tw-bg-opacity: 1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-red-500\\/15{background-color:#ef444426}#kanban-extension-root .bg-red-600\\/15{background-color:#dc262626}#kanban-extension-root .bg-red-600\\/20{background-color:#dc262633}#kanban-extension-root .bg-rose-400{--tw-bg-opacity: 1;background-color:rgb(251 113 133 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-rose-500\\/10{background-color:#f43f5e1a}#kanban-extension-root .bg-rose-500\\/15{background-color:#f43f5e26}#kanban-extension-root .bg-rose-500\\/20{background-color:#f43f5e33}#kanban-extension-root .bg-rose-500\\/80{background-color:#f43f5ecc}#kanban-extension-root .bg-rose-500\\/\\[0\\.06\\]{background-color:#f43f5e0f}#kanban-extension-root .bg-sky-500\\/15{background-color:#0ea5e926}#kanban-extension-root .bg-slate-400{--tw-bg-opacity: 1;background-color:rgb(148 163 184 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-slate-500\\/15{background-color:#64748b26}#kanban-extension-root .bg-slate-600{--tw-bg-opacity: 1;background-color:rgb(71 85 105 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-slate-600\\/40{background-color:#47556966}#kanban-extension-root .bg-slate-600\\/60{background-color:#47556999}#kanban-extension-root .bg-slate-700\\/40{background-color:#33415566}#kanban-extension-root .bg-slate-800\\/30{background-color:#1e293b4d}#kanban-extension-root .bg-slate-800\\/40{background-color:#1e293b66}#kanban-extension-root .bg-slate-800\\/50{background-color:#1e293b80}#kanban-extension-root .bg-slate-800\\/70{background-color:#1e293bb3}#kanban-extension-root .bg-slate-900{--tw-bg-opacity: 1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-slate-900\\/40{background-color:#0f172a66}#kanban-extension-root .bg-slate-900\\/60{background-color:#0f172a99}#kanban-extension-root .bg-slate-950\\/70{background-color:#020617b3}#kanban-extension-root .bg-slate-950\\/85{background-color:#020617d9}#kanban-extension-root .bg-transparent{background-color:transparent}#kanban-extension-root .bg-violet-400{--tw-bg-opacity: 1;background-color:rgb(167 139 250 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-violet-500\\/10{background-color:#8b5cf61a}#kanban-extension-root .bg-violet-500\\/15{background-color:#8b5cf626}#kanban-extension-root .bg-white\\/10{background-color:#ffffff1a}#kanban-extension-root .bg-white\\/5{background-color:#ffffff0d}#kanban-extension-root .bg-white\\/\\[0\\.02\\]{background-color:#ffffff05}#kanban-extension-root .bg-white\\/\\[0\\.03\\]{background-color:#ffffff08}#kanban-extension-root .bg-yellow-500\\/15{background-color:#eab30826}#kanban-extension-root .bg-gradient-to-br{background-image:linear-gradient(to bottom right,var(--tw-gradient-stops))}#kanban-extension-root .bg-gradient-to-r{background-image:linear-gradient(to right,var(--tw-gradient-stops))}#kanban-extension-root .from-\\[\\#0A84FF\\]{--tw-gradient-from: #0A84FF var(--tw-gradient-from-position);--tw-gradient-to: rgb(10 132 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-amber-500{--tw-gradient-from: #f59e0b var(--tw-gradient-from-position);--tw-gradient-to: rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-blue-500{--tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);--tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-cyan-500{--tw-gradient-from: #06b6d4 var(--tw-gradient-from-position);--tw-gradient-to: rgb(6 182 212 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-emerald-500{--tw-gradient-from: #10b981 var(--tw-gradient-from-position);--tw-gradient-to: rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-pink-500{--tw-gradient-from: #ec4899 var(--tw-gradient-from-position);--tw-gradient-to: rgb(236 72 153 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-rose-500{--tw-gradient-from: #f43f5e var(--tw-gradient-from-position);--tw-gradient-to: rgb(244 63 94 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-slate-500{--tw-gradient-from: #64748b var(--tw-gradient-from-position);--tw-gradient-to: rgb(100 116 139 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-violet-500{--tw-gradient-from: #8b5cf6 var(--tw-gradient-from-position);--tw-gradient-to: rgb(139 92 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .to-\\[\\#5E5CE6\\]{--tw-gradient-to: #5E5CE6 var(--tw-gradient-to-position)}#kanban-extension-root .to-blue-500{--tw-gradient-to: #3b82f6 var(--tw-gradient-to-position)}#kanban-extension-root .to-indigo-500{--tw-gradient-to: #6366f1 var(--tw-gradient-to-position)}#kanban-extension-root .to-indigo-600{--tw-gradient-to: #4f46e5 var(--tw-gradient-to-position)}#kanban-extension-root .to-orange-500{--tw-gradient-to: #f97316 var(--tw-gradient-to-position)}#kanban-extension-root .to-orange-600{--tw-gradient-to: #ea580c var(--tw-gradient-to-position)}#kanban-extension-root .to-purple-500{--tw-gradient-to: #a855f7 var(--tw-gradient-to-position)}#kanban-extension-root .to-purple-600{--tw-gradient-to: #9333ea var(--tw-gradient-to-position)}#kanban-extension-root .to-rose-400{--tw-gradient-to: #fb7185 var(--tw-gradient-to-position)}#kanban-extension-root .to-rose-500{--tw-gradient-to: #f43f5e var(--tw-gradient-to-position)}#kanban-extension-root .to-rose-600{--tw-gradient-to: #e11d48 var(--tw-gradient-to-position)}#kanban-extension-root .to-sky-600{--tw-gradient-to: #0284c7 var(--tw-gradient-to-position)}#kanban-extension-root .to-slate-600{--tw-gradient-to: #475569 var(--tw-gradient-to-position)}#kanban-extension-root .to-teal-500{--tw-gradient-to: #14b8a6 var(--tw-gradient-to-position)}#kanban-extension-root .to-teal-600{--tw-gradient-to: #0d9488 var(--tw-gradient-to-position)}#kanban-extension-root .fill-emerald-300{fill:#6ee7b7}#kanban-extension-root .fill-fuchsia-300{fill:#f0abfc}#kanban-extension-root .fill-slate-400{fill:#94a3b8}#kanban-extension-root .p-1{padding:.25rem}#kanban-extension-root .p-1\\.5{padding:.375rem}#kanban-extension-root .p-2{padding:.5rem}#kanban-extension-root .p-2\\.5{padding:.625rem}#kanban-extension-root .p-3{padding:.75rem}#kanban-extension-root .p-3\\.5{padding:.875rem}#kanban-extension-root .p-4{padding:1rem}#kanban-extension-root .p-5{padding:1.25rem}#kanban-extension-root .p-6{padding:1.5rem}#kanban-extension-root .p-8{padding:2rem}#kanban-extension-root .px-1{padding-left:.25rem;padding-right:.25rem}#kanban-extension-root .px-1\\.5{padding-left:.375rem;padding-right:.375rem}#kanban-extension-root .px-2{padding-left:.5rem;padding-right:.5rem}#kanban-extension-root .px-2\\.5{padding-left:.625rem;padding-right:.625rem}#kanban-extension-root .px-3{padding-left:.75rem;padding-right:.75rem}#kanban-extension-root .px-3\\.5{padding-left:.875rem;padding-right:.875rem}#kanban-extension-root .px-4{padding-left:1rem;padding-right:1rem}#kanban-extension-root .px-5{padding-left:1.25rem;padding-right:1.25rem}#kanban-extension-root .py-0\\.5{padding-top:.125rem;padding-bottom:.125rem}#kanban-extension-root .py-1{padding-top:.25rem;padding-bottom:.25rem}#kanban-extension-root .py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}#kanban-extension-root .py-2{padding-top:.5rem;padding-bottom:.5rem}#kanban-extension-root .py-2\\.5{padding-top:.625rem;padding-bottom:.625rem}#kanban-extension-root .py-3{padding-top:.75rem;padding-bottom:.75rem}#kanban-extension-root .py-6{padding-top:1.5rem;padding-bottom:1.5rem}#kanban-extension-root .py-8{padding-top:2rem;padding-bottom:2rem}#kanban-extension-root .pr-0\\.5{padding-right:.125rem}#kanban-extension-root .pr-1{padding-right:.25rem}#kanban-extension-root .pt-3{padding-top:.75rem}#kanban-extension-root .pt-4{padding-top:1rem}#kanban-extension-root .text-left{text-align:left}#kanban-extension-root .text-center{text-align:center}#kanban-extension-root .text-right{text-align:right}#kanban-extension-root .font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}#kanban-extension-root .text-2xl{font-size:1.5rem;line-height:2rem}#kanban-extension-root .text-3xl{font-size:1.875rem;line-height:2.25rem}#kanban-extension-root .text-\\[0\\.6875rem\\]{font-size:.6875rem}#kanban-extension-root .text-\\[10px\\]{font-size:10px}#kanban-extension-root .text-\\[11px\\]{font-size:11px}#kanban-extension-root .text-\\[2\\.25rem\\]{font-size:2.25rem}#kanban-extension-root .text-\\[9px\\]{font-size:9px}#kanban-extension-root .text-lg{font-size:1.125rem;line-height:1.75rem}#kanban-extension-root .text-sm{font-size:.875rem;line-height:1.25rem}#kanban-extension-root .text-xs{font-size:.75rem;line-height:1rem}#kanban-extension-root .font-bold{font-weight:700}#kanban-extension-root .font-extrabold{font-weight:800}#kanban-extension-root .font-medium{font-weight:500}#kanban-extension-root .font-normal{font-weight:400}#kanban-extension-root .font-semibold{font-weight:600}#kanban-extension-root .uppercase{text-transform:uppercase}#kanban-extension-root .normal-case{text-transform:none}#kanban-extension-root .tabular-nums{--tw-numeric-spacing: tabular-nums;font-variant-numeric:var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)}#kanban-extension-root .leading-\\[1\\.05\\]{line-height:1.05}#kanban-extension-root .leading-relaxed{line-height:1.625}#kanban-extension-root .leading-snug{line-height:1.375}#kanban-extension-root .tracking-\\[-0\\.02em\\]{letter-spacing:-.02em}#kanban-extension-root .tracking-\\[0\\.12em\\]{letter-spacing:.12em}#kanban-extension-root .tracking-\\[0\\.14em\\]{letter-spacing:.14em}#kanban-extension-root .tracking-\\[0\\.22em\\]{letter-spacing:.22em}#kanban-extension-root .tracking-normal{letter-spacing:0em}#kanban-extension-root .tracking-tight{letter-spacing:-.025em}#kanban-extension-root .tracking-wide{letter-spacing:.025em}#kanban-extension-root .tracking-wider{letter-spacing:.05em}#kanban-extension-root .text-amber-200{--tw-text-opacity: 1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-amber-300{--tw-text-opacity: 1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-amber-400{--tw-text-opacity: 1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-blue-300{--tw-text-opacity: 1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-blue-400{--tw-text-opacity: 1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-cyan-300{--tw-text-opacity: 1;color:rgb(103 232 249 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-emerald-200\\/80{color:#a7f3d0cc}#kanban-extension-root .text-emerald-300{--tw-text-opacity: 1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-emerald-400{--tw-text-opacity: 1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-fuchsia-300{--tw-text-opacity: 1;color:rgb(240 171 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-200{--tw-text-opacity: 1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-300{--tw-text-opacity: 1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-400{--tw-text-opacity: 1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-500{--tw-text-opacity: 1;color:rgb(99 102 241 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-orange-300{--tw-text-opacity: 1;color:rgb(253 186 116 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-purple-300{--tw-text-opacity: 1;color:rgb(216 180 254 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-red-300{--tw-text-opacity: 1;color:rgb(252 165 165 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-red-400{--tw-text-opacity: 1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-rose-200{--tw-text-opacity: 1;color:rgb(254 205 211 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-rose-200\\/80{color:#fecdd3cc}#kanban-extension-root .text-rose-300{--tw-text-opacity: 1;color:rgb(253 164 175 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-rose-400{--tw-text-opacity: 1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-sky-300{--tw-text-opacity: 1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-100{--tw-text-opacity: 1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-200{--tw-text-opacity: 1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-300{--tw-text-opacity: 1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-400{--tw-text-opacity: 1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-50{--tw-text-opacity: 1;color:rgb(248 250 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-500{--tw-text-opacity: 1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-600{--tw-text-opacity: 1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-700{--tw-text-opacity: 1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-violet-300{--tw-text-opacity: 1;color:rgb(196 181 253 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-violet-400{--tw-text-opacity: 1;color:rgb(167 139 250 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-white{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-yellow-300{--tw-text-opacity: 1;color:rgb(253 224 71 / var(--tw-text-opacity, 1))}#kanban-extension-root .opacity-15{opacity:.15}#kanban-extension-root .opacity-20{opacity:.2}#kanban-extension-root .opacity-25{opacity:.25}#kanban-extension-root .opacity-60{opacity:.6}#kanban-extension-root .opacity-75{opacity:.75}#kanban-extension-root .shadow{--tw-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);--tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .shadow-2xl{--tw-shadow: 0 25px 50px -12px rgb(0 0 0 / .25);--tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .shadow-lg{--tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);--tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .shadow-md{--tw-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);--tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .ring{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .ring-1{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .ring-2{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .ring-amber-400\\/20{--tw-ring-color: rgb(251 191 36 / .2)}#kanban-extension-root .ring-amber-400\\/30{--tw-ring-color: rgb(251 191 36 / .3)}#kanban-extension-root .ring-amber-400\\/40{--tw-ring-color: rgb(251 191 36 / .4)}#kanban-extension-root .ring-amber-500\\/20{--tw-ring-color: rgb(245 158 11 / .2)}#kanban-extension-root .ring-blue-400\\/30{--tw-ring-color: rgb(96 165 250 / .3)}#kanban-extension-root .ring-blue-500\\/20{--tw-ring-color: rgb(59 130 246 / .2)}#kanban-extension-root .ring-cyan-400\\/20{--tw-ring-color: rgb(34 211 238 / .2)}#kanban-extension-root .ring-cyan-400\\/30{--tw-ring-color: rgb(34 211 238 / .3)}#kanban-extension-root .ring-emerald-400\\/20{--tw-ring-color: rgb(52 211 153 / .2)}#kanban-extension-root .ring-emerald-400\\/25{--tw-ring-color: rgb(52 211 153 / .25)}#kanban-extension-root .ring-emerald-400\\/30{--tw-ring-color: rgb(52 211 153 / .3)}#kanban-extension-root .ring-emerald-400\\/40{--tw-ring-color: rgb(52 211 153 / .4)}#kanban-extension-root .ring-emerald-500\\/15{--tw-ring-color: rgb(16 185 129 / .15)}#kanban-extension-root .ring-emerald-500\\/20{--tw-ring-color: rgb(16 185 129 / .2)}#kanban-extension-root .ring-fuchsia-400\\/20{--tw-ring-color: rgb(232 121 249 / .2)}#kanban-extension-root .ring-indigo-400\\/20{--tw-ring-color: rgb(129 140 248 / .2)}#kanban-extension-root .ring-indigo-400\\/25{--tw-ring-color: rgb(129 140 248 / .25)}#kanban-extension-root .ring-indigo-400\\/30{--tw-ring-color: rgb(129 140 248 / .3)}#kanban-extension-root .ring-indigo-400\\/40{--tw-ring-color: rgb(129 140 248 / .4)}#kanban-extension-root .ring-orange-400\\/30{--tw-ring-color: rgb(251 146 60 / .3)}#kanban-extension-root .ring-purple-400\\/30{--tw-ring-color: rgb(192 132 252 / .3)}#kanban-extension-root .ring-red-400\\/30{--tw-ring-color: rgb(248 113 113 / .3)}#kanban-extension-root .ring-red-500\\/30{--tw-ring-color: rgb(239 68 68 / .3)}#kanban-extension-root .ring-red-500\\/40{--tw-ring-color: rgb(239 68 68 / .4)}#kanban-extension-root .ring-rose-400\\/20{--tw-ring-color: rgb(251 113 133 / .2)}#kanban-extension-root .ring-rose-400\\/25{--tw-ring-color: rgb(251 113 133 / .25)}#kanban-extension-root .ring-rose-400\\/30{--tw-ring-color: rgb(251 113 133 / .3)}#kanban-extension-root .ring-rose-400\\/40{--tw-ring-color: rgb(251 113 133 / .4)}#kanban-extension-root .ring-rose-500\\/15{--tw-ring-color: rgb(244 63 94 / .15)}#kanban-extension-root .ring-rose-500\\/20{--tw-ring-color: rgb(244 63 94 / .2)}#kanban-extension-root .ring-sky-400\\/30{--tw-ring-color: rgb(56 189 248 / .3)}#kanban-extension-root .ring-slate-400\\/30{--tw-ring-color: rgb(148 163 184 / .3)}#kanban-extension-root .ring-violet-400\\/30{--tw-ring-color: rgb(167 139 250 / .3)}#kanban-extension-root .ring-violet-500\\/20{--tw-ring-color: rgb(139 92 246 / .2)}#kanban-extension-root .ring-white\\/10{--tw-ring-color: rgb(255 255 255 / .1)}#kanban-extension-root .ring-white\\/5{--tw-ring-color: rgb(255 255 255 / .05)}#kanban-extension-root .ring-yellow-400\\/30{--tw-ring-color: rgb(250 204 21 / .3)}#kanban-extension-root .blur{--tw-blur: blur(8px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}#kanban-extension-root .blur-2xl{--tw-blur: blur(40px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}#kanban-extension-root .filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}#kanban-extension-root .backdrop-blur-sm{--tw-backdrop-blur: blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}#kanban-extension-root .transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .duration-200{transition-duration:.2s}#kanban-extension-root .duration-300{transition-duration:.3s}#kanban-extension-root .duration-500{transition-duration:.5s}#kanban-extension-root .\\[color-scheme\\:dark\\]{color-scheme:dark}#kanban-extension-root{--kb-bg-900: #0a0a0c;--kb-bg-800: #101014;--kb-bg-700: #17171c;--kb-accent-blue: #0a84ff;--kb-accent-indigo: #5e5ce6;--kb-accent-violet: #bf5af2;--kb-status-todo: #8e8e93;--kb-status-progress: #0a84ff;--kb-status-review: #ff9f0a;--kb-status-done: #30d158;--kb-glow-todo: 142, 142, 147;--kb-glow-progress: 10, 132, 255;--kb-glow-review: 255, 159, 10;--kb-glow-done: 48, 209, 88;--kb-glow-waiting: 255, 204, 0;--kb-glow-blocked: 255, 69, 58;--kb-glow-neutral: 94, 92, 230;--kb-neu-raised: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 -1px 0 rgba(0, 0, 0, .4) inset, 0 18px 40px -18px rgba(0, 0, 0, .7), 0 4px 12px -6px rgba(0, 0, 0, .5);--kb-neu-raised-sm: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 -1px 0 rgba(0, 0, 0, .35) inset, 0 10px 24px -14px rgba(0, 0, 0, .6), 0 2px 6px -3px rgba(0, 0, 0, .4);--kb-neu-inset: 0 2px 6px rgba(0, 0, 0, .5) inset, 0 -1px 0 rgba(255, 255, 255, .03) inset;--kb-neu-lift: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 -1px 0 rgba(0, 0, 0, .4) inset, 0 28px 56px -20px rgba(0, 0, 0, .8), 0 10px 24px -10px rgba(0, 0, 0, .55);--kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, .3), 0 1px 3px rgba(0, 0, 0, .2);--kb-shadow-md: 0 4px 12px rgba(0, 0, 0, .35), 0 2px 4px rgba(0, 0, 0, .2);--kb-shadow-lg: 0 12px 32px rgba(0, 0, 0, .45), 0 4px 8px rgba(0, 0, 0, .25);--kb-shadow-glow: 0 0 0 1px rgba(var(--kb-glow-neutral), .25), 0 8px 24px rgba(var(--kb-glow-neutral), .18);--kb-text-display: 2.25rem;--kb-text-section: 1.25rem;--kb-text-card: .9375rem;--kb-text-body: .8125rem;--kb-text-meta: .6875rem;--kb-space-1: .5rem;--kb-space-2: 1rem;--kb-space-3: 1.5rem;--kb-space-4: 2rem;--kb-space-5: 3rem;--kb-radius-card: 20px;--kb-radius-button: 14px;--kb-radius-badge: 999px;min-height:100vh;margin:0;background:var(--kb-bg-900);color:#f5f5f7;font-family:Nunito,Inter,SF Pro Display,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.01em}#kanban-extension-root *,#kanban-extension-root *:before,#kanban-extension-root *:after{box-sizing:border-box}#kanban-extension-root h1,#kanban-extension-root h2,#kanban-extension-root h3,#kanban-extension-root h4,#kanban-extension-root h5,#kanban-extension-root h6{margin:0;font-size:inherit;font-weight:inherit}#kanban-extension-root p{margin:0}#kanban-extension-root ul,#kanban-extension-root ol{margin:0;padding:0;list-style:none}#kanban-extension-root button{margin:0;padding:0;font:inherit;color:inherit;background:transparent;border:0;cursor:pointer}#kanban-extension-root input,#kanban-extension-root textarea,#kanban-extension-root select{margin:0;font:inherit;color:inherit}#kanban-extension-root a{color:inherit;text-decoration:none}#kanban-extension-root img{display:block;max-width:100%}.kb-app{position:relative;min-height:100vh;overflow-x:hidden;background:radial-gradient(1100px 520px at 50% -12%,rgba(94,92,230,.1) 0%,transparent 62%),linear-gradient(180deg,var(--kb-bg-900) 0%,var(--kb-bg-800) 100%)}.kb-glass{background:linear-gradient(160deg,#1c1c22eb,#101014e0);backdrop-filter:blur(14px) saturate(120%);-webkit-backdrop-filter:blur(14px) saturate(120%);border:1px solid rgba(255,255,255,.06);box-shadow:var(--kb-neu-raised)}.kb-glass-sm{background:#17171cb8;backdrop-filter:blur(10px) saturate(115%);-webkit-backdrop-filter:blur(10px) saturate(115%);border:1px solid rgba(255,255,255,.05);box-shadow:var(--kb-neu-raised-sm)}.kb-inset{background:#0a0a0c99;border:1px solid rgba(255,255,255,.04);box-shadow:var(--kb-neu-inset)}.kb-gradient{background:linear-gradient(135deg,var(--kb-accent-blue) 0%,var(--kb-accent-indigo) 100%)}.kb-card{--kb-card-glow: var(--kb-glow-neutral);transition:box-shadow .3s cubic-bezier(.22,1,.36,1),border-color .3s ease}.kb-card:hover{border-color:rgba(var(--kb-card-glow),.28);box-shadow:0 1px #ffffff0f inset,0 -1px #0006 inset,0 0 0 1px rgba(var(--kb-card-glow),.16),0 16px 40px -16px rgba(var(--kb-card-glow),.28),0 6px 16px -8px #0009}.kb-btn-glow{transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s ease,filter .25s ease}.kb-btn-glow:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 0 0 1px #0a84ff59,0 10px 28px -8px #0a84ff66}.kb-add{border:1.5px dashed rgba(142,142,147,.28);background:transparent;transition:border-color .25s ease,background .25s ease,box-shadow .25s ease;position:relative;overflow:hidden}.kb-add:before{content:\"\";position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(135deg,#0a84ff1a,#5e5ce61a);opacity:0;transition:opacity .25s ease}.kb-add:hover{border-color:#0a84ff73;box-shadow:0 0 0 1px #0a84ff2e,0 6px 18px -8px #0a84ff33}.kb-add:hover:before{opacity:1}.kb-pill{transition:background .25s ease,color .25s ease,box-shadow .25s ease,transform .25s ease}.kb-pill--active{background:linear-gradient(135deg,var(--kb-accent-blue) 0%,var(--kb-accent-indigo) 100%);color:#fff;box-shadow:0 6px 18px -6px #0a84ff80,0 0 0 1px #0a84ff40}.kb-dragging{opacity:.92;transform:scale(1.04) rotate(1.5deg);box-shadow:var(--kb-shadow-glow),0 24px 48px #00000073;cursor:grabbing}.kb-drag-placeholder{opacity:0!important;pointer-events:none}.kb-drop-target{border-color:#6366f180!important;background:#6366f10f!important;box-shadow:var(--kb-shadow-glow)!important}@keyframes kb-fade-in{0%{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}.kb-fade-in{animation:kb-fade-in .2s ease-out both}.kb-delete-failed{border-color:#f43f5e80!important;box-shadow:0 0 0 1px #f43f5e4d,0 8px 24px #f43f5e33!important}@keyframes kb-delete-fade-out{0%{opacity:.6;transform:scale(1)}to{opacity:0;transform:scale(.96)}}.kb-delete-fading{animation:kb-delete-fade-out .4s ease-in both;pointer-events:none}@keyframes kb-shimmer{0%{background-position:-200% 0}to{background-position:200% 0}}.kb-skeleton{background:linear-gradient(90deg,#94a3b814 25%,#94a3b829 37%,#94a3b814 63%);background-size:200% 100%;animation:kb-shimmer 1.6s linear infinite}.kb-scroll::-webkit-scrollbar{width:6px;height:6px}.kb-scroll::-webkit-scrollbar-track{background:transparent}.kb-scroll::-webkit-scrollbar-thumb{background:#94a3b833;border-radius:9999px}.kb-scroll::-webkit-scrollbar-thumb:hover{background:#94a3b859}@keyframes kb-complete-flash{0%{box-shadow:0 0 #22c55e99;border-color:#22c55ecc}50%{box-shadow:0 0 0 6px #22c55e40;border-color:#22c55e80}to{box-shadow:0 0 #22c55e00;border-color:#94a3b81f}}.kb-complete{animation:kb-complete-flash .8s ease-out both}@keyframes kb-fail-shake{0%,to{transform:translate(0);border-color:#94a3b81f}15%{transform:translate(-4px);border-color:#f43f5eb3}30%{transform:translate(4px);border-color:#f43f5e99}45%{transform:translate(-3px);border-color:#f43f5e80}60%{transform:translate(3px);border-color:#f43f5e66}75%{transform:translate(-1px);border-color:#f43f5e4d}90%{transform:translate(1px);border-color:#f43f5e33}}.kb-failed{animation:kb-fail-shake .6s ease-in-out both}@keyframes kb-status-change{0%{transform:scale(1);box-shadow:0 0 #6366f166}50%{transform:scale(1.015);box-shadow:0 0 0 4px #6366f126}to{transform:scale(1);box-shadow:0 0 #6366f100}}.kb-status-changed{animation:kb-status-change .5s ease-out both}.kb-flip-lift{--kb-flip-accent: 99, 102, 241;box-shadow:0 0 0 1px rgba(var(--kb-flip-accent),.45),0 12px 32px rgba(var(--kb-flip-accent),.35),0 4px 8px #0000004d;border-color:rgba(var(--kb-flip-accent),.5);opacity:.92;will-change:transform}@keyframes kb-column-highlight{0%{border-color:rgba(var(--kb-col-accent),.6);box-shadow:0 0 0 1px rgba(var(--kb-col-accent),.35),0 0 24px rgba(var(--kb-col-accent),.25);background:rgba(var(--kb-col-accent),.08)}40%{border-color:rgba(var(--kb-col-accent),.45);box-shadow:0 0 0 1px rgba(var(--kb-col-accent),.25),0 0 16px rgba(var(--kb-col-accent),.18);background:rgba(var(--kb-col-accent),.05)}65%{border-color:rgba(var(--kb-col-accent),.55);box-shadow:0 0 0 1px rgba(var(--kb-col-accent),.3),0 0 20px rgba(var(--kb-col-accent),.22);background:rgba(var(--kb-col-accent),.07)}to{border-color:#94a3b81f;box-shadow:var(--kb-shadow-md);background:transparent}}.kb-column-highlight{--kb-col-accent: 99, 102, 241;animation:kb-column-highlight .7s ease-out both}@keyframes kb-sync-pulse{0%,to{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}.kb-sync-dot{animation:kb-sync-pulse 1.5s ease-in-out infinite}.kb-bento{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.kb-bento--2col{grid-template-columns:repeat(2,1fr)}.kb-bento--3col{grid-template-columns:repeat(3,1fr)}.kb-bento--4col{grid-template-columns:repeat(4,1fr)}@media (max-width: 768px){.kb-bento--2col,.kb-bento--3col,.kb-bento--4col{grid-template-columns:1fr}}.kb-bento-cell{border-radius:1.25rem;padding:1.5rem;position:relative;overflow:hidden}.kb-bento-cell:before{content:\"\";position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(160deg,rgba(255,255,255,.04) 0%,transparent 50%);pointer-events:none}@keyframes kb-page-enter{0%{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}.kb-page-enter{animation:kb-page-enter .3s ease-out both}@keyframes kb-dialog-in{0%{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}.kb-dialog-in{animation:kb-dialog-in .2s ease-out both}@keyframes kb-running-pulse{0%,to{box-shadow:0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241),.3),0 0 12px rgba(var(--kb-running-accent, 99, 102, 241),.15)}50%{box-shadow:0 0 0 2px rgba(var(--kb-running-accent, 99, 102, 241),.5),0 0 24px rgba(var(--kb-running-accent, 99, 102, 241),.3)}}.kb-running{animation:kb-running-pulse 2s ease-in-out infinite;border-color:rgba(var(--kb-running-accent, 99, 102, 241),.4)}.kb-reveal{opacity:0;transform:translateY(18px);filter:blur(6px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),filter .6s cubic-bezier(.22,1,.36,1);transition-delay:var(--kb-reveal-delay, 0ms);will-change:opacity,transform,filter}.kb-reveal--in{opacity:1;transform:translateY(0);filter:blur(0)}@media (prefers-reduced-motion: reduce){.kb-reveal{opacity:1;transform:none;filter:none;transition:none}.kb-app,.kb-card,.kb-btn-glow,.kb-pill{transition:none}}.kb-bento{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--kb-space-2);align-items:start}.kb-bento--wide{grid-column:span 2}.kb-bento--tall{grid-row:span 2}@media (max-width: 640px){.kb-bento--wide{grid-column:span 1}}#kanban-extension-root .placeholder\\:text-slate-500::-moz-placeholder{--tw-text-opacity: 1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}#kanban-extension-root .placeholder\\:text-slate-500::placeholder{--tw-text-opacity: 1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}#kanban-extension-root .placeholder\\:text-slate-600::-moz-placeholder{--tw-text-opacity: 1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}#kanban-extension-root .placeholder\\:text-slate-600::placeholder{--tw-text-opacity: 1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:-translate-y-0\\.5:hover{--tw-translate-y: -.125rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}#kanban-extension-root .hover\\:bg-blue-500\\/25:hover{background-color:#3b82f640}#kanban-extension-root .hover\\:bg-emerald-500\\/20:hover{background-color:#10b98133}#kanban-extension-root .hover\\:bg-indigo-500:hover{--tw-bg-opacity: 1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}#kanban-extension-root .hover\\:bg-indigo-500\\/20:hover{background-color:#6366f133}#kanban-extension-root .hover\\:bg-rose-500:hover{--tw-bg-opacity: 1;background-color:rgb(244 63 94 / var(--tw-bg-opacity, 1))}#kanban-extension-root .hover\\:bg-rose-500\\/10:hover{background-color:#f43f5e1a}#kanban-extension-root .hover\\:bg-rose-500\\/15:hover{background-color:#f43f5e26}#kanban-extension-root .hover\\:bg-rose-500\\/20:hover{background-color:#f43f5e33}#kanban-extension-root .hover\\:bg-rose-500\\/25:hover{background-color:#f43f5e40}#kanban-extension-root .hover\\:bg-rose-500\\/30:hover{background-color:#f43f5e4d}#kanban-extension-root .hover\\:bg-slate-800:hover{--tw-bg-opacity: 1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}#kanban-extension-root .hover\\:bg-slate-900\\/60:hover{background-color:#0f172a99}#kanban-extension-root .hover\\:bg-violet-500\\/25:hover{background-color:#8b5cf640}#kanban-extension-root .hover\\:bg-white\\/10:hover{background-color:#ffffff1a}#kanban-extension-root .hover\\:bg-white\\/5:hover{background-color:#ffffff0d}#kanban-extension-root .hover\\:text-rose-200:hover{--tw-text-opacity: 1;color:rgb(254 205 211 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-rose-400:hover{--tw-text-opacity: 1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-slate-200:hover{--tw-text-opacity: 1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-slate-300:hover{--tw-text-opacity: 1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-white:hover{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:shadow-\\[0_12px_40px_-12px_rgba\\(99\\,102\\,241\\,0\\.4\\)\\]:hover{--tw-shadow: 0 12px 40px -12px rgba(99,102,241,.4);--tw-shadow-colored: 0 12px 40px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .focus\\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}#kanban-extension-root .focus\\:ring-2:focus{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .focus\\:ring-indigo-500\\/50:focus{--tw-ring-color: rgb(99 102 241 / .5)}#kanban-extension-root .active\\:cursor-grabbing:active{cursor:grabbing}#kanban-extension-root .disabled\\:cursor-not-allowed:disabled{cursor:not-allowed}#kanban-extension-root .disabled\\:opacity-40:disabled{opacity:.4}#kanban-extension-root .disabled\\:opacity-50:disabled{opacity:.5}#kanban-extension-root .disabled\\:opacity-60:disabled{opacity:.6}#kanban-extension-root :is(.group:hover .group-hover\\:opacity-30){opacity:.3}@media (min-width: 640px){#kanban-extension-root .sm\\:inline{display:inline}#kanban-extension-root .sm\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}#kanban-extension-root .sm\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}#kanban-extension-root .sm\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}#kanban-extension-root .sm\\:p-4{padding:1rem}}@media (min-width: 768px){#kanban-extension-root .md\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (min-width: 1024px){#kanban-extension-root .lg\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}#kanban-extension-root .lg\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}#kanban-extension-root .lg\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}#kanban-extension-root .lg\\:flex-row{flex-direction:row}#kanban-extension-root .lg\\:items-end{align-items:flex-end}#kanban-extension-root .lg\\:justify-between{justify-content:space-between}#kanban-extension-root .lg\\:p-5{padding:1.25rem}}@media (min-width: 1280px){#kanban-extension-root .xl\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}}\n";const __kb_style=document.createElement('style');__kb_style.textContent=__kb_css;document.head.appendChild(__kb_style);
+const __kb_css=".\\!container{width:100%!important}.container{width:100%}@media (min-width: 640px){.\\!container{max-width:640px!important}.container{max-width:640px}}@media (min-width: 768px){.\\!container{max-width:768px!important}.container{max-width:768px}}@media (min-width: 1024px){.\\!container{max-width:1024px!important}.container{max-width:1024px}}@media (min-width: 1280px){.\\!container{max-width:1280px!important}.container{max-width:1280px}}@media (min-width: 1536px){.\\!container{max-width:1536px!important}.container{max-width:1536px}}#kanban-extension-root .visible{visibility:visible}#kanban-extension-root .invisible{visibility:hidden}#kanban-extension-root .collapse{visibility:collapse}#kanban-extension-root .fixed{position:fixed}#kanban-extension-root .absolute{position:absolute}#kanban-extension-root .relative{position:relative}#kanban-extension-root .inset-0{top:0;right:0;bottom:0;left:0}#kanban-extension-root .-right-6{right:-1.5rem}#kanban-extension-root .-top-6{top:-1.5rem}#kanban-extension-root .z-10{z-index:10}#kanban-extension-root .z-50{z-index:50}#kanban-extension-root .z-\\[80\\]{z-index:80}#kanban-extension-root .col-span-3{grid-column:span 3 / span 3}#kanban-extension-root .mb-1{margin-bottom:.25rem}#kanban-extension-root .mb-1\\.5{margin-bottom:.375rem}#kanban-extension-root .mb-2{margin-bottom:.5rem}#kanban-extension-root .mb-2\\.5{margin-bottom:.625rem}#kanban-extension-root .mb-3{margin-bottom:.75rem}#kanban-extension-root .mb-4{margin-bottom:1rem}#kanban-extension-root .mb-5{margin-bottom:1.25rem}#kanban-extension-root .ml-1{margin-left:.25rem}#kanban-extension-root .mt-0\\.5{margin-top:.125rem}#kanban-extension-root .mt-1{margin-top:.25rem}#kanban-extension-root .mt-1\\.5{margin-top:.375rem}#kanban-extension-root .mt-2{margin-top:.5rem}#kanban-extension-root .mt-3{margin-top:.75rem}#kanban-extension-root .mt-4{margin-top:1rem}#kanban-extension-root .mt-5{margin-top:1.25rem}#kanban-extension-root .mt-6{margin-top:1.5rem}#kanban-extension-root .mt-auto{margin-top:auto}#kanban-extension-root .line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}#kanban-extension-root .line-clamp-3{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3}#kanban-extension-root .line-clamp-4{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4}#kanban-extension-root .block{display:block}#kanban-extension-root .inline-block{display:inline-block}#kanban-extension-root .inline{display:inline}#kanban-extension-root .flex{display:flex}#kanban-extension-root .inline-flex{display:inline-flex}#kanban-extension-root .grid{display:grid}#kanban-extension-root .contents{display:contents}#kanban-extension-root .hidden{display:none}#kanban-extension-root .h-1{height:.25rem}#kanban-extension-root .h-1\\.5{height:.375rem}#kanban-extension-root .h-10{height:2.5rem}#kanban-extension-root .h-11{height:2.75rem}#kanban-extension-root .h-12{height:3rem}#kanban-extension-root .h-16{height:4rem}#kanban-extension-root .h-2{height:.5rem}#kanban-extension-root .h-2\\.5{height:.625rem}#kanban-extension-root .h-20{height:5rem}#kanban-extension-root .h-3{height:.75rem}#kanban-extension-root .h-3\\.5{height:.875rem}#kanban-extension-root .h-4{height:1rem}#kanban-extension-root .h-5{height:1.25rem}#kanban-extension-root .h-6{height:1.5rem}#kanban-extension-root .h-64{height:16rem}#kanban-extension-root .h-7{height:1.75rem}#kanban-extension-root .h-8{height:2rem}#kanban-extension-root .h-9{height:2.25rem}#kanban-extension-root .h-full{height:100%}#kanban-extension-root .max-h-48{max-height:12rem}#kanban-extension-root .max-h-\\[90vh\\]{max-height:90vh}#kanban-extension-root .min-h-0{min-height:0px}#kanban-extension-root .min-h-14{min-height:3.5rem}#kanban-extension-root .min-h-16{min-height:4rem}#kanban-extension-root .w-1\\.5{width:.375rem}#kanban-extension-root .w-1\\/2{width:50%}#kanban-extension-root .w-1\\/3{width:33.333333%}#kanban-extension-root .w-10{width:2.5rem}#kanban-extension-root .w-11{width:2.75rem}#kanban-extension-root .w-12{width:3rem}#kanban-extension-root .w-14{width:3.5rem}#kanban-extension-root .w-16{width:4rem}#kanban-extension-root .w-2{width:.5rem}#kanban-extension-root .w-2\\.5{width:.625rem}#kanban-extension-root .w-20{width:5rem}#kanban-extension-root .w-24{width:6rem}#kanban-extension-root .w-3{width:.75rem}#kanban-extension-root .w-3\\.5{width:.875rem}#kanban-extension-root .w-3\\/4{width:75%}#kanban-extension-root .w-32{width:8rem}#kanban-extension-root .w-4{width:1rem}#kanban-extension-root .w-40{width:10rem}#kanban-extension-root .w-5{width:1.25rem}#kanban-extension-root .w-6{width:1.5rem}#kanban-extension-root .w-64{width:16rem}#kanban-extension-root .w-7{width:1.75rem}#kanban-extension-root .w-72{width:18rem}#kanban-extension-root .w-8{width:2rem}#kanban-extension-root .w-9{width:2.25rem}#kanban-extension-root .w-\\[80vw\\]{width:80vw}#kanban-extension-root .w-full{width:100%}#kanban-extension-root .min-w-0{min-width:0px}#kanban-extension-root .min-w-6{min-width:1.5rem}#kanban-extension-root .min-w-\\[7rem\\]{min-width:7rem}#kanban-extension-root .max-w-\\[1200px\\]{max-width:1200px}#kanban-extension-root .max-w-full{max-width:100%}#kanban-extension-root .max-w-sm{max-width:24rem}#kanban-extension-root .flex-1{flex:1 1 0%}#kanban-extension-root .shrink-0{flex-shrink:0}#kanban-extension-root .transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes pulse{50%{opacity:.5}}#kanban-extension-root .animate-pulse{animation:pulse 2s cubic-bezier(.4,0,.6,1) infinite}@keyframes spin{to{transform:rotate(360deg)}}#kanban-extension-root .animate-spin{animation:spin 1s linear infinite}#kanban-extension-root .cursor-crosshair{cursor:crosshair}#kanban-extension-root .cursor-grab{cursor:grab}#kanban-extension-root .cursor-pointer{cursor:pointer}#kanban-extension-root .touch-none{touch-action:none}#kanban-extension-root .select-none{-webkit-user-select:none;-moz-user-select:none;user-select:none}#kanban-extension-root .resize-y{resize:vertical}#kanban-extension-root .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}#kanban-extension-root .grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}#kanban-extension-root .grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}#kanban-extension-root .flex-col{flex-direction:column}#kanban-extension-root .flex-wrap{flex-wrap:wrap}#kanban-extension-root .items-start{align-items:flex-start}#kanban-extension-root .items-end{align-items:flex-end}#kanban-extension-root .items-center{align-items:center}#kanban-extension-root .items-stretch{align-items:stretch}#kanban-extension-root .justify-end{justify-content:flex-end}#kanban-extension-root .justify-center{justify-content:center}#kanban-extension-root .justify-between{justify-content:space-between}#kanban-extension-root .gap-0\\.5{gap:.125rem}#kanban-extension-root .gap-1{gap:.25rem}#kanban-extension-root .gap-1\\.5{gap:.375rem}#kanban-extension-root .gap-2{gap:.5rem}#kanban-extension-root .gap-2\\.5{gap:.625rem}#kanban-extension-root .gap-3{gap:.75rem}#kanban-extension-root .gap-4{gap:1rem}#kanban-extension-root .gap-5{gap:1.25rem}#kanban-extension-root .gap-6{gap:1.5rem}#kanban-extension-root .gap-8{gap:2rem}#kanban-extension-root .gap-x-3{-moz-column-gap:.75rem;column-gap:.75rem}#kanban-extension-root .gap-y-1{row-gap:.25rem}#kanban-extension-root :is(.divide-x>:not([hidden])~:not([hidden])){--tw-divide-x-reverse: 0;border-right-width:calc(1px * var(--tw-divide-x-reverse));border-left-width:calc(1px * calc(1 - var(--tw-divide-x-reverse)))}#kanban-extension-root :is(.divide-white\\/\\[0\\.06\\]>:not([hidden])~:not([hidden])){border-color:#ffffff0f}#kanban-extension-root .overflow-auto{overflow:auto}#kanban-extension-root .overflow-hidden{overflow:hidden}#kanban-extension-root .overflow-y-auto{overflow-y:auto}#kanban-extension-root .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#kanban-extension-root .whitespace-pre-wrap{white-space:pre-wrap}#kanban-extension-root .break-words{overflow-wrap:break-word}#kanban-extension-root .rounded{border-radius:.25rem}#kanban-extension-root .rounded-2xl{border-radius:1rem}#kanban-extension-root .rounded-\\[14px\\]{border-radius:14px}#kanban-extension-root .rounded-\\[16px\\]{border-radius:16px}#kanban-extension-root .rounded-\\[18px\\]{border-radius:18px}#kanban-extension-root .rounded-full{border-radius:9999px}#kanban-extension-root .rounded-lg{border-radius:.5rem}#kanban-extension-root .rounded-md{border-radius:.375rem}#kanban-extension-root .rounded-xl{border-radius:.75rem}#kanban-extension-root .border{border-width:1px}#kanban-extension-root .border-0{border-width:0px}#kanban-extension-root .border-2{border-width:2px}#kanban-extension-root .border-t{border-top-width:1px}#kanban-extension-root .border-dashed{border-style:dashed}#kanban-extension-root .border-slate-600{--tw-border-opacity: 1;border-color:rgb(71 85 105 / var(--tw-border-opacity, 1))}#kanban-extension-root .border-white\\/10{border-color:#ffffff1a}#kanban-extension-root .border-white\\/5{border-color:#ffffff0d}#kanban-extension-root .border-t-transparent{border-top-color:transparent}#kanban-extension-root .bg-amber-400{--tw-bg-opacity: 1;background-color:rgb(251 191 36 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-amber-500{--tw-bg-opacity: 1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-amber-500\\/10{background-color:#f59e0b1a}#kanban-extension-root .bg-amber-500\\/15{background-color:#f59e0b26}#kanban-extension-root .bg-amber-500\\/20{background-color:#f59e0b33}#kanban-extension-root .bg-black\\/60{background-color:#0009}#kanban-extension-root .bg-blue-400{--tw-bg-opacity: 1;background-color:rgb(96 165 250 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-blue-400\\/70{background-color:#60a5fab3}#kanban-extension-root .bg-blue-500{--tw-bg-opacity: 1;background-color:rgb(59 130 246 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-blue-500\\/10{background-color:#3b82f61a}#kanban-extension-root .bg-blue-500\\/15{background-color:#3b82f626}#kanban-extension-root .bg-blue-500\\/20{background-color:#3b82f633}#kanban-extension-root .bg-cyan-500\\/10{background-color:#06b6d41a}#kanban-extension-root .bg-cyan-500\\/15{background-color:#06b6d426}#kanban-extension-root .bg-emerald-400{--tw-bg-opacity: 1;background-color:rgb(52 211 153 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-emerald-500{--tw-bg-opacity: 1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-emerald-500\\/10{background-color:#10b9811a}#kanban-extension-root .bg-emerald-500\\/15{background-color:#10b98126}#kanban-extension-root .bg-emerald-500\\/20{background-color:#10b98133}#kanban-extension-root .bg-emerald-500\\/\\[0\\.06\\]{background-color:#10b9810f}#kanban-extension-root .bg-fuchsia-500\\/10{background-color:#d946ef1a}#kanban-extension-root .bg-indigo-400{--tw-bg-opacity: 1;background-color:rgb(129 140 248 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-indigo-500\\/10{background-color:#6366f11a}#kanban-extension-root .bg-indigo-500\\/15{background-color:#6366f126}#kanban-extension-root .bg-indigo-500\\/20{background-color:#6366f133}#kanban-extension-root .bg-indigo-500\\/80{background-color:#6366f1cc}#kanban-extension-root .bg-orange-500\\/15{background-color:#f9731626}#kanban-extension-root .bg-purple-500\\/15{background-color:#a855f726}#kanban-extension-root .bg-red-500{--tw-bg-opacity: 1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-red-500\\/15{background-color:#ef444426}#kanban-extension-root .bg-red-600\\/15{background-color:#dc262626}#kanban-extension-root .bg-red-600\\/20{background-color:#dc262633}#kanban-extension-root .bg-rose-400{--tw-bg-opacity: 1;background-color:rgb(251 113 133 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-rose-500\\/10{background-color:#f43f5e1a}#kanban-extension-root .bg-rose-500\\/15{background-color:#f43f5e26}#kanban-extension-root .bg-rose-500\\/20{background-color:#f43f5e33}#kanban-extension-root .bg-rose-500\\/80{background-color:#f43f5ecc}#kanban-extension-root .bg-rose-500\\/\\[0\\.06\\]{background-color:#f43f5e0f}#kanban-extension-root .bg-sky-500\\/15{background-color:#0ea5e926}#kanban-extension-root .bg-slate-400{--tw-bg-opacity: 1;background-color:rgb(148 163 184 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-slate-500\\/15{background-color:#64748b26}#kanban-extension-root .bg-slate-600{--tw-bg-opacity: 1;background-color:rgb(71 85 105 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-slate-600\\/40{background-color:#47556966}#kanban-extension-root .bg-slate-600\\/60{background-color:#47556999}#kanban-extension-root .bg-slate-700\\/40{background-color:#33415566}#kanban-extension-root .bg-slate-800\\/30{background-color:#1e293b4d}#kanban-extension-root .bg-slate-800\\/40{background-color:#1e293b66}#kanban-extension-root .bg-slate-800\\/50{background-color:#1e293b80}#kanban-extension-root .bg-slate-800\\/70{background-color:#1e293bb3}#kanban-extension-root .bg-slate-900{--tw-bg-opacity: 1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-slate-900\\/40{background-color:#0f172a66}#kanban-extension-root .bg-slate-900\\/60{background-color:#0f172a99}#kanban-extension-root .bg-slate-950\\/70{background-color:#020617b3}#kanban-extension-root .bg-slate-950\\/85{background-color:#020617d9}#kanban-extension-root .bg-transparent{background-color:transparent}#kanban-extension-root .bg-violet-400{--tw-bg-opacity: 1;background-color:rgb(167 139 250 / var(--tw-bg-opacity, 1))}#kanban-extension-root .bg-violet-500\\/10{background-color:#8b5cf61a}#kanban-extension-root .bg-violet-500\\/15{background-color:#8b5cf626}#kanban-extension-root .bg-white\\/10{background-color:#ffffff1a}#kanban-extension-root .bg-white\\/5{background-color:#ffffff0d}#kanban-extension-root .bg-white\\/\\[0\\.02\\]{background-color:#ffffff05}#kanban-extension-root .bg-white\\/\\[0\\.03\\]{background-color:#ffffff08}#kanban-extension-root .bg-white\\/\\[0\\.04\\]{background-color:#ffffff0a}#kanban-extension-root .bg-yellow-500\\/15{background-color:#eab30826}#kanban-extension-root .bg-gradient-to-br{background-image:linear-gradient(to bottom right,var(--tw-gradient-stops))}#kanban-extension-root .bg-gradient-to-r{background-image:linear-gradient(to right,var(--tw-gradient-stops))}#kanban-extension-root .from-\\[\\#0A84FF\\]{--tw-gradient-from: #0A84FF var(--tw-gradient-from-position);--tw-gradient-to: rgb(10 132 255 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-amber-500{--tw-gradient-from: #f59e0b var(--tw-gradient-from-position);--tw-gradient-to: rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-blue-500{--tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);--tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-cyan-500{--tw-gradient-from: #06b6d4 var(--tw-gradient-from-position);--tw-gradient-to: rgb(6 182 212 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-emerald-500{--tw-gradient-from: #10b981 var(--tw-gradient-from-position);--tw-gradient-to: rgb(16 185 129 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-pink-500{--tw-gradient-from: #ec4899 var(--tw-gradient-from-position);--tw-gradient-to: rgb(236 72 153 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-rose-500{--tw-gradient-from: #f43f5e var(--tw-gradient-from-position);--tw-gradient-to: rgb(244 63 94 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .from-violet-500{--tw-gradient-from: #8b5cf6 var(--tw-gradient-from-position);--tw-gradient-to: rgb(139 92 246 / 0) var(--tw-gradient-to-position);--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to)}#kanban-extension-root .to-\\[\\#5E5CE6\\]{--tw-gradient-to: #5E5CE6 var(--tw-gradient-to-position)}#kanban-extension-root .to-blue-500{--tw-gradient-to: #3b82f6 var(--tw-gradient-to-position)}#kanban-extension-root .to-indigo-500{--tw-gradient-to: #6366f1 var(--tw-gradient-to-position)}#kanban-extension-root .to-indigo-600{--tw-gradient-to: #4f46e5 var(--tw-gradient-to-position)}#kanban-extension-root .to-orange-500{--tw-gradient-to: #f97316 var(--tw-gradient-to-position)}#kanban-extension-root .to-orange-600{--tw-gradient-to: #ea580c var(--tw-gradient-to-position)}#kanban-extension-root .to-purple-500{--tw-gradient-to: #a855f7 var(--tw-gradient-to-position)}#kanban-extension-root .to-purple-600{--tw-gradient-to: #9333ea var(--tw-gradient-to-position)}#kanban-extension-root .to-rose-400{--tw-gradient-to: #fb7185 var(--tw-gradient-to-position)}#kanban-extension-root .to-rose-500{--tw-gradient-to: #f43f5e var(--tw-gradient-to-position)}#kanban-extension-root .to-rose-600{--tw-gradient-to: #e11d48 var(--tw-gradient-to-position)}#kanban-extension-root .to-sky-600{--tw-gradient-to: #0284c7 var(--tw-gradient-to-position)}#kanban-extension-root .to-teal-500{--tw-gradient-to: #14b8a6 var(--tw-gradient-to-position)}#kanban-extension-root .to-teal-600{--tw-gradient-to: #0d9488 var(--tw-gradient-to-position)}#kanban-extension-root .fill-emerald-300{fill:#6ee7b7}#kanban-extension-root .fill-fuchsia-300{fill:#f0abfc}#kanban-extension-root .fill-slate-400{fill:#94a3b8}#kanban-extension-root .p-1{padding:.25rem}#kanban-extension-root .p-1\\.5{padding:.375rem}#kanban-extension-root .p-2{padding:.5rem}#kanban-extension-root .p-2\\.5{padding:.625rem}#kanban-extension-root .p-3{padding:.75rem}#kanban-extension-root .p-3\\.5{padding:.875rem}#kanban-extension-root .p-4{padding:1rem}#kanban-extension-root .p-5{padding:1.25rem}#kanban-extension-root .p-6{padding:1.5rem}#kanban-extension-root .p-8{padding:2rem}#kanban-extension-root .px-1{padding-left:.25rem;padding-right:.25rem}#kanban-extension-root .px-1\\.5{padding-left:.375rem;padding-right:.375rem}#kanban-extension-root .px-2{padding-left:.5rem;padding-right:.5rem}#kanban-extension-root .px-2\\.5{padding-left:.625rem;padding-right:.625rem}#kanban-extension-root .px-3{padding-left:.75rem;padding-right:.75rem}#kanban-extension-root .px-3\\.5{padding-left:.875rem;padding-right:.875rem}#kanban-extension-root .px-4{padding-left:1rem;padding-right:1rem}#kanban-extension-root .px-5{padding-left:1.25rem;padding-right:1.25rem}#kanban-extension-root .px-6{padding-left:1.5rem;padding-right:1.5rem}#kanban-extension-root .py-0\\.5{padding-top:.125rem;padding-bottom:.125rem}#kanban-extension-root .py-1{padding-top:.25rem;padding-bottom:.25rem}#kanban-extension-root .py-1\\.5{padding-top:.375rem;padding-bottom:.375rem}#kanban-extension-root .py-2{padding-top:.5rem;padding-bottom:.5rem}#kanban-extension-root .py-2\\.5{padding-top:.625rem;padding-bottom:.625rem}#kanban-extension-root .py-3{padding-top:.75rem;padding-bottom:.75rem}#kanban-extension-root .py-5{padding-top:1.25rem;padding-bottom:1.25rem}#kanban-extension-root .py-6{padding-top:1.5rem;padding-bottom:1.5rem}#kanban-extension-root .py-8{padding-top:2rem;padding-bottom:2rem}#kanban-extension-root .pr-0\\.5{padding-right:.125rem}#kanban-extension-root .pr-1{padding-right:.25rem}#kanban-extension-root .pt-3{padding-top:.75rem}#kanban-extension-root .pt-4{padding-top:1rem}#kanban-extension-root .text-left{text-align:left}#kanban-extension-root .text-center{text-align:center}#kanban-extension-root .text-right{text-align:right}#kanban-extension-root .font-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}#kanban-extension-root .text-2xl{font-size:1.5rem;line-height:2rem}#kanban-extension-root .text-3xl{font-size:1.875rem;line-height:2.25rem}#kanban-extension-root .text-\\[0\\.6875rem\\]{font-size:.6875rem}#kanban-extension-root .text-\\[0\\.8125rem\\]{font-size:.8125rem}#kanban-extension-root .text-\\[0\\.9375rem\\]{font-size:.9375rem}#kanban-extension-root .text-\\[10px\\]{font-size:10px}#kanban-extension-root .text-\\[11px\\]{font-size:11px}#kanban-extension-root .text-\\[2\\.5rem\\]{font-size:2.5rem}#kanban-extension-root .text-\\[9px\\]{font-size:9px}#kanban-extension-root .text-lg{font-size:1.125rem;line-height:1.75rem}#kanban-extension-root .text-sm{font-size:.875rem;line-height:1.25rem}#kanban-extension-root .text-xs{font-size:.75rem;line-height:1rem}#kanban-extension-root .font-bold{font-weight:700}#kanban-extension-root .font-medium{font-weight:500}#kanban-extension-root .font-normal{font-weight:400}#kanban-extension-root .font-semibold{font-weight:600}#kanban-extension-root .uppercase{text-transform:uppercase}#kanban-extension-root .normal-case{text-transform:none}#kanban-extension-root .tabular-nums{--tw-numeric-spacing: tabular-nums;font-variant-numeric:var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)}#kanban-extension-root .leading-\\[1\\.05\\]{line-height:1.05}#kanban-extension-root .leading-relaxed{line-height:1.625}#kanban-extension-root .leading-snug{line-height:1.375}#kanban-extension-root .tracking-\\[-0\\.025em\\]{letter-spacing:-.025em}#kanban-extension-root .tracking-\\[0\\.14em\\]{letter-spacing:.14em}#kanban-extension-root .tracking-\\[0\\.16em\\]{letter-spacing:.16em}#kanban-extension-root .tracking-\\[0\\.24em\\]{letter-spacing:.24em}#kanban-extension-root .tracking-normal{letter-spacing:0em}#kanban-extension-root .tracking-tight{letter-spacing:-.025em}#kanban-extension-root .tracking-wide{letter-spacing:.025em}#kanban-extension-root .tracking-wider{letter-spacing:.05em}#kanban-extension-root .text-amber-200{--tw-text-opacity: 1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-amber-300{--tw-text-opacity: 1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-amber-400{--tw-text-opacity: 1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-blue-300{--tw-text-opacity: 1;color:rgb(147 197 253 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-blue-400{--tw-text-opacity: 1;color:rgb(96 165 250 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-cyan-300{--tw-text-opacity: 1;color:rgb(103 232 249 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-emerald-200\\/80{color:#a7f3d0cc}#kanban-extension-root .text-emerald-300{--tw-text-opacity: 1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-emerald-400{--tw-text-opacity: 1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-fuchsia-300{--tw-text-opacity: 1;color:rgb(240 171 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-200{--tw-text-opacity: 1;color:rgb(199 210 254 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-300{--tw-text-opacity: 1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-400{--tw-text-opacity: 1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-indigo-500{--tw-text-opacity: 1;color:rgb(99 102 241 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-orange-300{--tw-text-opacity: 1;color:rgb(253 186 116 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-purple-300{--tw-text-opacity: 1;color:rgb(216 180 254 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-red-300{--tw-text-opacity: 1;color:rgb(252 165 165 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-red-400{--tw-text-opacity: 1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-rose-200{--tw-text-opacity: 1;color:rgb(254 205 211 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-rose-200\\/80{color:#fecdd3cc}#kanban-extension-root .text-rose-300{--tw-text-opacity: 1;color:rgb(253 164 175 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-rose-400{--tw-text-opacity: 1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-sky-300{--tw-text-opacity: 1;color:rgb(125 211 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-100{--tw-text-opacity: 1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-200{--tw-text-opacity: 1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-300{--tw-text-opacity: 1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-400{--tw-text-opacity: 1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-50{--tw-text-opacity: 1;color:rgb(248 250 252 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-500{--tw-text-opacity: 1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-600{--tw-text-opacity: 1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-slate-700{--tw-text-opacity: 1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-violet-300{--tw-text-opacity: 1;color:rgb(196 181 253 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-violet-400{--tw-text-opacity: 1;color:rgb(167 139 250 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-white{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}#kanban-extension-root .text-yellow-300{--tw-text-opacity: 1;color:rgb(253 224 71 / var(--tw-text-opacity, 1))}#kanban-extension-root .opacity-20{opacity:.2}#kanban-extension-root .opacity-25{opacity:.25}#kanban-extension-root .opacity-60{opacity:.6}#kanban-extension-root .opacity-75{opacity:.75}#kanban-extension-root .shadow{--tw-shadow: 0 1px 3px 0 rgb(0 0 0 / .1), 0 1px 2px -1px rgb(0 0 0 / .1);--tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .shadow-2xl{--tw-shadow: 0 25px 50px -12px rgb(0 0 0 / .25);--tw-shadow-colored: 0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .shadow-lg{--tw-shadow: 0 10px 15px -3px rgb(0 0 0 / .1), 0 4px 6px -4px rgb(0 0 0 / .1);--tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .shadow-md{--tw-shadow: 0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);--tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .ring{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .ring-1{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .ring-2{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .ring-amber-400\\/20{--tw-ring-color: rgb(251 191 36 / .2)}#kanban-extension-root .ring-amber-400\\/30{--tw-ring-color: rgb(251 191 36 / .3)}#kanban-extension-root .ring-amber-400\\/40{--tw-ring-color: rgb(251 191 36 / .4)}#kanban-extension-root .ring-amber-500\\/20{--tw-ring-color: rgb(245 158 11 / .2)}#kanban-extension-root .ring-blue-400\\/30{--tw-ring-color: rgb(96 165 250 / .3)}#kanban-extension-root .ring-blue-500\\/20{--tw-ring-color: rgb(59 130 246 / .2)}#kanban-extension-root .ring-cyan-400\\/20{--tw-ring-color: rgb(34 211 238 / .2)}#kanban-extension-root .ring-cyan-400\\/30{--tw-ring-color: rgb(34 211 238 / .3)}#kanban-extension-root .ring-emerald-400\\/20{--tw-ring-color: rgb(52 211 153 / .2)}#kanban-extension-root .ring-emerald-400\\/25{--tw-ring-color: rgb(52 211 153 / .25)}#kanban-extension-root .ring-emerald-400\\/30{--tw-ring-color: rgb(52 211 153 / .3)}#kanban-extension-root .ring-emerald-400\\/40{--tw-ring-color: rgb(52 211 153 / .4)}#kanban-extension-root .ring-emerald-500\\/15{--tw-ring-color: rgb(16 185 129 / .15)}#kanban-extension-root .ring-emerald-500\\/20{--tw-ring-color: rgb(16 185 129 / .2)}#kanban-extension-root .ring-fuchsia-400\\/20{--tw-ring-color: rgb(232 121 249 / .2)}#kanban-extension-root .ring-indigo-400\\/20{--tw-ring-color: rgb(129 140 248 / .2)}#kanban-extension-root .ring-indigo-400\\/25{--tw-ring-color: rgb(129 140 248 / .25)}#kanban-extension-root .ring-indigo-400\\/30{--tw-ring-color: rgb(129 140 248 / .3)}#kanban-extension-root .ring-indigo-400\\/40{--tw-ring-color: rgb(129 140 248 / .4)}#kanban-extension-root .ring-orange-400\\/30{--tw-ring-color: rgb(251 146 60 / .3)}#kanban-extension-root .ring-purple-400\\/30{--tw-ring-color: rgb(192 132 252 / .3)}#kanban-extension-root .ring-red-400\\/30{--tw-ring-color: rgb(248 113 113 / .3)}#kanban-extension-root .ring-red-500\\/30{--tw-ring-color: rgb(239 68 68 / .3)}#kanban-extension-root .ring-red-500\\/40{--tw-ring-color: rgb(239 68 68 / .4)}#kanban-extension-root .ring-rose-400\\/20{--tw-ring-color: rgb(251 113 133 / .2)}#kanban-extension-root .ring-rose-400\\/25{--tw-ring-color: rgb(251 113 133 / .25)}#kanban-extension-root .ring-rose-400\\/30{--tw-ring-color: rgb(251 113 133 / .3)}#kanban-extension-root .ring-rose-400\\/40{--tw-ring-color: rgb(251 113 133 / .4)}#kanban-extension-root .ring-rose-500\\/15{--tw-ring-color: rgb(244 63 94 / .15)}#kanban-extension-root .ring-rose-500\\/20{--tw-ring-color: rgb(244 63 94 / .2)}#kanban-extension-root .ring-sky-400\\/30{--tw-ring-color: rgb(56 189 248 / .3)}#kanban-extension-root .ring-slate-400\\/30{--tw-ring-color: rgb(148 163 184 / .3)}#kanban-extension-root .ring-violet-400\\/30{--tw-ring-color: rgb(167 139 250 / .3)}#kanban-extension-root .ring-violet-500\\/20{--tw-ring-color: rgb(139 92 246 / .2)}#kanban-extension-root .ring-white\\/10{--tw-ring-color: rgb(255 255 255 / .1)}#kanban-extension-root .ring-white\\/5{--tw-ring-color: rgb(255 255 255 / .05)}#kanban-extension-root .ring-white\\/\\[0\\.06\\]{--tw-ring-color: rgb(255 255 255 / .06)}#kanban-extension-root .ring-white\\/\\[0\\.08\\]{--tw-ring-color: rgb(255 255 255 / .08)}#kanban-extension-root .ring-yellow-400\\/30{--tw-ring-color: rgb(250 204 21 / .3)}#kanban-extension-root .blur{--tw-blur: blur(8px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}#kanban-extension-root .blur-2xl{--tw-blur: blur(40px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}#kanban-extension-root .filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}#kanban-extension-root .backdrop-blur-sm{--tw-backdrop-blur: blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}#kanban-extension-root .transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .transition-colors{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}#kanban-extension-root .duration-200{transition-duration:.2s}#kanban-extension-root .duration-300{transition-duration:.3s}#kanban-extension-root .duration-500{transition-duration:.5s}#kanban-extension-root .\\[color-scheme\\:dark\\]{color-scheme:dark}#kanban-extension-root{--kb-bg-900: #0a0a0c;--kb-bg-800: #101014;--kb-bg-700: #17171c;--kb-accent-blue: #0a84ff;--kb-accent-indigo: #5e5ce6;--kb-accent-violet: #bf5af2;--kb-status-todo: #8e8e93;--kb-status-progress: #0a84ff;--kb-status-review: #ff9f0a;--kb-status-done: #30d158;--kb-glow-todo: 142, 142, 147;--kb-glow-progress: 10, 132, 255;--kb-glow-review: 255, 159, 10;--kb-glow-done: 48, 209, 88;--kb-glow-waiting: 255, 204, 0;--kb-glow-blocked: 255, 69, 58;--kb-glow-neutral: 94, 92, 230;--kb-neu-raised: 0 1px 2px rgba(0, 0, 0, .25), 0 10px 30px -16px rgba(0, 0, 0, .5);--kb-neu-raised-sm: 0 1px 2px rgba(0, 0, 0, .2);--kb-neu-inset: inset 0 1px 3px rgba(0, 0, 0, .35);--kb-neu-lift: 0 1px 0 rgba(255, 255, 255, .06) inset, 0 -1px 0 rgba(0, 0, 0, .4) inset, 0 28px 56px -20px rgba(0, 0, 0, .8), 0 10px 24px -10px rgba(0, 0, 0, .55);--kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, .3), 0 1px 3px rgba(0, 0, 0, .2);--kb-shadow-md: 0 4px 12px rgba(0, 0, 0, .35), 0 2px 4px rgba(0, 0, 0, .2);--kb-shadow-lg: 0 12px 32px rgba(0, 0, 0, .45), 0 4px 8px rgba(0, 0, 0, .25);--kb-shadow-glow: 0 0 0 1px rgba(var(--kb-glow-neutral), .25), 0 8px 24px rgba(var(--kb-glow-neutral), .18);--kb-text-display: 2.5rem;--kb-text-section: 1.375rem;--kb-text-card: .9375rem;--kb-text-body: .875rem;--kb-text-meta: .6875rem;--kb-space-1: .5rem;--kb-space-2: 1.25rem;--kb-space-3: 2rem;--kb-space-4: 3rem;--kb-space-5: 4.5rem;--kb-radius-card: 20px;--kb-radius-button: 14px;--kb-radius-badge: 999px;min-height:100vh;margin:0;background:var(--kb-bg-900);color:#f5f5f7;font-family:Nunito,Inter,SF Pro Display,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.01em}#kanban-extension-root *,#kanban-extension-root *:before,#kanban-extension-root *:after{box-sizing:border-box}#kanban-extension-root h1,#kanban-extension-root h2,#kanban-extension-root h3,#kanban-extension-root h4,#kanban-extension-root h5,#kanban-extension-root h6{margin:0;font-size:inherit;font-weight:inherit}#kanban-extension-root p{margin:0}#kanban-extension-root ul,#kanban-extension-root ol{margin:0;padding:0;list-style:none}#kanban-extension-root button{margin:0;padding:0;font:inherit;color:inherit;background:transparent;border:0;cursor:pointer}#kanban-extension-root input,#kanban-extension-root textarea,#kanban-extension-root select{margin:0;font:inherit;color:inherit}#kanban-extension-root a{color:inherit;text-decoration:none}#kanban-extension-root img{display:block;max-width:100%}.kb-app{position:relative;min-height:100vh;overflow-x:hidden;background:radial-gradient(1100px 520px at 50% -12%,rgba(94,92,230,.1) 0%,transparent 62%),linear-gradient(180deg,var(--kb-bg-900) 0%,var(--kb-bg-800) 100%)}.kb-glass{background:#16161b99;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.07);box-shadow:var(--kb-neu-raised)}.kb-glass-sm{background:#ffffff08;border:1px solid rgba(255,255,255,.06);box-shadow:var(--kb-neu-raised-sm)}.kb-inset{background:#0a0a0c99;border:1px solid rgba(255,255,255,.04);box-shadow:var(--kb-neu-inset)}.kb-gradient{background:linear-gradient(135deg,var(--kb-accent-blue) 0%,var(--kb-accent-indigo) 100%)}.kb-card{--kb-card-glow: var(--kb-glow-neutral);transition:box-shadow .3s cubic-bezier(.22,1,.36,1),border-color .3s ease}.kb-card:hover{border-color:rgba(var(--kb-card-glow),.22);box-shadow:0 0 0 1px rgba(var(--kb-card-glow),.12),0 12px 32px -16px rgba(var(--kb-card-glow),.22),0 4px 12px -8px #00000080}.kb-btn-glow{transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s ease,filter .25s ease}.kb-btn-glow:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 0 0 1px #0a84ff59,0 10px 28px -8px #0a84ff66}.kb-add{border:1.5px dashed rgba(142,142,147,.28);background:transparent;transition:border-color .25s ease,background .25s ease,box-shadow .25s ease;position:relative;overflow:hidden}.kb-add:before{content:\"\";position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(135deg,#0a84ff1a,#5e5ce61a);opacity:0;transition:opacity .25s ease}.kb-add:hover{border-color:#0a84ff73;box-shadow:0 0 0 1px #0a84ff2e,0 6px 18px -8px #0a84ff33}.kb-add:hover:before{opacity:1}.kb-pill{transition:background .25s ease,color .25s ease,box-shadow .25s ease,transform .25s ease}.kb-pill--active{background:linear-gradient(135deg,var(--kb-accent-blue) 0%,var(--kb-accent-indigo) 100%);color:#fff;box-shadow:0 4px 14px -6px #0a84ff66}.kb-dragging{opacity:.92;transform:scale(1.04) rotate(1.5deg);box-shadow:var(--kb-shadow-glow),0 24px 48px #00000073;cursor:grabbing}.kb-drag-placeholder{opacity:0!important;pointer-events:none}.kb-drop-target{border-color:#6366f180!important;background:#6366f10f!important;box-shadow:var(--kb-shadow-glow)!important}@keyframes kb-fade-in{0%{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}.kb-fade-in{animation:kb-fade-in .2s ease-out both}.kb-delete-failed{border-color:#f43f5e80!important;box-shadow:0 0 0 1px #f43f5e4d,0 8px 24px #f43f5e33!important}@keyframes kb-delete-fade-out{0%{opacity:.6;transform:scale(1)}to{opacity:0;transform:scale(.96)}}.kb-delete-fading{animation:kb-delete-fade-out .4s ease-in both;pointer-events:none}@keyframes kb-shimmer{0%{background-position:-200% 0}to{background-position:200% 0}}.kb-skeleton{background:linear-gradient(90deg,#94a3b814 25%,#94a3b829 37%,#94a3b814 63%);background-size:200% 100%;animation:kb-shimmer 1.6s linear infinite}.kb-scroll::-webkit-scrollbar{width:6px;height:6px}.kb-scroll::-webkit-scrollbar-track{background:transparent}.kb-scroll::-webkit-scrollbar-thumb{background:#94a3b833;border-radius:9999px}.kb-scroll::-webkit-scrollbar-thumb:hover{background:#94a3b859}@keyframes kb-complete-flash{0%{box-shadow:0 0 #22c55e99;border-color:#22c55ecc}50%{box-shadow:0 0 0 6px #22c55e40;border-color:#22c55e80}to{box-shadow:0 0 #22c55e00;border-color:#94a3b81f}}.kb-complete{animation:kb-complete-flash .8s ease-out both}@keyframes kb-fail-shake{0%,to{transform:translate(0);border-color:#94a3b81f}15%{transform:translate(-4px);border-color:#f43f5eb3}30%{transform:translate(4px);border-color:#f43f5e99}45%{transform:translate(-3px);border-color:#f43f5e80}60%{transform:translate(3px);border-color:#f43f5e66}75%{transform:translate(-1px);border-color:#f43f5e4d}90%{transform:translate(1px);border-color:#f43f5e33}}.kb-failed{animation:kb-fail-shake .6s ease-in-out both}@keyframes kb-status-change{0%{transform:scale(1);box-shadow:0 0 #6366f166}50%{transform:scale(1.015);box-shadow:0 0 0 4px #6366f126}to{transform:scale(1);box-shadow:0 0 #6366f100}}.kb-status-changed{animation:kb-status-change .5s ease-out both}.kb-flip-lift{--kb-flip-accent: 99, 102, 241;box-shadow:0 0 0 1px rgba(var(--kb-flip-accent),.45),0 12px 32px rgba(var(--kb-flip-accent),.35),0 4px 8px #0000004d;border-color:rgba(var(--kb-flip-accent),.5);opacity:.92;will-change:transform}@keyframes kb-column-highlight{0%{border-color:rgba(var(--kb-col-accent),.6);box-shadow:0 0 0 1px rgba(var(--kb-col-accent),.35),0 0 24px rgba(var(--kb-col-accent),.25);background:rgba(var(--kb-col-accent),.08)}40%{border-color:rgba(var(--kb-col-accent),.45);box-shadow:0 0 0 1px rgba(var(--kb-col-accent),.25),0 0 16px rgba(var(--kb-col-accent),.18);background:rgba(var(--kb-col-accent),.05)}65%{border-color:rgba(var(--kb-col-accent),.55);box-shadow:0 0 0 1px rgba(var(--kb-col-accent),.3),0 0 20px rgba(var(--kb-col-accent),.22);background:rgba(var(--kb-col-accent),.07)}to{border-color:#94a3b81f;box-shadow:var(--kb-shadow-md);background:transparent}}.kb-column-highlight{--kb-col-accent: 99, 102, 241;animation:kb-column-highlight .7s ease-out both}@keyframes kb-sync-pulse{0%,to{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}.kb-sync-dot{animation:kb-sync-pulse 1.5s ease-in-out infinite}@keyframes kb-page-enter{0%{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}.kb-page-enter{animation:kb-page-enter .3s ease-out both}@keyframes kb-dialog-in{0%{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}.kb-dialog-in{animation:kb-dialog-in .2s ease-out both}@keyframes kb-running-pulse{0%,to{box-shadow:0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241),.3),0 0 12px rgba(var(--kb-running-accent, 99, 102, 241),.15)}50%{box-shadow:0 0 0 2px rgba(var(--kb-running-accent, 99, 102, 241),.5),0 0 24px rgba(var(--kb-running-accent, 99, 102, 241),.3)}}.kb-running{animation:kb-running-pulse 2s ease-in-out infinite;border-color:rgba(var(--kb-running-accent, 99, 102, 241),.4)}.kb-reveal{opacity:0;transform:translateY(18px);filter:blur(6px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),filter .6s cubic-bezier(.22,1,.36,1);transition-delay:var(--kb-reveal-delay, 0ms);will-change:opacity,transform,filter}.kb-reveal--in{opacity:1;transform:translateY(0);filter:blur(0)}@media (prefers-reduced-motion: reduce){.kb-reveal{opacity:1;transform:none;filter:none;transition:none}.kb-app,.kb-card,.kb-btn-glow,.kb-pill{transition:none}}#kanban-extension-root .placeholder\\:text-slate-500::-moz-placeholder{--tw-text-opacity: 1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}#kanban-extension-root .placeholder\\:text-slate-500::placeholder{--tw-text-opacity: 1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}#kanban-extension-root .placeholder\\:text-slate-600::-moz-placeholder{--tw-text-opacity: 1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}#kanban-extension-root .placeholder\\:text-slate-600::placeholder{--tw-text-opacity: 1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:-translate-y-0\\.5:hover{--tw-translate-y: -.125rem;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skew(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}#kanban-extension-root .hover\\:bg-blue-500\\/25:hover{background-color:#3b82f640}#kanban-extension-root .hover\\:bg-emerald-500\\/20:hover{background-color:#10b98133}#kanban-extension-root .hover\\:bg-indigo-500:hover{--tw-bg-opacity: 1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}#kanban-extension-root .hover\\:bg-indigo-500\\/20:hover{background-color:#6366f133}#kanban-extension-root .hover\\:bg-rose-500:hover{--tw-bg-opacity: 1;background-color:rgb(244 63 94 / var(--tw-bg-opacity, 1))}#kanban-extension-root .hover\\:bg-rose-500\\/10:hover{background-color:#f43f5e1a}#kanban-extension-root .hover\\:bg-rose-500\\/15:hover{background-color:#f43f5e26}#kanban-extension-root .hover\\:bg-rose-500\\/20:hover{background-color:#f43f5e33}#kanban-extension-root .hover\\:bg-rose-500\\/25:hover{background-color:#f43f5e40}#kanban-extension-root .hover\\:bg-rose-500\\/30:hover{background-color:#f43f5e4d}#kanban-extension-root .hover\\:bg-slate-800:hover{--tw-bg-opacity: 1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}#kanban-extension-root .hover\\:bg-slate-900\\/60:hover{background-color:#0f172a99}#kanban-extension-root .hover\\:bg-violet-500\\/25:hover{background-color:#8b5cf640}#kanban-extension-root .hover\\:bg-white\\/10:hover{background-color:#ffffff1a}#kanban-extension-root .hover\\:bg-white\\/5:hover{background-color:#ffffff0d}#kanban-extension-root .hover\\:text-rose-200:hover{--tw-text-opacity: 1;color:rgb(254 205 211 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-rose-400:hover{--tw-text-opacity: 1;color:rgb(251 113 133 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-slate-200:hover{--tw-text-opacity: 1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-slate-300:hover{--tw-text-opacity: 1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:text-white:hover{--tw-text-opacity: 1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}#kanban-extension-root .hover\\:shadow-\\[0_12px_40px_-12px_rgba\\(99\\,102\\,241\\,0\\.4\\)\\]:hover{--tw-shadow: 0 12px 40px -12px rgba(99,102,241,.4);--tw-shadow-colored: 0 12px 40px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000),var(--tw-ring-shadow, 0 0 #0000),var(--tw-shadow)}#kanban-extension-root .focus\\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}#kanban-extension-root .focus\\:ring-2:focus{--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow, 0 0 #0000)}#kanban-extension-root .focus\\:ring-indigo-500\\/50:focus{--tw-ring-color: rgb(99 102 241 / .5)}#kanban-extension-root .active\\:cursor-grabbing:active{cursor:grabbing}#kanban-extension-root .disabled\\:cursor-not-allowed:disabled{cursor:not-allowed}#kanban-extension-root .disabled\\:opacity-40:disabled{opacity:.4}#kanban-extension-root .disabled\\:opacity-50:disabled{opacity:.5}#kanban-extension-root .disabled\\:opacity-60:disabled{opacity:.6}@media (min-width: 640px){#kanban-extension-root .sm\\:inline{display:inline}#kanban-extension-root .sm\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}#kanban-extension-root .sm\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}#kanban-extension-root .sm\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}#kanban-extension-root .sm\\:p-6{padding:1.5rem}}@media (min-width: 768px){#kanban-extension-root .md\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (min-width: 1024px){#kanban-extension-root .lg\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}#kanban-extension-root .lg\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}#kanban-extension-root .lg\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}#kanban-extension-root .lg\\:flex-row{flex-direction:row}#kanban-extension-root .lg\\:items-end{align-items:flex-end}#kanban-extension-root .lg\\:justify-between{justify-content:space-between}#kanban-extension-root .lg\\:p-8{padding:2rem}}@media (min-width: 1280px){#kanban-extension-root .xl\\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}}\n";const __kb_style=document.createElement('style');__kb_style.textContent=__kb_css;document.head.appendChild(__kb_style);
 var Ym = Object.defineProperty;
 var Qm = (e, t, n) => t in e ? Ym(e, t, { enumerable: !0, configurable: !0, writable: !0, value: n }) : e[t] = n;
 var Me = (e, t, n) => Qm(e, typeof t != "symbol" ? t + "" : t, n);
@@ -591,7 +591,7 @@ function Oa(e, t, n, r) {
   var s = Ve.hasOwnProperty(t) ? Ve[t] : null;
   (s !== null ? s.type !== 0 : r || !(2 < t.length) || t[0] !== "o" && t[0] !== "O" || t[1] !== "n" && t[1] !== "N") && (b0(t, n, s, r) && (n = null), r || s === null ? w0(t) && (n === null ? e.removeAttribute(t) : e.setAttribute(t, "" + n)) : s.mustUseProperty ? e[s.propertyName] = n === null ? s.type === 3 ? !1 : "" : n : (t = s.attributeName, r = s.attributeNamespace, n === null ? e.removeAttribute(t) : (s = s.type, n = s === 3 || s === 4 && n === !0 ? "" : "" + n, r ? e.setAttributeNS(r, t, n) : e.setAttribute(t, n))));
 }
-var cn = v0.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED, ll = Symbol.for("react.element"), pr = Symbol.for("react.portal"), mr = Symbol.for("react.fragment"), La = Symbol.for("react.strict_mode"), Ai = Symbol.for("react.profiler"), nf = Symbol.for("react.provider"), rf = Symbol.for("react.context"), $a = Symbol.for("react.forward_ref"), Ti = Symbol.for("react.suspense"), Mi = Symbol.for("react.suspense_list"), za = Symbol.for("react.memo"), xn = Symbol.for("react.lazy"), sf = Symbol.for("react.offscreen"), Kc = Symbol.iterator;
+var an = v0.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED, ll = Symbol.for("react.element"), pr = Symbol.for("react.portal"), mr = Symbol.for("react.fragment"), La = Symbol.for("react.strict_mode"), Ai = Symbol.for("react.profiler"), nf = Symbol.for("react.provider"), rf = Symbol.for("react.context"), $a = Symbol.for("react.forward_ref"), Ti = Symbol.for("react.suspense"), Mi = Symbol.for("react.suspense_list"), za = Symbol.for("react.memo"), hn = Symbol.for("react.lazy"), sf = Symbol.for("react.offscreen"), Kc = Symbol.iterator;
 function Zr(e) {
   return e === null || typeof e != "object" ? null : (e = Kc && e[Kc] || e["@@iterator"], typeof e == "function" ? e : null);
 }
@@ -712,7 +712,7 @@ function Pi(e) {
       return e = e.displayName, e || (e = t.displayName || t.name || "", e = e !== "" ? "ForwardRef(" + e + ")" : "ForwardRef"), e;
     case za:
       return t = e.displayName || null, t !== null ? t : Pi(e.type) || "Memo";
-    case xn:
+    case hn:
       t = e._payload, e = e._init;
       try {
         return Pi(e(t));
@@ -771,7 +771,7 @@ function j0(e) {
   }
   return null;
 }
-function Ln(e) {
+function On(e) {
   switch (typeof e) {
     case "boolean":
     case "number":
@@ -829,20 +829,20 @@ function Di(e, t) {
 }
 function Yc(e, t) {
   var n = t.defaultValue == null ? "" : t.defaultValue, r = t.checked != null ? t.checked : t.defaultChecked;
-  n = Ln(t.value != null ? t.value : n), e._wrapperState = { initialChecked: r, initialValue: n, controlled: t.type === "checkbox" || t.type === "radio" ? t.checked != null : t.value != null };
+  n = On(t.value != null ? t.value : n), e._wrapperState = { initialChecked: r, initialValue: n, controlled: t.type === "checkbox" || t.type === "radio" ? t.checked != null : t.value != null };
 }
 function af(e, t) {
   t = t.checked, t != null && Oa(e, "checked", t, !1);
 }
 function Oi(e, t) {
   af(e, t);
-  var n = Ln(t.value), r = t.type;
+  var n = On(t.value), r = t.type;
   if (n != null) r === "number" ? (n === 0 && e.value === "" || e.value != n) && (e.value = "" + n) : e.value !== "" + n && (e.value = "" + n);
   else if (r === "submit" || r === "reset") {
     e.removeAttribute("value");
     return;
   }
-  t.hasOwnProperty("value") ? Li(e, t.type, n) : t.hasOwnProperty("defaultValue") && Li(e, t.type, Ln(t.defaultValue)), t.checked == null && t.defaultChecked != null && (e.defaultChecked = !!t.defaultChecked);
+  t.hasOwnProperty("value") ? Li(e, t.type, n) : t.hasOwnProperty("defaultValue") && Li(e, t.type, On(t.defaultValue)), t.checked == null && t.defaultChecked != null && (e.defaultChecked = !!t.defaultChecked);
 }
 function Qc(e, t, n) {
   if (t.hasOwnProperty("value") || t.hasOwnProperty("defaultValue")) {
@@ -862,7 +862,7 @@ function Cr(e, t, n, r) {
     for (var s = 0; s < n.length; s++) t["$" + n[s]] = !0;
     for (n = 0; n < e.length; n++) s = t.hasOwnProperty("$" + e[n].value), e[n].selected !== s && (e[n].selected = s), s && r && (e[n].defaultSelected = !0);
   } else {
-    for (n = "" + Ln(n), t = null, s = 0; s < e.length; s++) {
+    for (n = "" + On(n), t = null, s = 0; s < e.length; s++) {
       if (e[s].value === n) {
         e[s].selected = !0, r && (e[s].defaultSelected = !0);
         return;
@@ -889,10 +889,10 @@ function Gc(e, t) {
     }
     t == null && (t = ""), n = t;
   }
-  e._wrapperState = { initialValue: Ln(n) };
+  e._wrapperState = { initialValue: On(n) };
 }
 function cf(e, t) {
-  var n = Ln(t.value), r = Ln(t.defaultValue);
+  var n = On(t.value), r = On(t.defaultValue);
   n != null && (n = "" + n, n !== e.value && (e.value = n), t.defaultValue == null && e.defaultValue !== n && (e.defaultValue = n)), r != null && (e.defaultValue = "" + r);
 }
 function qc(e) {
@@ -1363,20 +1363,20 @@ var ce = 0;
 function Cf(e) {
   return e &= -e, 1 < e ? 4 < e ? e & 268435455 ? 16 : 536870912 : 4 : 1;
 }
-var Ef, Ba, If, _f, Rf, Yi = !1, ul = [], En = null, In = null, _n = null, Is = /* @__PURE__ */ new Map(), _s = /* @__PURE__ */ new Map(), wn = [], V0 = "mousedown mouseup touchcancel touchend touchstart auxclick dblclick pointercancel pointerdown pointerup dragend dragstart drop compositionend compositionstart keydown keypress keyup input textInput copy cut paste click change contextmenu reset submit".split(" ");
+var Ef, Ba, If, _f, Rf, Yi = !1, ul = [], Cn = null, En = null, In = null, Is = /* @__PURE__ */ new Map(), _s = /* @__PURE__ */ new Map(), yn = [], V0 = "mousedown mouseup touchcancel touchend touchstart auxclick dblclick pointercancel pointerdown pointerup dragend dragstart drop compositionend compositionstart keydown keypress keyup input textInput copy cut paste click change contextmenu reset submit".split(" ");
 function eu(e, t) {
   switch (e) {
     case "focusin":
     case "focusout":
-      En = null;
+      Cn = null;
       break;
     case "dragenter":
     case "dragleave":
-      In = null;
+      En = null;
       break;
     case "mouseover":
     case "mouseout":
-      _n = null;
+      In = null;
       break;
     case "pointerover":
     case "pointerout":
@@ -1393,11 +1393,11 @@ function ts(e, t, n, r, s, l) {
 function H0(e, t, n, r, s) {
   switch (t) {
     case "focusin":
-      return En = ts(En, e, t, n, r, s), !0;
+      return Cn = ts(Cn, e, t, n, r, s), !0;
     case "dragenter":
-      return In = ts(In, e, t, n, r, s), !0;
+      return En = ts(En, e, t, n, r, s), !0;
     case "mouseover":
-      return _n = ts(_n, e, t, n, r, s), !0;
+      return In = ts(In, e, t, n, r, s), !0;
     case "pointerover":
       var l = s.pointerId;
       return Is.set(l, ts(Is.get(l) || null, e, t, n, r, s)), !0;
@@ -1443,7 +1443,7 @@ function tu(e, t, n) {
   Rl(e) && n.delete(t);
 }
 function K0() {
-  Yi = !1, En !== null && Rl(En) && (En = null), In !== null && Rl(In) && (In = null), _n !== null && Rl(_n) && (_n = null), Is.forEach(tu), _s.forEach(tu);
+  Yi = !1, Cn !== null && Rl(Cn) && (Cn = null), En !== null && Rl(En) && (En = null), In !== null && Rl(In) && (In = null), Is.forEach(tu), _s.forEach(tu);
 }
 function ns(e, t) {
   e.blockedOn === t && (e.blockedOn = null, Yi || (Yi = !0, ht.unstable_scheduleCallback(ht.unstable_NormalPriority, K0)));
@@ -1459,10 +1459,10 @@ function Rs(e) {
       r.blockedOn === e && (r.blockedOn = null);
     }
   }
-  for (En !== null && ns(En, e), In !== null && ns(In, e), _n !== null && ns(_n, e), Is.forEach(t), _s.forEach(t), n = 0; n < wn.length; n++) r = wn[n], r.blockedOn === e && (r.blockedOn = null);
-  for (; 0 < wn.length && (n = wn[0], n.blockedOn === null); ) Af(n), n.blockedOn === null && wn.shift();
+  for (Cn !== null && ns(Cn, e), En !== null && ns(En, e), In !== null && ns(In, e), Is.forEach(t), _s.forEach(t), n = 0; n < yn.length; n++) r = yn[n], r.blockedOn === e && (r.blockedOn = null);
+  for (; 0 < yn.length && (n = yn[0], n.blockedOn === null); ) Af(n), n.blockedOn === null && yn.shift();
 }
-var _r = cn.ReactCurrentBatchConfig, Yl = !0;
+var _r = an.ReactCurrentBatchConfig, Yl = !0;
 function Y0(e, t, n, r) {
   var s = ce, l = _r.transition;
   _r.transition = null;
@@ -1600,10 +1600,10 @@ function Tf(e) {
       return 16;
   }
 }
-var bn = null, Ha = null, Al = null;
+var kn = null, Ha = null, Al = null;
 function Mf() {
   if (Al) return Al;
-  var e, t = Ha, n = t.length, r, s = "value" in bn ? bn.value : bn.textContent, l = s.length;
+  var e, t = Ha, n = t.length, r, s = "value" in kn ? kn.value : kn.textContent, l = s.length;
   for (e = 0; e < n && t[e] === s[e]; e++) ;
   var i = n - e;
   for (r = 1; r <= i && t[n - r] === s[l - r]; r++) ;
@@ -1758,7 +1758,7 @@ function yg(e, t) {
   }
 }
 function wg(e, t) {
-  if (gr) return e === "compositionend" || !Qa && Df(e, t) ? (e = Mf(), Al = Ha = bn = null, gr = !1, e) : null;
+  if (gr) return e === "compositionend" || !Qa && Df(e, t) ? (e = Mf(), Al = Ha = kn = null, gr = !1, e) : null;
   switch (e) {
     case "paste":
       return null;
@@ -2193,7 +2193,7 @@ function ai(e, t, n, r, s) {
         y = void 0;
       }
       else gr ? Df(e, n) && (y = "onCompositionEnd") : e === "keydown" && n.keyCode === 229 && (y = "onCompositionStart");
-      y && (Pf && n.locale !== "ko" && (gr || y !== "onCompositionStart" ? y === "onCompositionEnd" && gr && (S = Mf()) : (bn = p, Ha = "value" in bn ? bn.value : bn.textContent, gr = !0)), j = Gl(u, y), 0 < j.length && (y = new su(y, e, null, n, p), d.push({ event: y, listeners: j }), S ? y.data = S : (S = Of(n), S !== null && (y.data = S)))), (S = vg ? yg(e, n) : wg(e, n)) && (u = Gl(u, "onBeforeInput"), 0 < u.length && (p = new su("onBeforeInput", "beforeinput", null, n, p), d.push({ event: p, listeners: u }), p.data = S));
+      y && (Pf && n.locale !== "ko" && (gr || y !== "onCompositionStart" ? y === "onCompositionEnd" && gr && (S = Mf()) : (kn = p, Ha = "value" in kn ? kn.value : kn.textContent, gr = !0)), j = Gl(u, y), 0 < j.length && (y = new su(y, e, null, n, p), d.push({ event: y, listeners: j }), S ? y.data = S : (S = Of(n), S !== null && (y.data = S)))), (S = vg ? yg(e, n) : wg(e, n)) && (u = Gl(u, "onBeforeInput"), 0 < u.length && (p = new su("onBeforeInput", "beforeinput", null, n, p), d.push({ event: p, listeners: u }), p.data = S));
     }
     Qf(d, t);
   });
@@ -2260,7 +2260,7 @@ function ci(e, t) {
   } while (n);
   Rs(t);
 }
-function Rn(e) {
+function _n(e) {
   for (; e != null; e = e.nextSibling) {
     var t = e.nodeType;
     if (t === 1 || t === 3) break;
@@ -2321,10 +2321,10 @@ function xe(e) {
 function me(e, t) {
   yr++, na[yr] = e.current, e.current = t;
 }
-var $n = {}, qe = Fn($n), it = Fn(!1), Zn = $n;
+var Ln = {}, qe = Fn(Ln), it = Fn(!1), Zn = Ln;
 function Pr(e, t) {
   var n = e.type.contextTypes;
-  if (!n) return $n;
+  if (!n) return Ln;
   var r = e.stateNode;
   if (r && r.__reactInternalMemoizedUnmaskedChildContext === t) return r.__reactInternalMemoizedMaskedChildContext;
   var s = {}, l;
@@ -2338,7 +2338,7 @@ function Xl() {
   xe(it), xe(qe);
 }
 function wu(e, t, n) {
-  if (qe.current !== $n) throw Error(T(168));
+  if (qe.current !== Ln) throw Error(T(168));
   me(qe, t), me(it, n);
 }
 function qf(e, t, n) {
@@ -2349,7 +2349,7 @@ function qf(e, t, n) {
   return je({}, n, r);
 }
 function Jl(e) {
-  return e = (e = e.stateNode) && e.__reactInternalMemoizedMergedChildContext || $n, Zn = qe.current, me(qe, e), me(it, it.current), !0;
+  return e = (e = e.stateNode) && e.__reactInternalMemoizedMergedChildContext || Ln, Zn = qe.current, me(qe, e), me(it, it.current), !0;
 }
 function ku(e, t, n) {
   var r = e.stateNode;
@@ -2416,7 +2416,7 @@ function bu(e, t) {
   switch (e.tag) {
     case 5:
       var n = e.type;
-      return t = t.nodeType !== 1 || n.toLowerCase() !== t.nodeName.toLowerCase() ? null : t, t !== null ? (e.stateNode = t, gt = e, mt = Rn(t.firstChild), !0) : !1;
+      return t = t.nodeType !== 1 || n.toLowerCase() !== t.nodeName.toLowerCase() ? null : t, t !== null ? (e.stateNode = t, gt = e, mt = _n(t.firstChild), !0) : !1;
     case 6:
       return t = e.pendingProps === "" || t.nodeType !== 3 ? null : t, t !== null ? (e.stateNode = t, gt = e, mt = null, !0) : !1;
     case 13:
@@ -2435,7 +2435,7 @@ function sa(e) {
       var n = t;
       if (!bu(e, t)) {
         if (ra(e)) throw Error(T(418));
-        t = Rn(n.nextSibling);
+        t = _n(n.nextSibling);
         var r = gt;
         t && bu(e, t) ? Zf(r, n) : (e.flags = e.flags & -4097 | 2, we = !1, gt = e);
       }
@@ -2455,7 +2455,7 @@ function gl(e) {
   var t;
   if ((t = e.tag !== 3) && !(t = e.tag !== 5) && (t = e.type, t = t !== "head" && t !== "body" && !Zi(e.type, e.memoizedProps)), t && (t = mt)) {
     if (ra(e)) throw ep(), Error(T(418));
-    for (; t; ) Zf(e, t), t = Rn(t.nextSibling);
+    for (; t; ) Zf(e, t), t = _n(t.nextSibling);
   }
   if (Nu(e), e.tag === 13) {
     if (e = e.memoizedState, e = e !== null ? e.dehydrated : null, !e) throw Error(T(317));
@@ -2465,7 +2465,7 @@ function gl(e) {
           var n = e.data;
           if (n === "/$") {
             if (t === 0) {
-              mt = Rn(e.nextSibling);
+              mt = _n(e.nextSibling);
               break e;
             }
             t--;
@@ -2475,11 +2475,11 @@ function gl(e) {
       }
       mt = null;
     }
-  } else mt = gt ? Rn(e.stateNode.nextSibling) : null;
+  } else mt = gt ? _n(e.stateNode.nextSibling) : null;
   return !0;
 }
 function ep() {
-  for (var e = mt; e; ) e = Rn(e.nextSibling);
+  for (var e = mt; e; ) e = _n(e.nextSibling);
 }
 function Dr() {
   mt = gt = null, we = !1;
@@ -2487,7 +2487,7 @@ function Dr() {
 function Ja(e) {
   Tt === null ? Tt = [e] : Tt.push(e);
 }
-var Wg = cn.ReactCurrentBatchConfig;
+var Wg = an.ReactCurrentBatchConfig;
 function ss(e, t, n) {
   if (e = n.ref, e !== null && typeof e != "function" && typeof e != "object") {
     if (n._owner) {
@@ -2531,7 +2531,7 @@ function tp(e) {
     return h;
   }
   function s(h, m) {
-    return h = Pn(h, m), h.index = 0, h.sibling = null, h;
+    return h = Mn(h, m), h.index = 0, h.sibling = null, h;
   }
   function l(h, m, x) {
     return h.index = x, e ? (x = h.alternate, x !== null ? (x = x.index, x < m ? (h.flags |= 2, m) : x) : (h.flags |= 2, m)) : (h.flags |= 1048576, m);
@@ -2544,7 +2544,7 @@ function tp(e) {
   }
   function c(h, m, x, v) {
     var w = x.type;
-    return w === mr ? p(h, m, x.props.children, v, x.key) : m !== null && (m.elementType === w || typeof w == "object" && w !== null && w.$$typeof === xn && ju(w) === m.type) ? (v = s(m, x.props), v.ref = ss(h, m, x), v.return = h, v) : (v = zl(x.type, x.key, x.props, null, h.mode, v), v.ref = ss(h, m, x), v.return = h, v);
+    return w === mr ? p(h, m, x.props.children, v, x.key) : m !== null && (m.elementType === w || typeof w == "object" && w !== null && w.$$typeof === hn && ju(w) === m.type) ? (v = s(m, x.props), v.ref = ss(h, m, x), v.return = h, v) : (v = zl(x.type, x.key, x.props, null, h.mode, v), v.ref = ss(h, m, x), v.return = h, v);
   }
   function u(h, m, x, v) {
     return m === null || m.tag !== 4 || m.stateNode.containerInfo !== x.containerInfo || m.stateNode.implementation !== x.implementation ? (m = vi(x, h.mode, v), m.return = h, m) : (m = s(m, x.children || []), m.return = h, m);
@@ -2560,7 +2560,7 @@ function tp(e) {
           return x = zl(m.type, m.key, m.props, null, h.mode, x), x.ref = ss(h, null, m), x.return = h, x;
         case pr:
           return m = vi(m, h.mode, x), m.return = h, m;
-        case xn:
+        case hn:
           var v = m._init;
           return d(h, v(m._payload), x);
       }
@@ -2578,7 +2578,7 @@ function tp(e) {
           return x.key === w ? c(h, m, x, v) : null;
         case pr:
           return x.key === w ? u(h, m, x, v) : null;
-        case xn:
+        case hn:
           return w = x._init, f(
             h,
             m,
@@ -2599,7 +2599,7 @@ function tp(e) {
           return h = h.get(v.key === null ? x : v.key) || null, c(m, h, v, w);
         case pr:
           return h = h.get(v.key === null ? x : v.key) || null, u(m, h, v, w);
-        case xn:
+        case hn:
           var j = v._init;
           return k(h, m, x, j(v._payload), w);
       }
@@ -2666,7 +2666,7 @@ function tp(e) {
                     n(h, j.sibling), m = s(j, x.props.children), m.return = h, h = m;
                     break e;
                   }
-                } else if (j.elementType === w || typeof w == "object" && w !== null && w.$$typeof === xn && ju(w) === j.type) {
+                } else if (j.elementType === w || typeof w == "object" && w !== null && w.$$typeof === hn && ju(w) === j.type) {
                   n(h, j.sibling), m = s(j, x.props), m.ref = ss(h, j, x), m.return = h, h = m;
                   break e;
                 }
@@ -2694,7 +2694,7 @@ function tp(e) {
             m = vi(x, h.mode, v), m.return = h, h = m;
           }
           return i(h);
-        case xn:
+        case hn:
           return j = x._init, A(h, m, j(x._payload), v);
       }
       if (as(x)) return N(h, m, x, v);
@@ -2745,7 +2745,7 @@ function rn(e, t) {
   for (n !== null && (n.lanes |= t), n = e, e = e.return; e !== null; ) e.childLanes |= t, n = e.alternate, n !== null && (n.childLanes |= t), n = e, e = e.return;
   return n.tag === 3 ? n.stateNode : null;
 }
-var vn = !1;
+var xn = !1;
 function rc(e) {
   e.updateQueue = { baseState: e.memoizedState, firstBaseUpdate: null, lastBaseUpdate: null, shared: { pending: null, interleaved: null, lanes: 0 }, effects: null };
 }
@@ -2755,7 +2755,7 @@ function sp(e, t) {
 function en(e, t) {
   return { eventTime: e, lane: t, tag: 0, payload: null, callback: null, next: null };
 }
-function An(e, t, n) {
+function Rn(e, t, n) {
   var r = e.updateQueue;
   if (r === null) return null;
   if (r = r.shared, le & 2) {
@@ -2788,7 +2788,7 @@ function Su(e, t) {
 }
 function ro(e, t, n, r) {
   var s = e.updateQueue;
-  vn = !1;
+  xn = !1;
   var l = s.firstBaseUpdate, i = s.lastBaseUpdate, a = s.shared.pending;
   if (a !== null) {
     s.shared.pending = null;
@@ -2828,7 +2828,7 @@ function ro(e, t, n, r) {
               d = je({}, d, f);
               break e;
             case 2:
-              vn = !0;
+              xn = !0;
           }
         }
         a.callback !== null && a.lane !== 0 && (e.flags |= 64, f = s.effects, f === null ? s.effects = [a] : f.push(a));
@@ -2909,7 +2909,7 @@ function oc() {
   for (var e = 0; e < di.length; e++) di[e]._workInProgressVersionPrimary = null;
   di.length = 0;
 }
-var Pl = cn.ReactCurrentDispatcher, fi = cn.ReactCurrentBatchConfig, tr = 0, Ne = null, Pe = null, Le = null, lo = !1, xs = !1, $s = 0, Bg = 0;
+var Pl = an.ReactCurrentDispatcher, fi = an.ReactCurrentBatchConfig, tr = 0, Ne = null, Pe = null, Le = null, lo = !1, xs = !1, $s = 0, Bg = 0;
 function He() {
   throw Error(T(321));
 }
@@ -3125,7 +3125,7 @@ function kp() {
   return Ct().memoizedState;
 }
 function Hg(e, t, n) {
-  var r = Mn(e);
+  var r = Tn(e);
   if (n = { lane: r, action: n, hasEagerState: !1, eagerState: null, next: null }, bp(e)) Np(t, n);
   else if (n = rp(e, t, n, r), n !== null) {
     var s = et();
@@ -3133,7 +3133,7 @@ function Hg(e, t, n) {
   }
 }
 function Kg(e, t, n) {
-  var r = Mn(e), s = { lane: r, action: n, hasEagerState: !1, eagerState: null, next: null };
+  var r = Tn(e), s = { lane: r, action: n, hasEagerState: !1, eagerState: null, next: null };
   if (bp(e)) Np(t, s);
   else {
     var l = e.alternate;
@@ -3268,23 +3268,23 @@ var Ao = { isMounted: function(e) {
   return (e = e._reactInternals) ? ir(e) === e : !1;
 }, enqueueSetState: function(e, t, n) {
   e = e._reactInternals;
-  var r = et(), s = Mn(e), l = en(r, s);
-  l.payload = t, n != null && (l.callback = n), t = An(e, l, s), t !== null && (Pt(t, e, s, r), Ml(t, e, s));
+  var r = et(), s = Tn(e), l = en(r, s);
+  l.payload = t, n != null && (l.callback = n), t = Rn(e, l, s), t !== null && (Pt(t, e, s, r), Ml(t, e, s));
 }, enqueueReplaceState: function(e, t, n) {
   e = e._reactInternals;
-  var r = et(), s = Mn(e), l = en(r, s);
-  l.tag = 1, l.payload = t, n != null && (l.callback = n), t = An(e, l, s), t !== null && (Pt(t, e, s, r), Ml(t, e, s));
+  var r = et(), s = Tn(e), l = en(r, s);
+  l.tag = 1, l.payload = t, n != null && (l.callback = n), t = Rn(e, l, s), t !== null && (Pt(t, e, s, r), Ml(t, e, s));
 }, enqueueForceUpdate: function(e, t) {
   e = e._reactInternals;
-  var n = et(), r = Mn(e), s = en(n, r);
-  s.tag = 2, t != null && (s.callback = t), t = An(e, s, r), t !== null && (Pt(t, e, r, n), Ml(t, e, r));
+  var n = et(), r = Tn(e), s = en(n, r);
+  s.tag = 2, t != null && (s.callback = t), t = Rn(e, s, r), t !== null && (Pt(t, e, r, n), Ml(t, e, r));
 } };
 function _u(e, t, n, r, s, l, i) {
   return e = e.stateNode, typeof e.shouldComponentUpdate == "function" ? e.shouldComponentUpdate(r, l, i) : t.prototype && t.prototype.isPureReactComponent ? !Ts(n, r) || !Ts(s, l) : !0;
 }
 function Sp(e, t, n) {
-  var r = !1, s = $n, l = t.contextType;
-  return typeof l == "object" && l !== null ? l = St(l) : (s = at(t) ? Zn : qe.current, r = t.contextTypes, l = (r = r != null) ? Pr(e, s) : $n), t = new t(n, l), e.memoizedState = t.state !== null && t.state !== void 0 ? t.state : null, t.updater = Ao, e.stateNode = t, t._reactInternals = e, r && (e = e.stateNode, e.__reactInternalMemoizedUnmaskedChildContext = s, e.__reactInternalMemoizedMaskedChildContext = l), t;
+  var r = !1, s = Ln, l = t.contextType;
+  return typeof l == "object" && l !== null ? l = St(l) : (s = at(t) ? Zn : qe.current, r = t.contextTypes, l = (r = r != null) ? Pr(e, s) : Ln), t = new t(n, l), e.memoizedState = t.state !== null && t.state !== void 0 ? t.state : null, t.updater = Ao, e.stateNode = t, t._reactInternals = e, r && (e = e.stateNode, e.__reactInternalMemoizedUnmaskedChildContext = s, e.__reactInternalMemoizedMaskedChildContext = l), t;
 }
 function Ru(e, t, n, r) {
   e = t.state, typeof t.componentWillReceiveProps == "function" && t.componentWillReceiveProps(n, r), typeof t.UNSAFE_componentWillReceiveProps == "function" && t.UNSAFE_componentWillReceiveProps(n, r), t.state !== e && Ao.enqueueReplaceState(t, t.state, null);
@@ -3342,7 +3342,7 @@ function Ep(e, t, n) {
   }
   var l = e.stateNode;
   return l !== null && typeof l.componentDidCatch == "function" && (n.callback = function() {
-    aa(e, t), typeof r != "function" && (Tn === null ? Tn = /* @__PURE__ */ new Set([this]) : Tn.add(this));
+    aa(e, t), typeof r != "function" && (An === null ? An = /* @__PURE__ */ new Set([this]) : An.add(this));
     var i = t.stack;
     this.componentDidCatch(t.value, { componentStack: i !== null ? i : "" });
   }), n;
@@ -3365,9 +3365,9 @@ function Tu(e) {
   return null;
 }
 function Mu(e, t, n, r, s) {
-  return e.mode & 1 ? (e.flags |= 65536, e.lanes = s, e) : (e === t ? e.flags |= 65536 : (e.flags |= 128, n.flags |= 131072, n.flags &= -52805, n.tag === 1 && (n.alternate === null ? n.tag = 17 : (t = en(-1, 1), t.tag = 2, An(n, t, 1))), n.lanes |= 1), e);
+  return e.mode & 1 ? (e.flags |= 65536, e.lanes = s, e) : (e === t ? e.flags |= 65536 : (e.flags |= 128, n.flags |= 131072, n.flags &= -52805, n.tag === 1 && (n.alternate === null ? n.tag = 17 : (t = en(-1, 1), t.tag = 2, Rn(n, t, 1))), n.lanes |= 1), e);
 }
-var Xg = cn.ReactCurrentOwner, ot = !1;
+var Xg = an.ReactCurrentOwner, ot = !1;
 function Ze(e, t, n, r) {
   t.child = e === null ? np(t, null, n, r) : Or(t, e.child, n, r);
 }
@@ -3385,7 +3385,7 @@ function Du(e, t, n, r, s) {
     var i = l.memoizedProps;
     if (n = n.compare, n = n !== null ? n : Ts, n(i, r) && e.ref === t.ref) return sn(e, t, s);
   }
-  return t.flags |= 1, e = Pn(l, r), e.ref = t.ref, e.return = t, t.child = e;
+  return t.flags |= 1, e = Mn(l, r), e.ref = t.ref, e.return = t, t.child = e;
 }
 function Ip(e, t, n, r, s) {
   if (e !== null) {
@@ -3425,15 +3425,15 @@ function Ou(e, t, n, r, s) {
     var c = i.context, u = n.contextType;
     typeof u == "object" && u !== null ? u = St(u) : (u = at(n) ? Zn : qe.current, u = Pr(t, u));
     var p = n.getDerivedStateFromProps, d = typeof p == "function" || typeof i.getSnapshotBeforeUpdate == "function";
-    d || typeof i.UNSAFE_componentWillReceiveProps != "function" && typeof i.componentWillReceiveProps != "function" || (a !== r || c !== u) && Ru(t, i, r, u), vn = !1;
+    d || typeof i.UNSAFE_componentWillReceiveProps != "function" && typeof i.componentWillReceiveProps != "function" || (a !== r || c !== u) && Ru(t, i, r, u), xn = !1;
     var f = t.memoizedState;
-    i.state = f, ro(t, r, i, s), c = t.memoizedState, a !== r || f !== c || it.current || vn ? (typeof p == "function" && (oa(t, n, p, r), c = t.memoizedState), (a = vn || _u(t, n, a, r, f, c, u)) ? (d || typeof i.UNSAFE_componentWillMount != "function" && typeof i.componentWillMount != "function" || (typeof i.componentWillMount == "function" && i.componentWillMount(), typeof i.UNSAFE_componentWillMount == "function" && i.UNSAFE_componentWillMount()), typeof i.componentDidMount == "function" && (t.flags |= 4194308)) : (typeof i.componentDidMount == "function" && (t.flags |= 4194308), t.memoizedProps = r, t.memoizedState = c), i.props = r, i.state = c, i.context = u, r = a) : (typeof i.componentDidMount == "function" && (t.flags |= 4194308), r = !1);
+    i.state = f, ro(t, r, i, s), c = t.memoizedState, a !== r || f !== c || it.current || xn ? (typeof p == "function" && (oa(t, n, p, r), c = t.memoizedState), (a = xn || _u(t, n, a, r, f, c, u)) ? (d || typeof i.UNSAFE_componentWillMount != "function" && typeof i.componentWillMount != "function" || (typeof i.componentWillMount == "function" && i.componentWillMount(), typeof i.UNSAFE_componentWillMount == "function" && i.UNSAFE_componentWillMount()), typeof i.componentDidMount == "function" && (t.flags |= 4194308)) : (typeof i.componentDidMount == "function" && (t.flags |= 4194308), t.memoizedProps = r, t.memoizedState = c), i.props = r, i.state = c, i.context = u, r = a) : (typeof i.componentDidMount == "function" && (t.flags |= 4194308), r = !1);
   } else {
     i = t.stateNode, sp(e, t), a = t.memoizedProps, u = t.type === t.elementType ? a : Rt(t.type, a), i.props = u, d = t.pendingProps, f = i.context, c = n.contextType, typeof c == "object" && c !== null ? c = St(c) : (c = at(n) ? Zn : qe.current, c = Pr(t, c));
     var k = n.getDerivedStateFromProps;
-    (p = typeof k == "function" || typeof i.getSnapshotBeforeUpdate == "function") || typeof i.UNSAFE_componentWillReceiveProps != "function" && typeof i.componentWillReceiveProps != "function" || (a !== d || f !== c) && Ru(t, i, r, c), vn = !1, f = t.memoizedState, i.state = f, ro(t, r, i, s);
+    (p = typeof k == "function" || typeof i.getSnapshotBeforeUpdate == "function") || typeof i.UNSAFE_componentWillReceiveProps != "function" && typeof i.componentWillReceiveProps != "function" || (a !== d || f !== c) && Ru(t, i, r, c), xn = !1, f = t.memoizedState, i.state = f, ro(t, r, i, s);
     var N = t.memoizedState;
-    a !== d || f !== N || it.current || vn ? (typeof k == "function" && (oa(t, n, k, r), N = t.memoizedState), (u = vn || _u(t, n, u, r, f, N, c) || !1) ? (p || typeof i.UNSAFE_componentWillUpdate != "function" && typeof i.componentWillUpdate != "function" || (typeof i.componentWillUpdate == "function" && i.componentWillUpdate(r, N, c), typeof i.UNSAFE_componentWillUpdate == "function" && i.UNSAFE_componentWillUpdate(r, N, c)), typeof i.componentDidUpdate == "function" && (t.flags |= 4), typeof i.getSnapshotBeforeUpdate == "function" && (t.flags |= 1024)) : (typeof i.componentDidUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 4), typeof i.getSnapshotBeforeUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 1024), t.memoizedProps = r, t.memoizedState = N), i.props = r, i.state = N, i.context = c, r = u) : (typeof i.componentDidUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 4), typeof i.getSnapshotBeforeUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 1024), r = !1);
+    a !== d || f !== N || it.current || xn ? (typeof k == "function" && (oa(t, n, k, r), N = t.memoizedState), (u = xn || _u(t, n, u, r, f, N, c) || !1) ? (p || typeof i.UNSAFE_componentWillUpdate != "function" && typeof i.componentWillUpdate != "function" || (typeof i.componentWillUpdate == "function" && i.componentWillUpdate(r, N, c), typeof i.UNSAFE_componentWillUpdate == "function" && i.UNSAFE_componentWillUpdate(r, N, c)), typeof i.componentDidUpdate == "function" && (t.flags |= 4), typeof i.getSnapshotBeforeUpdate == "function" && (t.flags |= 1024)) : (typeof i.componentDidUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 4), typeof i.getSnapshotBeforeUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 1024), t.memoizedProps = r, t.memoizedState = N), i.props = r, i.state = N, i.context = c, r = u) : (typeof i.componentDidUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 4), typeof i.getSnapshotBeforeUpdate != "function" || a === e.memoizedProps && f === e.memoizedState || (t.flags |= 1024), r = !1);
   }
   return ua(e, t, n, r, l, s);
 }
@@ -3464,9 +3464,9 @@ function Tp(e, t, n) {
   if (l) {
     l = r.fallback, i = t.mode, s = e.child, a = s.sibling;
     var c = { mode: "hidden", children: r.children };
-    return !(i & 1) && t.child !== s ? (r = t.child, r.childLanes = 0, r.pendingProps = c, t.deletions = null) : (r = Pn(s, c), r.subtreeFlags = s.subtreeFlags & 14680064), a !== null ? l = Pn(a, l) : (l = qn(l, i, n, null), l.flags |= 2), l.return = t, r.return = t, r.sibling = l, t.child = r, r = l, l = t.child, i = e.child.memoizedState, i = i === null ? fa(n) : { baseLanes: i.baseLanes | n, cachePool: null, transitions: i.transitions }, l.memoizedState = i, l.childLanes = e.childLanes & ~n, t.memoizedState = da, r;
+    return !(i & 1) && t.child !== s ? (r = t.child, r.childLanes = 0, r.pendingProps = c, t.deletions = null) : (r = Mn(s, c), r.subtreeFlags = s.subtreeFlags & 14680064), a !== null ? l = Mn(a, l) : (l = qn(l, i, n, null), l.flags |= 2), l.return = t, r.return = t, r.sibling = l, t.child = r, r = l, l = t.child, i = e.child.memoizedState, i = i === null ? fa(n) : { baseLanes: i.baseLanes | n, cachePool: null, transitions: i.transitions }, l.memoizedState = i, l.childLanes = e.childLanes & ~n, t.memoizedState = da, r;
   }
-  return l = e.child, e = l.sibling, r = Pn(l, { mode: "visible", children: r.children }), !(t.mode & 1) && (r.lanes = n), r.return = t, r.sibling = null, e !== null && (n = t.deletions, n === null ? (t.deletions = [e], t.flags |= 16) : n.push(e)), t.child = r, t.memoizedState = null, r;
+  return l = e.child, e = l.sibling, r = Mn(l, { mode: "visible", children: r.children }), !(t.mode & 1) && (r.lanes = n), r.return = t, r.sibling = null, e !== null && (n = t.deletions, n === null ? (t.deletions = [e], t.flags |= 16) : n.push(e)), t.child = r, t.memoizedState = null, r;
 }
 function fc(e, t) {
   return t = Po({ mode: "visible", children: t }, e.mode, 0, null), t.return = e, e.child = t;
@@ -3524,7 +3524,7 @@ function Jg(e, t, n, r, s, l, i) {
     }
     return vc(), r = gi(Error(T(421))), xl(e, t, i, r);
   }
-  return s.data === "$?" ? (t.flags |= 128, t.child = e.child, t = dh.bind(null, e), s._reactRetry = t, null) : (e = l.treeContext, mt = Rn(s.nextSibling), gt = t, we = !0, Tt = null, e !== null && (kt[bt++] = Jt, kt[bt++] = Zt, kt[bt++] = er, Jt = e.id, Zt = e.overflow, er = t), t = fc(t, r.children), t.flags |= 4096, t);
+  return s.data === "$?" ? (t.flags |= 128, t.child = e.child, t = dh.bind(null, e), s._reactRetry = t, null) : (e = l.treeContext, mt = _n(s.nextSibling), gt = t, we = !0, Tt = null, e !== null && (kt[bt++] = Jt, kt[bt++] = Zt, kt[bt++] = er, Jt = e.id, Zt = e.overflow, er = t), t = fc(t, r.children), t.flags |= 4096, t);
 }
 function $u(e, t, n) {
   e.lanes |= t;
@@ -3586,7 +3586,7 @@ function sn(e, t, n) {
   if (e !== null && (t.dependencies = e.dependencies), nr |= t.lanes, !(n & t.childLanes)) return null;
   if (e !== null && t.child !== e.child) throw Error(T(153));
   if (t.child !== null) {
-    for (e = t.child, n = Pn(e, e.pendingProps), t.child = n, n.return = t; e.sibling !== null; ) e = e.sibling, n = n.sibling = Pn(e, e.pendingProps), n.return = t;
+    for (e = t.child, n = Mn(e, e.pendingProps), t.child = n, n.return = t; e.sibling !== null; ) e = e.sibling, n = n.sibling = Mn(e, e.pendingProps), n.return = t;
     n.sibling = null;
   }
   return t.child;
@@ -3856,7 +3856,7 @@ function eh(e, t, n) {
                 ol(e), qc(e);
                 break;
               case "option":
-                r.value != null && e.setAttribute("value", "" + Ln(r.value));
+                r.value != null && e.setAttribute("value", "" + On(r.value));
                 break;
               case "select":
                 e.multiple = !!r.multiple, l = r.value, l != null ? Cr(e, !!r.multiple, l, !1) : r.defaultValue != null && Cr(
@@ -4142,7 +4142,7 @@ function xa(e, t, n) {
   else if (r !== 4 && (e = e.child, e !== null)) for (xa(e, t, n), e = e.sibling; e !== null; ) xa(e, t, n), e = e.sibling;
 }
 var We = null, At = !1;
-function gn(e, t, n) {
+function mn(e, t, n) {
   for (n = n.child; n !== null; ) zp(e, t, n), n = n.sibling;
 }
 function zp(e, t, n) {
@@ -4155,13 +4155,13 @@ function zp(e, t, n) {
       Ge || Nr(n, t);
     case 6:
       var r = We, s = At;
-      We = null, gn(e, t, n), We = r, At = s, We !== null && (At ? (e = We, n = n.stateNode, e.nodeType === 8 ? e.parentNode.removeChild(n) : e.removeChild(n)) : We.removeChild(n.stateNode));
+      We = null, mn(e, t, n), We = r, At = s, We !== null && (At ? (e = We, n = n.stateNode, e.nodeType === 8 ? e.parentNode.removeChild(n) : e.removeChild(n)) : We.removeChild(n.stateNode));
       break;
     case 18:
       We !== null && (At ? (e = We, n = n.stateNode, e.nodeType === 8 ? ci(e.parentNode, n) : e.nodeType === 1 && ci(e, n), Rs(e)) : ci(We, n.stateNode));
       break;
     case 4:
-      r = We, s = At, We = n.stateNode.containerInfo, At = !0, gn(e, t, n), We = r, At = s;
+      r = We, s = At, We = n.stateNode.containerInfo, At = !0, mn(e, t, n), We = r, At = s;
       break;
     case 0:
     case 11:
@@ -4174,7 +4174,7 @@ function zp(e, t, n) {
           l = l.tag, i !== void 0 && (l & 2 || l & 4) && ma(n, t, i), s = s.next;
         } while (s !== r);
       }
-      gn(e, t, n);
+      mn(e, t, n);
       break;
     case 1:
       if (!Ge && (Nr(n, t), r = n.stateNode, typeof r.componentWillUnmount == "function")) try {
@@ -4182,16 +4182,16 @@ function zp(e, t, n) {
       } catch (a) {
         Ee(n, t, a);
       }
-      gn(e, t, n);
+      mn(e, t, n);
       break;
     case 21:
-      gn(e, t, n);
+      mn(e, t, n);
       break;
     case 22:
-      n.mode & 1 ? (Ge = (r = Ge) || n.memoizedState !== null, gn(e, t, n), Ge = r) : gn(e, t, n);
+      n.mode & 1 ? (Ge = (r = Ge) || n.memoizedState !== null, mn(e, t, n), Ge = r) : mn(e, t, n);
       break;
     default:
-      gn(e, t, n);
+      mn(e, t, n);
   }
 }
 function Uu(e) {
@@ -4623,16 +4623,16 @@ function Vu(e) {
     B = t.return;
   }
 }
-var lh = Math.ceil, io = cn.ReactCurrentDispatcher, pc = cn.ReactCurrentOwner, jt = cn.ReactCurrentBatchConfig, le = 0, Fe = null, Ae = null, Be = 0, pt = 0, jr = Fn(0), Oe = 0, Us = null, nr = 0, Mo = 0, mc = 0, ys = null, lt = null, gc = 0, zr = 1 / 0, qt = null, ao = !1, va = null, Tn = null, yl = !1, Nn = null, co = 0, ws = 0, ya = null, Ll = -1, $l = 0;
+var lh = Math.ceil, io = an.ReactCurrentDispatcher, pc = an.ReactCurrentOwner, jt = an.ReactCurrentBatchConfig, le = 0, Fe = null, Ae = null, Be = 0, pt = 0, jr = Fn(0), Oe = 0, Us = null, nr = 0, Mo = 0, mc = 0, ys = null, lt = null, gc = 0, zr = 1 / 0, qt = null, ao = !1, va = null, An = null, yl = !1, bn = null, co = 0, ws = 0, ya = null, Ll = -1, $l = 0;
 function et() {
   return le & 6 ? _e() : Ll !== -1 ? Ll : Ll = _e();
 }
-function Mn(e) {
+function Tn(e) {
   return e.mode & 1 ? le & 2 && Be !== 0 ? Be & -Be : Wg.transition !== null ? ($l === 0 && ($l = Sf()), $l) : (e = ce, e !== 0 || (e = window.event, e = e === void 0 ? 16 : Tf(e.type)), e) : 1;
 }
 function Pt(e, t, n, r) {
   if (50 < ws) throw ws = 0, ya = null, Error(T(185));
-  Ks(e, n, r), (!(le & 2) || e !== Fe) && (e === Fe && (!(le & 2) && (Mo |= n), Oe === 4 && kn(e, Be)), ct(e, r), n === 1 && le === 0 && !(t.mode & 1) && (zr = _e() + 500, _o && Un()));
+  Ks(e, n, r), (!(le & 2) || e !== Fe) && (e === Fe && (!(le & 2) && (Mo |= n), Oe === 4 && wn(e, Be)), ct(e, r), n === 1 && le === 0 && !(t.mode & 1) && (zr = _e() + 500, _o && Un()));
 }
 function ct(e, t) {
   var n = e.callbackNode;
@@ -4689,10 +4689,10 @@ function Wp(e, t) {
     ec(), io.current = l, le = s, Ae !== null ? t = 0 : (Fe = null, Be = 0, t = Oe);
   }
   if (t !== 0) {
-    if (t === 2 && (s = Ki(e), s !== 0 && (r = s, t = wa(e, s))), t === 1) throw n = Us, Gn(e, 0), kn(e, r), ct(e, _e()), n;
-    if (t === 6) kn(e, r);
+    if (t === 2 && (s = Ki(e), s !== 0 && (r = s, t = wa(e, s))), t === 1) throw n = Us, Gn(e, 0), wn(e, r), ct(e, _e()), n;
+    if (t === 6) wn(e, r);
     else {
-      if (s = e.current.alternate, !(r & 30) && !oh(s) && (t = uo(e, r), t === 2 && (l = Ki(e), l !== 0 && (r = l, t = wa(e, l))), t === 1)) throw n = Us, Gn(e, 0), kn(e, r), ct(e, _e()), n;
+      if (s = e.current.alternate, !(r & 30) && !oh(s) && (t = uo(e, r), t === 2 && (l = Ki(e), l !== 0 && (r = l, t = wa(e, l))), t === 1)) throw n = Us, Gn(e, 0), wn(e, r), ct(e, _e()), n;
       switch (e.finishedWork = s, e.finishedLanes = r, t) {
         case 0:
         case 1:
@@ -4701,7 +4701,7 @@ function Wp(e, t) {
           Hn(e, lt, qt);
           break;
         case 3:
-          if (kn(e, r), (r & 130023424) === r && (t = gc + 500 - _e(), 10 < t)) {
+          if (wn(e, r), (r & 130023424) === r && (t = gc + 500 - _e(), 10 < t)) {
             if (Kl(e, 0) !== 0) break;
             if (s = e.suspendedLanes, (s & r) !== r) {
               et(), e.pingedLanes |= e.suspendedLanes & s;
@@ -4713,7 +4713,7 @@ function Wp(e, t) {
           Hn(e, lt, qt);
           break;
         case 4:
-          if (kn(e, r), (r & 4194240) === r) break;
+          if (wn(e, r), (r & 4194240) === r) break;
           for (t = e.eventTimes, s = -1; 0 < r; ) {
             var i = 31 - Mt(r);
             l = 1 << i, i = t[i], i > s && (s = i), r &= ~l;
@@ -4767,7 +4767,7 @@ function oh(e) {
   }
   return !0;
 }
-function kn(e, t) {
+function wn(e, t) {
   for (t &= ~mc, t &= ~Mo, e.suspendedLanes |= t, e.pingedLanes &= ~t, e = e.expirationTimes; 0 < t; ) {
     var n = 31 - Mt(t), r = 1 << n;
     e[n] = -1, t &= ~r;
@@ -4783,7 +4783,7 @@ function Hu(e) {
     var r = Ki(e);
     r !== 0 && (t = r, n = wa(e, r));
   }
-  if (n === 1) throw n = Us, Gn(e, 0), kn(e, t), ct(e, _e()), n;
+  if (n === 1) throw n = Us, Gn(e, 0), wn(e, t), ct(e, _e()), n;
   if (n === 6) throw Error(T(345));
   return e.finishedWork = e.current.alternate, e.finishedLanes = t, Hn(e, lt, qt), ct(e, _e()), null;
 }
@@ -4797,7 +4797,7 @@ function hc(e, t) {
   }
 }
 function rr(e) {
-  Nn !== null && Nn.tag === 0 && !(le & 6) && Ar();
+  bn !== null && bn.tag === 0 && !(le & 6) && Ar();
   var t = le;
   le |= 1;
   var n = jt.transition, r = ce;
@@ -4843,7 +4843,7 @@ function Gn(e, t) {
     }
     n = n.return;
   }
-  if (Fe = e, Ae = e = Pn(e.current, null), Be = pt = t, Oe = 0, Us = null, mc = Mo = nr = 0, lt = ys = null, Yn !== null) {
+  if (Fe = e, Ae = e = Mn(e.current, null), Be = pt = t, Oe = 0, Us = null, mc = Mo = nr = 0, lt = ys = null, Yn !== null) {
     for (t = 0; t < Yn.length; t++) if (n = Yn[t], r = n.interleaved, r !== null) {
       n.interleaved = null;
       var s = r.next, l = n.pending;
@@ -4914,7 +4914,7 @@ function Bp(e, t) {
             case 1:
               a = c;
               var m = l.type, x = l.stateNode;
-              if (!(l.flags & 128) && (typeof m.getDerivedStateFromError == "function" || x !== null && typeof x.componentDidCatch == "function" && (Tn === null || !Tn.has(x)))) {
+              if (!(l.flags & 128) && (typeof m.getDerivedStateFromError == "function" || x !== null && typeof x.componentDidCatch == "function" && (An === null || !An.has(x)))) {
                 l.flags |= 65536, t &= -t, l.lanes |= t;
                 var v = Ep(l, a, t);
                 Su(l, v);
@@ -4937,7 +4937,7 @@ function Vp() {
   return io.current = oo, e === null ? oo : e;
 }
 function vc() {
-  (Oe === 0 || Oe === 3 || Oe === 2) && (Oe = 4), Fe === null || !(nr & 268435455) && !(Mo & 268435455) || kn(Fe, Be);
+  (Oe === 0 || Oe === 3 || Oe === 2) && (Oe = 4), Fe === null || !(nr & 268435455) && !(Mo & 268435455) || wn(Fe, Be);
 }
 function uo(e, t) {
   var n = le;
@@ -5003,7 +5003,7 @@ function Hn(e, t, n) {
 function ch(e, t, n, r) {
   do
     Ar();
-  while (Nn !== null);
+  while (bn !== null);
   if (le & 6) throw Error(T(327));
   n = e.finishedWork;
   var s = e.finishedLanes;
@@ -5020,17 +5020,17 @@ function ch(e, t, n, r) {
     var a = le;
     le |= 4, pc.current = null, rh(e, n), Fp(n, e), _g(Ji), Yl = !!Xi, Ji = Xi = null, e.current = n, sh(n), P0(), le = a, ce = i, jt.transition = l;
   } else e.current = n;
-  if (yl && (yl = !1, Nn = e, co = s), l = e.pendingLanes, l === 0 && (Tn = null), L0(n.stateNode), ct(e, _e()), t !== null) for (r = e.onRecoverableError, n = 0; n < t.length; n++) s = t[n], r(s.value, { componentStack: s.stack, digest: s.digest });
+  if (yl && (yl = !1, bn = e, co = s), l = e.pendingLanes, l === 0 && (An = null), L0(n.stateNode), ct(e, _e()), t !== null) for (r = e.onRecoverableError, n = 0; n < t.length; n++) s = t[n], r(s.value, { componentStack: s.stack, digest: s.digest });
   if (ao) throw ao = !1, e = va, va = null, e;
   return co & 1 && e.tag !== 0 && Ar(), l = e.pendingLanes, l & 1 ? e === ya ? ws++ : (ws = 0, ya = e) : ws = 0, Un(), null;
 }
 function Ar() {
-  if (Nn !== null) {
+  if (bn !== null) {
     var e = Cf(co), t = jt.transition, n = ce;
     try {
-      if (jt.transition = null, ce = 16 > e ? 16 : e, Nn === null) var r = !1;
+      if (jt.transition = null, ce = 16 > e ? 16 : e, bn === null) var r = !1;
       else {
-        if (e = Nn, Nn = null, co = 0, le & 6) throw Error(T(331));
+        if (e = bn, bn = null, co = 0, le & 6) throw Error(T(331));
         var s = le;
         for (le |= 4, B = e.current; B !== null; ) {
           var l = B, i = l.child;
@@ -5136,7 +5136,7 @@ function Ar() {
   return !1;
 }
 function Ku(e, t, n) {
-  t = $r(n, t), t = Cp(e, t, 1), e = An(e, t, 1), t = et(), e !== null && (Ks(e, 1, t), ct(e, t));
+  t = $r(n, t), t = Cp(e, t, 1), e = Rn(e, t, 1), t = et(), e !== null && (Ks(e, 1, t), ct(e, t));
 }
 function Ee(e, t, n) {
   if (e.tag === 3) Ku(e, e, n);
@@ -5146,8 +5146,8 @@ function Ee(e, t, n) {
       break;
     } else if (t.tag === 1) {
       var r = t.stateNode;
-      if (typeof t.type.getDerivedStateFromError == "function" || typeof r.componentDidCatch == "function" && (Tn === null || !Tn.has(r))) {
-        e = $r(n, e), e = Ep(t, e, 1), t = An(t, e, 1), e = et(), t !== null && (Ks(t, 1, e), ct(t, e));
+      if (typeof t.type.getDerivedStateFromError == "function" || typeof r.componentDidCatch == "function" && (An === null || !An.has(r))) {
+        e = $r(n, e), e = Ep(t, e, 1), t = Rn(t, e, 1), e = et(), t !== null && (Ks(t, 1, e), ct(t, e));
         break;
       }
     }
@@ -5237,7 +5237,7 @@ Qp = function(e, t, n) {
         } else if (r !== s) {
           s = $r(Error(T(424)), t), t = Lu(e, t, r, n, s);
           break e;
-        } else for (mt = Rn(t.stateNode.containerInfo.firstChild), gt = t, we = !0, Tt = null, n = np(t, null, r, n), t.child = n; n; ) n.flags = n.flags & -3 | 4096, n = n.sibling;
+        } else for (mt = _n(t.stateNode.containerInfo.firstChild), gt = t, we = !0, Tt = null, n = np(t, null, r, n), t.child = n; n; ) n.flags = n.flags & -3 | 4096, n = n.sibling;
         else {
           if (Dr(), r === s) {
             t = sn(e, t, n);
@@ -5352,7 +5352,7 @@ function mh(e) {
   }
   return 2;
 }
-function Pn(e, t) {
+function Mn(e, t) {
   var n = e.alternate;
   return n === null ? (n = Nt(e.tag, t, e.key, e.mode), n.elementType = e.elementType, n.type = e.type, n.stateNode = e.stateNode, n.alternate = e, e.alternate = n) : (n.pendingProps = t, n.type = e.type, n.flags = 0, n.subtreeFlags = 0, n.deletions = null), n.flags = e.flags & 14680064, n.childLanes = e.childLanes, n.lanes = e.lanes, n.child = e.child, n.memoizedProps = e.memoizedProps, n.memoizedState = e.memoizedState, n.updateQueue = e.updateQueue, t = e.dependencies, n.dependencies = t === null ? null : { lanes: t.lanes, firstContext: t.firstContext }, n.sibling = e.sibling, n.index = e.index, n.ref = e.ref, n;
 }
@@ -5388,7 +5388,7 @@ function zl(e, t, n, r, s, l) {
         case za:
           i = 14;
           break e;
-        case xn:
+        case hn:
           i = 16, r = null;
           break e;
       }
@@ -5419,7 +5419,7 @@ function hh(e, t, n) {
   return { $$typeof: pr, key: r == null ? null : "" + r, children: e, containerInfo: t, implementation: n };
 }
 function qp(e) {
-  if (!e) return $n;
+  if (!e) return Ln;
   e = e._reactInternals;
   e: {
     if (ir(e) !== e || e.tag !== 1) throw Error(T(170));
@@ -5446,11 +5446,11 @@ function qp(e) {
   return t;
 }
 function Xp(e, t, n, r, s, l, i, a, c) {
-  return e = wc(n, r, !0, e, s, l, i, a, c), e.context = qp(null), n = e.current, r = et(), s = Mn(n), l = en(r, s), l.callback = t ?? null, An(n, l, s), e.current.lanes = s, Ks(e, s, r), ct(e, r), e;
+  return e = wc(n, r, !0, e, s, l, i, a, c), e.context = qp(null), n = e.current, r = et(), s = Tn(n), l = en(r, s), l.callback = t ?? null, Rn(n, l, s), e.current.lanes = s, Ks(e, s, r), ct(e, r), e;
 }
 function Do(e, t, n, r) {
-  var s = t.current, l = et(), i = Mn(s);
-  return n = qp(n), t.context === null ? t.context = n : t.pendingContext = n, t = en(l, i), t.payload = { element: e }, r = r === void 0 ? null : r, r !== null && (t.callback = r), e = An(s, t, i), e !== null && (Pt(e, s, i, l), Ml(e, s, i)), i;
+  var s = t.current, l = et(), i = Tn(s);
+  return n = qp(n), t.context === null ? t.context = n : t.pendingContext = n, t = en(l, i), t.payload = { element: e }, r = r === void 0 ? null : r, r !== null && (t.callback = r), e = Rn(s, t, i), e !== null && (Pt(e, s, i, l), Ml(e, s, i)), i;
 }
 function fo(e) {
   if (e = e.current, !e.child) return null;
@@ -5501,8 +5501,8 @@ Oo.prototype.unstable_scheduleHydration = function(e) {
   if (e) {
     var t = _f();
     e = { blockedOn: null, target: e, priority: t };
-    for (var n = 0; n < wn.length && t !== 0 && t < wn[n].priority; n++) ;
-    wn.splice(n, 0, e), n === 0 && Af(e);
+    for (var n = 0; n < yn.length && t !== 0 && t < yn[n].priority; n++) ;
+    yn.splice(n, 0, e), n === 0 && Af(e);
   }
 };
 function Nc(e) {
@@ -5584,7 +5584,7 @@ Ba = function(e) {
 };
 If = function(e) {
   if (e.tag === 13) {
-    var t = Mn(e), n = rn(e, t);
+    var t = Tn(e), n = rn(e, t);
     if (n !== null) {
       var r = et();
       Pt(n, e, t, r);
@@ -5627,7 +5627,7 @@ Bi = function(e, t, n) {
 };
 hf = hc;
 xf = rr;
-var yh = { usingClientEntryPoint: !1, Events: [Qs, vr, Io, mf, gf, hc] }, os = { findFiberByHostInstance: Kn, bundleType: 0, version: "18.3.1", rendererPackageName: "react-dom" }, wh = { bundleType: os.bundleType, version: os.version, rendererPackageName: os.rendererPackageName, rendererConfig: os.rendererConfig, overrideHookState: null, overrideHookStateDeletePath: null, overrideHookStateRenamePath: null, overrideProps: null, overridePropsDeletePath: null, overridePropsRenamePath: null, setErrorHandler: null, setSuspenseHandler: null, scheduleUpdate: null, currentDispatcherRef: cn.ReactCurrentDispatcher, findHostInstanceByFiber: function(e) {
+var yh = { usingClientEntryPoint: !1, Events: [Qs, vr, Io, mf, gf, hc] }, os = { findFiberByHostInstance: Kn, bundleType: 0, version: "18.3.1", rendererPackageName: "react-dom" }, wh = { bundleType: os.bundleType, version: os.version, rendererPackageName: os.rendererPackageName, rendererConfig: os.rendererConfig, overrideHookState: null, overrideHookStateDeletePath: null, overrideHookStateRenamePath: null, overrideProps: null, overridePropsDeletePath: null, overridePropsRenamePath: null, setErrorHandler: null, setSuspenseHandler: null, scheduleUpdate: null, currentDispatcherRef: an.ReactCurrentDispatcher, findHostInstanceByFiber: function(e) {
   return e = wf(e), e === null ? null : e.stateNode;
 }, findFiberByHostInstance: os.findFiberByHostInstance || xh, findHostInstancesForRefresh: null, scheduleRefresh: null, scheduleRoot: null, setRefreshHandler: null, getCurrentFiber: null, reconcilerVersion: "18.3.1-next-f1338f8080-20240426" };
 if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ < "u") {
@@ -7659,10 +7659,10 @@ const Bo = /* @__PURE__ */ g.createContext({
   scaleX: 1,
   scaleY: 1
 });
-var yn;
+var vn;
 (function(e) {
   e[e.Uninitialized = 0] = "Uninitialized", e[e.Initializing = 1] = "Initializing", e[e.Initialized = 2] = "Initialized";
-})(yn || (yn = {}));
+})(vn || (vn = {}));
 const Tx = /* @__PURE__ */ g.memo(function(t) {
   var n, r, s, l;
   let {
@@ -7676,7 +7676,7 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
     modifiers: k,
     ...N
   } = t;
-  const b = g.useReducer(Ix, void 0, Ex), [A, h] = b, [m, x] = Rh(), [v, w] = g.useState(yn.Uninitialized), j = v === yn.Initialized, {
+  const b = g.useReducer(Ix, void 0, Ex), [A, h] = b, [m, x] = Rh(), [v, w] = g.useState(vn.Uninitialized), j = v === vn.Initialized, {
     draggable: {
       active: S,
       nodes: y,
@@ -7727,10 +7727,10 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
     scrollAdjustedTranslate: null
   }), ye = R.getNodeFor((n = ve.current.over) == null ? void 0 : n.id), Te = Nx({
     measure: L.dragOverlay.measure
-  }), pe = (r = Te.nodeRef.current) != null ? r : _, st = j ? (s = Te.rect) != null ? s : X : null, Et = !!(Te.nodeRef.current && Te.rect), dn = xx(Et ? null : X), Lt = gm(pe ? rt(pe) : null), ut = vx(j ? ye ?? _ : null), oe = bx(ut), $t = ym(k, {
+  }), pe = (r = Te.nodeRef.current) != null ? r : _, st = j ? (s = Te.rect) != null ? s : X : null, Et = !!(Te.nodeRef.current && Te.rect), un = xx(Et ? null : X), Lt = gm(pe ? rt(pe) : null), ut = vx(j ? ye ?? _ : null), oe = bx(ut), $t = ym(k, {
     transform: {
-      x: M.x - dn.x,
-      y: M.y - dn.y,
+      x: M.x - un.x,
+      y: M.y - un.y,
       scaleX: 1,
       scaleY: 1
     },
@@ -7744,7 +7744,7 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
     scrollableAncestors: ut,
     scrollableAncestorRects: oe,
     windowRect: Lt
-  }), Wn = $ ? Tr($, M) : null, fn = yx(ut), Gr = sd(fn), ne = sd(fn, [X]), ue = Tr($t, Gr), It = st ? Bh(st, $t) : null, zt = Z && It ? d({
+  }), Wn = $ ? Tr($, M) : null, dn = yx(ut), Gr = sd(dn), ne = sd(dn, [X]), ue = Tr($t, Gr), It = st ? Bh(st, $t) : null, zt = Z && It ? d({
     active: Z,
     collisionRect: It,
     droppableRects: Se,
@@ -7782,27 +7782,27 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
             event: Gt
           });
         },
-        onPending(Ue, pn, Ft, Gt) {
+        onPending(Ue, fn, Ft, Gt) {
           if (!y.get(Ue))
             return;
           const {
             onDragPending: Xr
-          } = z.current, mn = {
+          } = z.current, pn = {
             id: Ue,
-            constraint: pn,
+            constraint: fn,
             initialCoordinates: Ft,
             offset: Gt
           };
-          Xr == null || Xr(mn), m({
+          Xr == null || Xr(pn), m({
             type: "onDragPending",
-            event: mn
+            event: pn
           });
         },
         onStart(Ue) {
-          const pn = te.current;
-          if (pn == null)
+          const fn = te.current;
+          if (fn == null)
             return;
-          const Ft = y.get(pn);
+          const Ft = y.get(fn);
           if (!Ft)
             return;
           const {
@@ -7810,16 +7810,16 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
           } = z.current, qr = {
             activatorEvent: Je,
             active: {
-              id: pn,
+              id: fn,
               data: Ft.data,
               rect: G
             }
           };
           Sr.unstable_batchedUpdates(() => {
-            Gt == null || Gt(qr), w(yn.Initializing), h({
+            Gt == null || Gt(qr), w(vn.Initializing), h({
               type: De.DragStart,
               initialCoordinates: Ue,
-              active: pn
+              active: fn
             }), m({
               type: "onDragStart",
               event: qr
@@ -7844,29 +7844,29 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
             over: qr,
             scrollAdjustedTranslate: Xr
           } = ve.current;
-          let mn = null;
+          let pn = null;
           if (Ft && Xr) {
             const {
               cancelDrop: Jr
             } = z.current;
-            mn = {
+            pn = {
               activatorEvent: Je,
               active: Ft,
               collisions: Gt,
               delta: Xr,
               over: qr
-            }, Ue === De.DragEnd && typeof Jr == "function" && await Promise.resolve(Jr(mn)) && (Ue = De.DragCancel);
+            }, Ue === De.DragEnd && typeof Jr == "function" && await Promise.resolve(Jr(pn)) && (Ue = De.DragCancel);
           }
           te.current = null, Sr.unstable_batchedUpdates(() => {
             h({
               type: Ue
-            }), w(yn.Uninitialized), Bn(null), q(null), I(null), C.current = null;
+            }), w(vn.Uninitialized), Bn(null), q(null), I(null), C.current = null;
             const Jr = Ue === De.DragEnd ? "onDragEnd" : "onDragCancel";
-            if (mn) {
+            if (pn) {
               const Ko = z.current[Jr];
-              Ko == null || Ko(mn), m({
+              Ko == null || Ko(pn), m({
                 type: Jr,
-                event: mn
+                event: pn
               });
             }
           });
@@ -7892,7 +7892,7 @@ const Tx = /* @__PURE__ */ g.memo(function(t) {
     }, te.current = ft, O(Re, ke));
   }, [y, O]), H = fx(p, W);
   wx(p), ln(() => {
-    X && v === yn.Initializing && w(yn.Initialized);
+    X && v === vn.Initializing && w(vn.Initialized);
   }, [X, v]), g.useEffect(
     () => {
       const {
@@ -8584,7 +8584,7 @@ const km = K("BarChart3", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const un = K("Bot", [
+const cn = K("Bot", [
   ["path", { d: "M12 8V4H8", key: "hb8ula" }],
   ["rect", { width: "16", height: "12", x: "4", y: "8", rx: "2", key: "enze0r" }],
   ["path", { d: "M2 14h2", key: "vft8re" }],
@@ -8637,7 +8637,7 @@ const rv = K("CircleAlert", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const on = K("CircleCheck", [
+const $n = K("CircleCheck", [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
 ]);
@@ -8732,16 +8732,6 @@ const iv = K("Diamond", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const av = K("Eye", [
-  ["path", { d: "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z", key: "rwhkz3" }],
-  ["circle", { cx: "12", cy: "12", r: "3", key: "1v7zrd" }]
-]);
-/**
- * @license lucide-react v0.400.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
 const Cm = K("FileText", [
   ["path", { d: "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z", key: "1rqfz7" }],
   ["path", { d: "M14 2v4a2 2 0 0 0 2 2h4", key: "tnqrlb" }],
@@ -8755,7 +8745,7 @@ const Cm = K("FileText", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const cv = K("Gauge", [
+const av = K("Gauge", [
   ["path", { d: "m12 14 4-4", key: "9kzdfg" }],
   ["path", { d: "M3.34 19a10 10 0 1 1 17.32 0", key: "19p75a" }]
 ]);
@@ -8788,7 +8778,7 @@ const ad = K("GitCommitHorizontal", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const uv = K("GitMerge", [
+const cv = K("GitMerge", [
   ["circle", { cx: "18", cy: "18", r: "3", key: "1xkwt0" }],
   ["circle", { cx: "6", cy: "6", r: "3", key: "1lh9wr" }],
   ["path", { d: "M6 21V9a9 9 0 0 0 9 9", key: "7kw0sc" }]
@@ -8810,7 +8800,7 @@ const Tc = K("History", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const dv = K("Inbox", [
+const uv = K("Inbox", [
   ["polyline", { points: "22 12 16 12 14 15 10 15 8 12 2 12", key: "o97t9d" }],
   [
     "path",
@@ -8826,22 +8816,9 @@ const dv = K("Inbox", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const fv = K("ListChecks", [
+const dv = K("ListChecks", [
   ["path", { d: "m3 17 2 2 4-4", key: "1jhpwq" }],
   ["path", { d: "m3 7 2 2 4-4", key: "1obspn" }],
-  ["path", { d: "M13 6h8", key: "15sg57" }],
-  ["path", { d: "M13 12h8", key: "h98zly" }],
-  ["path", { d: "M13 18h8", key: "oe0vm4" }]
-]);
-/**
- * @license lucide-react v0.400.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const pv = K("ListTodo", [
-  ["rect", { x: "3", y: "5", width: "6", height: "6", rx: "1", key: "1defrl" }],
-  ["path", { d: "m3 17 2 2 4-4", key: "1jhpwq" }],
   ["path", { d: "M13 6h8", key: "15sg57" }],
   ["path", { d: "M13 12h8", key: "h98zly" }],
   ["path", { d: "M13 18h8", key: "oe0vm4" }]
@@ -8861,23 +8838,7 @@ const Jn = K("LoaderCircle", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const mv = K("Loader", [
-  ["path", { d: "M12 2v4", key: "3427ic" }],
-  ["path", { d: "m16.2 7.8 2.9-2.9", key: "r700ao" }],
-  ["path", { d: "M18 12h4", key: "wj9ykh" }],
-  ["path", { d: "m16.2 16.2 2.9 2.9", key: "1bxg5t" }],
-  ["path", { d: "M12 18v4", key: "jadmvz" }],
-  ["path", { d: "m4.9 19.1 2.9-2.9", key: "bwix9q" }],
-  ["path", { d: "M2 12h4", key: "j09sii" }],
-  ["path", { d: "m4.9 4.9 2.9 2.9", key: "giyufr" }]
-]);
-/**
- * @license lucide-react v0.400.0 - ISC
- *
- * This source code is licensed under the ISC license.
- * See the LICENSE file in the root directory of this source tree.
- */
-const gv = K("Lock", [
+const fv = K("Lock", [
   ["rect", { width: "18", height: "11", x: "3", y: "11", rx: "2", ry: "2", key: "1w4ew1" }],
   ["path", { d: "M7 11V7a5 5 0 0 1 10 0v4", key: "fwvmzm" }]
 ]);
@@ -8887,7 +8848,7 @@ const gv = K("Lock", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const hv = K("MessageSquare", [
+const pv = K("MessageSquare", [
   ["path", { d: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z", key: "1lielz" }]
 ]);
 /**
@@ -8896,7 +8857,7 @@ const hv = K("MessageSquare", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const xv = K("MousePointer2", [
+const mv = K("MousePointer2", [
   ["path", { d: "m4 4 7.07 17 2.51-7.39L21 11.07z", key: "1vqm48" }]
 ]);
 /**
@@ -8905,7 +8866,7 @@ const xv = K("MousePointer2", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const vv = K("PenLine", [
+const gv = K("PenLine", [
   ["path", { d: "M12 20h9", key: "t2du7b" }],
   [
     "path",
@@ -8968,7 +8929,7 @@ const Pc = K("RefreshCw", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const yv = K("Repeat", [
+const hv = K("Repeat", [
   ["path", { d: "m17 2 4 4-4 4", key: "nntrym" }],
   ["path", { d: "M3 11v-1a4 4 0 0 1 4-4h14", key: "84bu3i" }],
   ["path", { d: "m7 22-4-4 4-4", key: "1wqhfi" }],
@@ -8980,7 +8941,7 @@ const yv = K("Repeat", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const an = K("RotateCcw", [
+const on = K("RotateCcw", [
   ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
   ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
 ]);
@@ -9007,7 +8968,7 @@ const Dc = K("Save", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const wv = K("ScrollText", [
+const xv = K("ScrollText", [
   ["path", { d: "M15 12h-5", key: "r7krc0" }],
   ["path", { d: "M15 8h-5", key: "1khuty" }],
   ["path", { d: "M19 17V5a2 2 0 0 0-2-2H4", key: "zz82l3" }],
@@ -9025,7 +8986,7 @@ const wv = K("ScrollText", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const kv = K("SquareKanban", [
+const vv = K("SquareKanban", [
   ["rect", { width: "18", height: "18", x: "3", y: "3", rx: "2", key: "afitv7" }],
   ["path", { d: "M8 7v7", key: "1x2jlm" }],
   ["path", { d: "M12 7v4", key: "xawao1" }],
@@ -9046,7 +9007,7 @@ const el = K("Square", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const bv = K("Tag", [
+const yv = K("Tag", [
   [
     "path",
     {
@@ -9062,7 +9023,7 @@ const bv = K("Tag", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Nv = K("Target", [
+const wv = K("Target", [
   ["circle", { cx: "12", cy: "12", r: "10", key: "1mglay" }],
   ["circle", { cx: "12", cy: "12", r: "6", key: "1vlfrh" }],
   ["circle", { cx: "12", cy: "12", r: "2", key: "1c9p78" }]
@@ -9073,7 +9034,7 @@ const Nv = K("Target", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const jv = K("Terminal", [
+const kv = K("Terminal", [
   ["polyline", { points: "4 17 10 11 4 5", key: "akl6gq" }],
   ["line", { x1: "12", x2: "20", y1: "19", y2: "19", key: "q2wloq" }]
 ]);
@@ -9083,7 +9044,7 @@ const jv = K("Terminal", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Sv = K("Timer", [
+const bv = K("Timer", [
   ["line", { x1: "10", x2: "14", y1: "2", y2: "2", key: "14vaq8" }],
   ["line", { x1: "12", x2: "15", y1: "14", y2: "11", key: "17fdiu" }],
   ["circle", { cx: "12", cy: "14", r: "8", key: "1e1u0o" }]
@@ -9094,7 +9055,7 @@ const Sv = K("Timer", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Dn = K("Trash2", [
+const Pn = K("Trash2", [
   ["path", { d: "M3 6h18", key: "d0wm0j" }],
   ["path", { d: "M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6", key: "4alrt4" }],
   ["path", { d: "M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2", key: "v07s0e" }],
@@ -9107,7 +9068,7 @@ const Dn = K("Trash2", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Cv = K("TriangleAlert", [
+const Nv = K("TriangleAlert", [
   [
     "path",
     {
@@ -9124,7 +9085,7 @@ const Cv = K("TriangleAlert", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Ev = K("UserCheck", [
+const jv = K("UserCheck", [
   ["path", { d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2", key: "1yyitq" }],
   ["circle", { cx: "9", cy: "7", r: "4", key: "nufk8" }],
   ["polyline", { points: "16 11 18 13 22 9", key: "1pwet4" }]
@@ -9145,7 +9106,7 @@ const Oc = K("User", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Iv = K("WandSparkles", [
+const Sv = K("WandSparkles", [
   [
     "path",
     {
@@ -9167,7 +9128,7 @@ const Iv = K("WandSparkles", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const _v = K("Workflow", [
+const Cv = K("Workflow", [
   ["rect", { width: "8", height: "8", x: "3", y: "3", rx: "2", key: "by2w9f" }],
   ["path", { d: "M7 11v4a2 2 0 0 0 2 2h4", key: "xkn7yn" }],
   ["rect", { width: "8", height: "8", x: "13", y: "13", rx: "2", key: "1cgmvn" }]
@@ -9203,7 +9164,7 @@ const Ur = K("X", [
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */
-const Rv = K("Zap", [
+const Ev = K("Zap", [
   [
     "path",
     {
@@ -9211,7 +9172,7 @@ const Rv = K("Zap", [
       key: "1xq2db"
     }
   ]
-]), Av = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='128'%20height='128'%20viewBox='0%200%2016%2016'%20fill='none'%20role='img'%20aria-label='Kanban%20AI'%3e%3cdefs%3e%3clinearGradient%20id='kb-grad'%20x1='0'%20y1='0'%20x2='16'%20y2='0'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20offset='0'%20stop-color='%233b82f6'/%3e%3cstop%20offset='0.5'%20stop-color='%236366f1'/%3e%3cstop%20offset='1'%20stop-color='%238b5cf6'/%3e%3c/linearGradient%3e%3clinearGradient%20id='kb-node'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3e%3cstop%20offset='0'%20stop-color='%23ffffff'/%3e%3cstop%20offset='1'%20stop-color='%23a5b4fc'/%3e%3c/linearGradient%3e%3c/defs%3e%3cg%20stroke='url(%23kb-node)'%20stroke-width='0.9'%20stroke-linecap='round'%20opacity='0.92'%3e%3cline%20x1='3'%20y1='5'%20x2='8'%20y2='2.6'/%3e%3cline%20x1='8'%20y1='2.6'%20x2='13'%20y2='5'/%3e%3cline%20x1='3'%20y1='5'%20x2='13'%20y2='5'/%3e%3cline%20x1='3'%20y1='5'%20x2='3'%20y2='7.5'/%3e%3cline%20x1='8'%20y1='2.6'%20x2='8'%20y2='7.5'/%3e%3cline%20x1='13'%20y1='5'%20x2='13'%20y2='7.5'/%3e%3c/g%3e%3cg%20fill='url(%23kb-grad)'%3e%3crect%20x='1.3'%20y='7.5'%20width='3.4'%20height='7'%20rx='1.4'/%3e%3crect%20x='6.3'%20y='7.5'%20width='3.4'%20height='7'%20rx='1.4'/%3e%3crect%20x='11.3'%20y='7.5'%20width='3.4'%20height='7'%20rx='1.4'/%3e%3c/g%3e%3cg%20fill='url(%23kb-node)'%3e%3ccircle%20cx='3'%20cy='5'%20r='1.4'/%3e%3ccircle%20cx='8'%20cy='2.6'%20r='1.6'/%3e%3ccircle%20cx='13'%20cy='5'%20r='1.4'/%3e%3c/g%3e%3c/svg%3e";
+]), Iv = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20width='128'%20height='128'%20viewBox='0%200%2016%2016'%20fill='none'%20role='img'%20aria-label='Kanban%20AI'%3e%3cdefs%3e%3clinearGradient%20id='kb-grad'%20x1='0'%20y1='0'%20x2='16'%20y2='0'%20gradientUnits='userSpaceOnUse'%3e%3cstop%20offset='0'%20stop-color='%233b82f6'/%3e%3cstop%20offset='0.5'%20stop-color='%236366f1'/%3e%3cstop%20offset='1'%20stop-color='%238b5cf6'/%3e%3c/linearGradient%3e%3clinearGradient%20id='kb-node'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3e%3cstop%20offset='0'%20stop-color='%23ffffff'/%3e%3cstop%20offset='1'%20stop-color='%23a5b4fc'/%3e%3c/linearGradient%3e%3c/defs%3e%3cg%20stroke='url(%23kb-node)'%20stroke-width='0.9'%20stroke-linecap='round'%20opacity='0.92'%3e%3cline%20x1='3'%20y1='5'%20x2='8'%20y2='2.6'/%3e%3cline%20x1='8'%20y1='2.6'%20x2='13'%20y2='5'/%3e%3cline%20x1='3'%20y1='5'%20x2='13'%20y2='5'/%3e%3cline%20x1='3'%20y1='5'%20x2='3'%20y2='7.5'/%3e%3cline%20x1='8'%20y1='2.6'%20x2='8'%20y2='7.5'/%3e%3cline%20x1='13'%20y1='5'%20x2='13'%20y2='7.5'/%3e%3c/g%3e%3cg%20fill='url(%23kb-grad)'%3e%3crect%20x='1.3'%20y='7.5'%20width='3.4'%20height='7'%20rx='1.4'/%3e%3crect%20x='6.3'%20y='7.5'%20width='3.4'%20height='7'%20rx='1.4'/%3e%3crect%20x='11.3'%20y='7.5'%20width='3.4'%20height='7'%20rx='1.4'/%3e%3c/g%3e%3cg%20fill='url(%23kb-node)'%3e%3ccircle%20cx='3'%20cy='5'%20r='1.4'/%3e%3ccircle%20cx='8'%20cy='2.6'%20r='1.6'/%3e%3ccircle%20cx='13'%20cy='5'%20r='1.4'/%3e%3c/g%3e%3c/svg%3e";
 function Ht(e = {}) {
   const { delay: t = 0, threshold: n = 0.15 } = e, r = g.useRef(null);
   return g.useEffect(() => {
@@ -9231,18 +9192,18 @@ function Ht(e = {}) {
     return l.observe(s), () => l.disconnect();
   }, [t, n]), r;
 }
-function Tv({ onCreate: e, syncing: t = !1 }) {
+function _v({ onCreate: e, syncing: t = !1 }) {
   const n = Ht({ delay: 0 }), r = Ht({ delay: 60 }), s = Ht({ delay: 120 }), l = Ht({ delay: 180 });
-  return /* @__PURE__ */ o.jsx("header", { className: "relative z-10 flex flex-col gap-5", children: /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between", children: [
-    /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-4", children: [
-      /* @__PURE__ */ o.jsx("div", { className: "kb-glass flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px]", children: /* @__PURE__ */ o.jsx(
+  return /* @__PURE__ */ o.jsx("header", { className: "relative z-10 flex flex-col gap-8", children: /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between", children: [
+    /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-5", children: [
+      /* @__PURE__ */ o.jsx("div", { className: "kb-glass-sm flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px]", children: /* @__PURE__ */ o.jsx(
         "img",
         {
-          src: Av,
+          src: Iv,
           alt: "Kanban AI",
-          width: 40,
-          height: 40,
-          className: "h-10 w-10"
+          width: 36,
+          height: 36,
+          className: "h-9 w-9"
         }
       ) }),
       /* @__PURE__ */ o.jsxs("div", { children: [
@@ -9250,7 +9211,7 @@ function Tv({ onCreate: e, syncing: t = !1 }) {
           "p",
           {
             ref: n,
-            className: "kb-reveal text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-slate-500",
+            className: "kb-reveal text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-slate-500",
             children: "Workspace"
           }
         ),
@@ -9258,7 +9219,7 @@ function Tv({ onCreate: e, syncing: t = !1 }) {
           "h1",
           {
             ref: r,
-            className: "kb-reveal mt-1 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.02em] text-slate-50",
+            className: "kb-reveal mt-2 text-[2.5rem] font-bold leading-[1.05] tracking-[-0.025em] text-slate-50",
             children: "Kanban Board"
           }
         ),
@@ -9266,7 +9227,7 @@ function Tv({ onCreate: e, syncing: t = !1 }) {
           "p",
           {
             ref: s,
-            className: "kb-reveal mt-1.5 text-sm text-slate-400",
+            className: "kb-reveal mt-2 text-[0.9375rem] text-slate-400",
             children: "Plan, track and ship work across your team — in one place."
           }
         )
@@ -9276,7 +9237,7 @@ function Tv({ onCreate: e, syncing: t = !1 }) {
       /* @__PURE__ */ o.jsxs(
         "div",
         {
-          className: "flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-medium ring-1 ring-white/10",
+          className: "flex items-center gap-1.5 rounded-full bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium ring-1 ring-white/[0.08]",
           title: t ? "Syncing…" : "Synced",
           children: [
             /* @__PURE__ */ o.jsx(
@@ -9289,7 +9250,7 @@ function Tv({ onCreate: e, syncing: t = !1 }) {
           ]
         }
       ),
-      /* @__PURE__ */ o.jsx("div", { className: "kb-glass flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-semibold text-white", children: "GP" }),
+      /* @__PURE__ */ o.jsx("div", { className: "kb-glass-sm flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-semibold text-white", children: "GP" }),
       /* @__PURE__ */ o.jsxs(
         "button",
         {
@@ -9305,79 +9266,33 @@ function Tv({ onCreate: e, syncing: t = !1 }) {
     ] })
   ] }) });
 }
-function Mv({ stats: e }) {
-  const t = [
-    {
-      label: "Total Tasks",
-      value: e.total,
-      icon: pv,
-      accent: "from-slate-500 to-slate-600",
-      valueCls: "text-slate-50",
-      wide: !0
-    },
-    {
-      label: "In Progress",
-      value: e.byStatus.in_progress,
-      icon: mv,
-      accent: "from-blue-500 to-indigo-500",
-      valueCls: "text-blue-400"
-    },
-    {
-      label: "Review",
-      value: e.byStatus.review,
-      icon: av,
-      accent: "from-amber-500 to-orange-500",
-      valueCls: "text-amber-400"
-    },
-    {
-      label: "Completed",
-      value: e.byStatus.done,
-      icon: on,
-      accent: "from-emerald-500 to-teal-500",
-      valueCls: "text-emerald-400"
-    }
+function Rv({ stats: e }) {
+  const t = Ht({ delay: 0 }), n = [
+    { label: "Total Tasks", value: e.total, valueCls: "text-slate-50" },
+    { label: "In Progress", value: e.byStatus.in_progress, valueCls: "text-blue-400" },
+    { label: "Review", value: e.byStatus.review, valueCls: "text-amber-400" },
+    { label: "Completed", value: e.byStatus.done, valueCls: "text-emerald-400" }
   ];
-  return /* @__PURE__ */ o.jsx("div", { className: "kb-bento relative z-10", children: t.map((n, r) => /* @__PURE__ */ o.jsx(Pv, { metric: n, delay: r * 70 }, n.label)) });
-}
-function Pv({ metric: e, delay: t }) {
-  const n = Ht({ delay: t }), r = e.icon;
-  return /* @__PURE__ */ o.jsxs(
+  return /* @__PURE__ */ o.jsx(
     "div",
     {
-      ref: n,
-      className: `kb-reveal kb-glass kb-card kb-fade-in group relative overflow-hidden rounded-[20px] p-5 ${e.wide ? "kb-bento--wide" : ""}`,
-      children: [
-        /* @__PURE__ */ o.jsx(
-          "div",
-          {
-            className: `absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${e.accent} opacity-15 blur-2xl transition-opacity duration-300 group-hover:opacity-30`
-          }
-        ),
-        /* @__PURE__ */ o.jsxs("div", { className: "relative flex items-center gap-4", children: [
-          /* @__PURE__ */ o.jsx(
-            "div",
-            {
-              className: `flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br ${e.accent} shadow-lg`,
-              children: /* @__PURE__ */ o.jsx(r, { className: "h-5 w-5 text-white", strokeWidth: 2 })
-            }
-          ),
-          /* @__PURE__ */ o.jsxs("div", { className: "min-w-0", children: [
-            /* @__PURE__ */ o.jsx("p", { className: `text-3xl font-extrabold tabular-nums tracking-tight ${e.valueCls}`, children: e.value }),
-            /* @__PURE__ */ o.jsx("p", { className: "truncate text-xs font-medium uppercase tracking-[0.14em] text-slate-400", children: e.label })
-          ] })
-        ] })
-      ]
+      ref: t,
+      className: "kb-reveal kb-glass relative z-10 flex flex-wrap items-stretch divide-x divide-white/[0.06] rounded-[16px]",
+      children: n.map((r) => /* @__PURE__ */ o.jsxs("div", { className: "flex min-w-[7rem] flex-1 flex-col gap-1 px-6 py-5", children: [
+        /* @__PURE__ */ o.jsx("p", { className: `text-3xl font-bold tabular-nums tracking-tight ${r.valueCls}`, children: r.value }),
+        /* @__PURE__ */ o.jsx("p", { className: "text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-slate-500", children: r.label })
+      ] }, r.label))
     }
   );
 }
-const Dv = [
+const Av = [
   { id: "all", label: "All" },
   { id: "active", label: "Active" },
   { id: "assigned", label: "Assigned" },
   { id: "completed", label: "Completed" }
 ];
-function Ov({ filter: e, onFilter: t }) {
-  return /* @__PURE__ */ o.jsx("div", { className: "relative z-10 flex flex-wrap items-center gap-2", children: Dv.map((n) => {
+function Tv({ filter: e, onFilter: t }) {
+  return /* @__PURE__ */ o.jsx("div", { className: "relative z-10 flex flex-wrap items-center gap-2", children: Av.map((n) => {
     const r = e === n.id;
     return /* @__PURE__ */ o.jsx(
       "button",
@@ -9408,7 +9323,7 @@ function Rm(e, t) {
   const n = new Date(e);
   return n.setDate(n.getDate() + t), n;
 }
-function Lv(e, t) {
+function Mv(e, t) {
   if (!e) return "none";
   const n = Im(e);
   if (!n) return "none";
@@ -9429,10 +9344,10 @@ const cd = {
   high: { label: "High", cls: "bg-rose-500/10 text-rose-400 ring-rose-500/20", dot: "bg-rose-400" },
   critical: { label: "Critical", cls: "bg-red-600/15 text-red-400 ring-red-500/30", dot: "bg-red-500" }
 };
-function jn(e) {
+function Nn(e) {
   return e ? cd[e] ?? cd.pending : null;
 }
-function $v(e) {
+function Pv(e) {
   return Wr[e ?? "medium"] ?? Wr.medium;
 }
 function lr({
@@ -9451,7 +9366,7 @@ function lr({
     }
   );
 }
-const zv = {
+const Dv = {
   deleting: "Deleting Task…",
   removing_conversation: "Removing conversation…",
   syncing: "Synchronizing…",
@@ -9469,14 +9384,14 @@ function dd(e) {
   for (let n = 0; n < e.length; n++) t = t * 31 + e.charCodeAt(n) | 0;
   return ud[Math.abs(t) % ud.length];
 }
-function Fv(e) {
+function Ov(e) {
   return e.split(/\s+/).map((t) => t[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 }
-function Uv(e) {
+function Lv(e) {
   const t = /* @__PURE__ */ new Date(e + "T00:00:00");
   return isNaN(t.getTime()) ? e : t.toLocaleDateString(void 0, { month: "short", day: "numeric" });
 }
-function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deleting: s = !1, deletePhase: l, deleteError: i, onEdit: a, onDelete: c, onRetryDelete: u, onCancelDelete: p }) {
+function $v({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deleting: s = !1, deletePhase: l, deleteError: i, onEdit: a, onDelete: c, onRetryDelete: u, onCancelDelete: p }) {
   var ie;
   const d = s || !!i, { attributes: f, listeners: k, setNodeRef: N, transform: b } = Dx({
     id: e.id,
@@ -9487,11 +9402,11 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
   }), A = k == null ? void 0 : k.onPointerDown, h = r ? { zIndex: 9999 } : {
     transform: Fr.Translate.toString(b),
     opacity: n ? 0 : void 0
-  }, m = e.priority ?? "medium", x = $v(m), v = e.dueDate ? Lv(e.dueDate, e.status) : "none", w = e.progress ?? 0, j = e.agentId ? t.find((I) => I.id === e.agentId) : void 0, S = (ie = e.ai) == null ? void 0 : ie.executionStatus, y = S === "running" || S === "queued", M = g.useRef(null), R = g.useRef(!1);
+  }, m = e.priority ?? "medium", x = Pv(m), v = e.dueDate ? Mv(e.dueDate, e.status) : "none", w = e.progress ?? 0, j = e.agentId ? t.find((I) => I.id === e.agentId) : void 0, S = (ie = e.ai) == null ? void 0 : ie.executionStatus, y = S === "running" || S === "queued", M = g.useRef(null), R = g.useRef(!1);
   g.useEffect(() => {
     n && (R.current = !0);
   }, [n]);
-  const F = jn(S), G = e.status === "done" ? "var(--kb-glow-done)" : e.status === "review" ? "var(--kb-glow-review)" : e.status === "in_progress" ? "var(--kb-glow-progress)" : e.status === "todo" ? "var(--kb-glow-todo)" : S === "failed" ? "var(--kb-glow-blocked)" : S === "queued" ? "var(--kb-glow-waiting)" : "var(--kb-glow-neutral)", Z = g.useRef(e.status), te = g.useRef(S), [fe, q] = g.useState("");
+  const F = Nn(S), G = e.status === "done" ? "var(--kb-glow-done)" : e.status === "review" ? "var(--kb-glow-review)" : e.status === "in_progress" ? "var(--kb-glow-progress)" : e.status === "todo" ? "var(--kb-glow-todo)" : S === "failed" ? "var(--kb-glow-blocked)" : S === "queued" ? "var(--kb-glow-waiting)" : "var(--kb-glow-neutral)", Z = g.useRef(e.status), te = g.useRef(S), [fe, q] = g.useState("");
   return g.useEffect(() => {
     const I = Z.current, z = te.current;
     if (Z.current = e.status, te.current = S, I !== "done" && e.status === "done") {
@@ -9528,7 +9443,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
         const U = Math.hypot(I.clientX - z.x, I.clientY - z.y), se = R.current;
         R.current = !1, !(s || i) && (U > 5 || se || a == null || a(e));
       },
-      className: `kb-glass kb-card kb-fade-in group cursor-grab rounded-[20px] p-4 active:cursor-grabbing ${r ? "kb-dragging kb-drag-overlay" : n ? "kb-drag-placeholder" : ""} ${s ? "opacity-60" : ""} ${i ? "kb-delete-failed" : ""} ${l === "fading" ? "kb-delete-fading" : ""} ${y ? "kb-running" : ""} ${fe}`,
+      className: `kb-glass kb-card kb-fade-in group cursor-grab rounded-[16px] p-4 active:cursor-grabbing ${r ? "kb-dragging kb-drag-overlay" : n ? "kb-drag-placeholder" : ""} ${s ? "opacity-60" : ""} ${i ? "kb-delete-failed" : ""} ${l === "fading" ? "kb-delete-fading" : ""} ${y ? "kb-running" : ""} ${fe}`,
       children: [
         i ? (
           // Deletion failed — the task was NOT removed. Show the reason and
@@ -9549,7 +9464,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
                   className: "flex items-center gap-1.5 rounded-lg bg-rose-500/20 px-3 py-1.5 text-xs font-semibold text-rose-200 ring-1 ring-rose-400/30 transition-colors hover:bg-rose-500/30",
                   "aria-label": "Retry deletion",
                   children: [
-                    /* @__PURE__ */ o.jsx(an, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
+                    /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
                     "Retry"
                   ]
                 }
@@ -9577,7 +9492,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
               /* @__PURE__ */ o.jsx("circle", { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }),
               /* @__PURE__ */ o.jsx("path", { className: "opacity-75", fill: "currentColor", d: "M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" })
             ] }),
-            /* @__PURE__ */ o.jsx("span", { className: "text-sm font-semibold text-rose-300", children: l ? zv[l] : "Deleting…" }),
+            /* @__PURE__ */ o.jsx("span", { className: "text-sm font-semibold text-rose-300", children: l ? Dv[l] : "Deleting…" }),
             /* @__PURE__ */ o.jsx("div", { className: "h-1 w-32 overflow-hidden rounded-full bg-white/10", children: /* @__PURE__ */ o.jsx(
               "div",
               {
@@ -9598,7 +9513,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
               className: "flex items-center gap-1 rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-medium text-rose-400 ring-1 ring-rose-500/20",
               title: `Waiting on ${e.waitingOn.length} task(s)`,
               children: [
-                /* @__PURE__ */ o.jsx(Cv, { className: "h-3 w-3" }),
+                /* @__PURE__ */ o.jsx(Nv, { className: "h-3 w-3" }),
                 "Blocked"
               ]
             }
@@ -9613,7 +9528,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
           ))
         ] }),
         y && /* @__PURE__ */ o.jsxs("div", { className: "mb-2.5 flex items-center gap-2 rounded-xl bg-blue-500/10 px-3 py-2 text-[11px] font-medium text-blue-300 ring-1 ring-blue-500/20", children: [
-          /* @__PURE__ */ o.jsx(gv, { className: "h-3.5 w-3.5 shrink-0" }),
+          /* @__PURE__ */ o.jsx(fv, { className: "h-3.5 w-3.5 shrink-0" }),
           "Task is currently running and cannot be edited."
         ] }),
         /* @__PURE__ */ o.jsx("h4", { className: "mb-1.5 text-sm font-semibold leading-snug text-slate-100 line-clamp-2", children: e.title }),
@@ -9623,7 +9538,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
             {
               className: `flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white shadow-md ring-2 ring-white/10 ${dd(j.name)}`,
               title: j.name,
-              children: /* @__PURE__ */ o.jsx(un, { className: "h-3.5 w-3.5", strokeWidth: 2 })
+              children: /* @__PURE__ */ o.jsx(cn, { className: "h-3.5 w-3.5", strokeWidth: 2 })
             }
           ),
           /* @__PURE__ */ o.jsxs("div", { className: "flex min-w-0 flex-col", children: [
@@ -9658,7 +9573,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
               className: `flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${v === "overdue" ? "bg-rose-500/10 text-rose-400 ring-rose-500/20" : v === "soon" ? "bg-amber-500/10 text-amber-400 ring-amber-500/20" : "bg-white/5 text-slate-500 ring-white/10"}`,
               children: [
                 /* @__PURE__ */ o.jsx(bm, { className: "h-3 w-3" }),
-                Uv(e.dueDate)
+                Lv(e.dueDate)
               ]
             }
           ) }),
@@ -9691,7 +9606,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
                   className: "flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-rose-500/15 hover:text-rose-400 disabled:cursor-not-allowed disabled:opacity-40",
                   "aria-label": y ? "Task is running — stop it before deleting" : "Delete task",
                   title: y ? "Stop the task before deleting it." : "Delete task",
-                  children: /* @__PURE__ */ o.jsx(Dn, { className: "h-3.5 w-3.5" })
+                  children: /* @__PURE__ */ o.jsx(Pn, { className: "h-3.5 w-3.5" })
                 }
               )
             ] }),
@@ -9700,7 +9615,7 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
               {
                 className: `flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold text-white shadow-md ring-2 ring-white/10 ${dd(e.assignee)}`,
                 title: e.assignee,
-                children: Fv(e.assignee)
+                children: Ov(e.assignee)
               }
             )
           ] })
@@ -9709,44 +9624,44 @@ function Wv({ task: e, agents: t = [], isDragging: n, isOverlay: r = !1, deletin
     }
   );
 }
-const Am = g.memo(Wv);
-function Bv({ columnTitle: e }) {
+const Am = g.memo($v);
+function zv({ columnTitle: e }) {
   return /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col items-center justify-center gap-2.5 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center", children: [
-    /* @__PURE__ */ o.jsx("div", { className: "flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10", children: /* @__PURE__ */ o.jsx(dv, { className: "h-5 w-5 text-slate-500", strokeWidth: 1.5 }) }),
+    /* @__PURE__ */ o.jsx("div", { className: "flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10", children: /* @__PURE__ */ o.jsx(uv, { className: "h-5 w-5 text-slate-500", strokeWidth: 1.5 }) }),
     /* @__PURE__ */ o.jsxs("p", { className: "text-xs font-medium text-slate-500", children: [
       "No tasks in ",
       e
     ] })
   ] });
 }
-const Vv = {
+const Fv = {
   todo: "bg-slate-400",
   in_progress: "bg-blue-500",
   review: "bg-amber-500",
   done: "bg-emerald-500"
-}, Hv = {
+}, Uv = {
   todo: "rgba(142, 142, 147, 0.5)",
   in_progress: "rgba(10, 132, 255, 0.5)",
   review: "rgba(255, 159, 10, 0.5)",
   done: "rgba(48, 209, 88, 0.5)"
 };
-function Kv({ column: e, activeTaskId: t, agents: n = [], deletingTaskIds: r, deletePhases: s, deleteErrors: l, onEdit: i, onDelete: a, onRetryDelete: c, onCancelDelete: u }) {
-  const { setNodeRef: p, isOver: d } = zx({ id: e.status }), f = Vv[e.status];
+function Wv({ column: e, activeTaskId: t, agents: n = [], deletingTaskIds: r, deletePhases: s, deleteErrors: l, onEdit: i, onDelete: a, onRetryDelete: c, onCancelDelete: u }) {
+  const { setNodeRef: p, isOver: d } = zx({ id: e.status }), f = Fv[e.status];
   return /* @__PURE__ */ o.jsxs(
     "div",
     {
       ref: p,
       "data-drop-status": e.status,
-      className: `kb-glass flex flex-col rounded-[20px] p-3 transition-all duration-200 ${d ? "kb-drop-target" : ""}`,
+      className: `kb-glass-sm flex flex-col rounded-[18px] p-4 transition-all duration-200 ${d ? "kb-drop-target" : ""}`,
       children: [
-        /* @__PURE__ */ o.jsxs("div", { className: "mb-3 flex items-center justify-between px-1.5", children: [
+        /* @__PURE__ */ o.jsxs("div", { className: "mb-4 flex items-center justify-between px-1", children: [
           /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-2.5", children: [
-            /* @__PURE__ */ o.jsx("span", { className: `h-2.5 w-2.5 rounded-full ${f}`, style: { boxShadow: `0 0 10px ${Hv[e.status]}` } }),
-            /* @__PURE__ */ o.jsx("h3", { className: "text-sm font-bold uppercase tracking-[0.12em] text-slate-300", children: e.title })
+            /* @__PURE__ */ o.jsx("span", { className: `h-2 w-2 rounded-full ${f}`, style: { boxShadow: `0 0 8px ${Uv[e.status]}` } }),
+            /* @__PURE__ */ o.jsx("h3", { className: "text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-slate-400", children: e.title })
           ] }),
-          /* @__PURE__ */ o.jsx("span", { className: "flex h-6 min-w-6 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400 ring-1 ring-white/10", children: e.tasks.length })
+          /* @__PURE__ */ o.jsx("span", { className: "flex h-6 min-w-6 items-center justify-center rounded-full bg-white/[0.04] px-2 text-xs font-semibold tabular-nums text-slate-500 ring-1 ring-white/[0.06]", children: e.tasks.length })
         ] }),
-        /* @__PURE__ */ o.jsx("div", { className: "kb-scroll flex flex-1 flex-col gap-3 overflow-y-auto pr-0.5", children: e.tasks.length === 0 ? /* @__PURE__ */ o.jsx(Bv, { columnTitle: e.title }) : e.tasks.map((k) => /* @__PURE__ */ o.jsx(
+        /* @__PURE__ */ o.jsx("div", { className: "kb-scroll flex flex-1 flex-col gap-3 overflow-y-auto pr-0.5", children: e.tasks.length === 0 ? /* @__PURE__ */ o.jsx(zv, { columnTitle: e.title }) : e.tasks.map((k) => /* @__PURE__ */ o.jsx(
           Am,
           {
             task: k,
@@ -9766,16 +9681,16 @@ function Kv({ column: e, activeTaskId: t, agents: n = [], deletingTaskIds: r, de
     }
   );
 }
-const Yv = [
-  { id: "board", label: "Board", icon: kv },
+const Bv = [
+  { id: "board", label: "Board", icon: vv },
   { id: "workflow", label: "Workflow", icon: Sa },
   { id: "monitoring", label: "Activity", icon: Xn },
-  { id: "agents", label: "Agents", icon: un },
+  { id: "agents", label: "Agents", icon: cn },
   { id: "history", label: "History", icon: Tc },
   { id: "analytics", label: "Analytics", icon: km }
 ];
-function Qv({ view: e, onView: t }) {
-  return /* @__PURE__ */ o.jsx("nav", { className: "kb-glass-sm relative z-10 flex items-center gap-1 rounded-2xl p-1.5", children: Yv.map((n) => {
+function Vv({ view: e, onView: t }) {
+  return /* @__PURE__ */ o.jsx("nav", { className: "kb-glass-sm relative z-10 flex items-center gap-1 rounded-2xl p-1.5", children: Bv.map((n) => {
     const r = e === n.id, s = n.icon;
     return /* @__PURE__ */ o.jsxs(
       "button",
@@ -9793,7 +9708,7 @@ function Qv({ view: e, onView: t }) {
     );
   }) });
 }
-function Gv({
+function Hv({
   open: e,
   question: t,
   detail: n,
@@ -9804,7 +9719,7 @@ function Gv({
   onCancel: a
 }) {
   if (!e) return null;
-  const c = l === "stop" ? el : an, u = s === "danger" ? "bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/40 hover:bg-rose-500/30" : "kb-gradient kb-btn-glow text-white";
+  const c = l === "stop" ? el : on, u = s === "danger" ? "bg-rose-500/20 text-rose-200 ring-1 ring-rose-400/40 hover:bg-rose-500/30" : "kb-gradient kb-btn-glow text-white";
   return /* @__PURE__ */ o.jsx(
     "div",
     {
@@ -9871,7 +9786,7 @@ function Gv({
     }
   );
 }
-const qv = {
+const Kv = {
   todo: "To Do",
   in_progress: "In Progress",
   review: "Review",
@@ -9880,17 +9795,17 @@ const qv = {
 function fd(e) {
   return e ? new Date(e).toLocaleString() : "—";
 }
-function Xv(e, t) {
+function Yv(e, t) {
   if (!e) return "—";
   const n = t ?? Date.now(), r = Math.max(0, Math.round((n - e) / 1e3));
   if (r < 60) return `${r}s`;
   const s = Math.floor(r / 60);
   return s < 60 ? `${s}m ${r % 60}s` : `${Math.floor(s / 60)}h ${s % 60}m`;
 }
-function Jv(e) {
+function Qv(e) {
   return e && e.status === "completed" ? 100 : 0;
 }
-function Zv({
+function Gv({
   task: e,
   agents: t,
   openHandsState: n,
@@ -9911,7 +9826,7 @@ function Zv({
     var Te;
     const P = n == null ? void 0 : n.snapshot.executions.find(
       (pe) => pe.taskId === e.id || pe.id === e.conversationId || pe.id === e.executionId
-    ), _ = ((n == null ? void 0 : n.snapshot.events) ?? []).filter((pe) => pe.taskId === e.id || pe.executionId === e.conversationId || pe.executionId === e.executionId).sort((pe, st) => st.at - pe.at), $ = _[0], Y = ($ == null ? void 0 : $.title) ?? "—", ee = ($ == null ? void 0 : $.detail) ?? ($ == null ? void 0 : $.title) ?? "—", X = (P == null ? void 0 : P.error) ?? ((Te = _.find((pe) => pe.type === "error")) == null ? void 0 : Te.detail), Ce = Jv(P), ve = (P == null ? void 0 : P.status) === "running", ye = jn(P == null ? void 0 : P.status);
+    ), _ = ((n == null ? void 0 : n.snapshot.events) ?? []).filter((pe) => pe.taskId === e.id || pe.executionId === e.conversationId || pe.executionId === e.executionId).sort((pe, st) => st.at - pe.at), $ = _[0], Y = ($ == null ? void 0 : $.title) ?? "—", ee = ($ == null ? void 0 : $.detail) ?? ($ == null ? void 0 : $.title) ?? "—", X = (P == null ? void 0 : P.error) ?? ((Te = _.find((pe) => pe.type === "error")) == null ? void 0 : Te.detail), Ce = Qv(P), ve = (P == null ? void 0 : P.status) === "running", ye = Nn(P == null ? void 0 : P.status);
     return { execution: P, events: _, latest: $, currentStep: Y, latestMessage: ee, error: X, progress: Ce, isRunning: ve, statusStyle: ye };
   }, [n, e.id, e.conversationId, e.executionId]);
   g.useEffect(() => {
@@ -9948,7 +9863,7 @@ function Zv({
             children: [
               /* @__PURE__ */ o.jsxs("div", { className: "mb-5 flex items-start justify-between", children: [
                 /* @__PURE__ */ o.jsxs("div", { children: [
-                  /* @__PURE__ */ o.jsx("span", { className: "mb-1 inline-block rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-300 ring-1 ring-indigo-400/25", children: qv[e.status] }),
+                  /* @__PURE__ */ o.jsx("span", { className: "mb-1 inline-block rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-300 ring-1 ring-indigo-400/25", children: Kv[e.status] }),
                   /* @__PURE__ */ o.jsx("h3", { className: "text-lg font-semibold text-white", children: "Edit Task" })
                 ] }),
                 /* @__PURE__ */ o.jsx(
@@ -9970,7 +9885,7 @@ function Zv({
                 L.execution && /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-3", children: [
                   /* @__PURE__ */ o.jsxs("div", { className: "rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5", children: [
                     /* @__PURE__ */ o.jsxs("h4", { className: "mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400", children: [
-                      /* @__PURE__ */ o.jsx(Nv, { className: "h-3.5 w-3.5" }),
+                      /* @__PURE__ */ o.jsx(wv, { className: "h-3.5 w-3.5" }),
                       " Task Goal"
                     ] }),
                     /* @__PURE__ */ o.jsx("p", { className: "text-xs leading-relaxed text-slate-300", children: e.expectedOutput || e.agentPrompt || "No goal defined." })
@@ -9978,7 +9893,7 @@ function Zv({
                   /* @__PURE__ */ o.jsxs("div", { className: "rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5", children: [
                     /* @__PURE__ */ o.jsxs("div", { className: "mb-2 flex items-center justify-between", children: [
                       /* @__PURE__ */ o.jsxs("h4", { className: "flex items-center gap-1.5 text-xs font-semibold text-slate-400", children: [
-                        /* @__PURE__ */ o.jsx(cv, { className: "h-3.5 w-3.5" }),
+                        /* @__PURE__ */ o.jsx(av, { className: "h-3.5 w-3.5" }),
                         " Progress"
                       ] }),
                       L.statusStyle && /* @__PURE__ */ o.jsx(lr, { style: L.statusStyle, pulse: L.isRunning })
@@ -9994,21 +9909,21 @@ function Zv({
                   ] }),
                   /* @__PURE__ */ o.jsxs("div", { className: "rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5", children: [
                     /* @__PURE__ */ o.jsxs("h4", { className: "mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400", children: [
-                      /* @__PURE__ */ o.jsx(un, { className: "h-3.5 w-3.5" }),
+                      /* @__PURE__ */ o.jsx(cn, { className: "h-3.5 w-3.5" }),
                       " What the Agent Is Doing"
                     ] }),
                     /* @__PURE__ */ o.jsx("p", { className: "text-xs leading-relaxed text-slate-300", children: L.isRunning ? L.currentStep : L.execution.status === "completed" ? "Task completed successfully." : "—" })
                   ] }),
                   /* @__PURE__ */ o.jsxs("div", { className: "rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5", children: [
                     /* @__PURE__ */ o.jsxs("h4", { className: "mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400", children: [
-                      /* @__PURE__ */ o.jsx(hv, { className: "h-3.5 w-3.5" }),
+                      /* @__PURE__ */ o.jsx(pv, { className: "h-3.5 w-3.5" }),
                       " Agent Summary"
                     ] }),
                     /* @__PURE__ */ o.jsx("p", { className: "line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-slate-300", children: L.latestMessage !== "—" ? L.latestMessage : "No agent messages yet." })
                   ] }),
                   L.execution.status === "completed" && /* @__PURE__ */ o.jsxs("div", { className: "rounded-xl bg-emerald-500/[0.06] p-3.5 ring-1 ring-emerald-500/15", children: [
                     /* @__PURE__ */ o.jsxs("h4", { className: "mb-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-400", children: [
-                      /* @__PURE__ */ o.jsx(fv, { className: "h-3.5 w-3.5" }),
+                      /* @__PURE__ */ o.jsx(dv, { className: "h-3.5 w-3.5" }),
                       " Final Result"
                     ] }),
                     /* @__PURE__ */ o.jsx("p", { className: "text-xs leading-relaxed text-emerald-200/80", children: e.successCriteria || "Task completed. See agent summary above for details." })
@@ -10074,7 +9989,7 @@ function Zv({
                         "aria-label": "Retry execution for this task",
                         title: "Retry execution",
                         children: [
-                          /* @__PURE__ */ o.jsx(an, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
+                          /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
                           "Retry"
                         ]
                       }
@@ -10205,7 +10120,7 @@ function Zv({
                       "aria-expanded": U,
                       children: [
                         /* @__PURE__ */ o.jsxs("span", { className: "flex items-center gap-1.5 text-xs font-semibold text-slate-400", children: [
-                          /* @__PURE__ */ o.jsx(wv, { className: "h-3.5 w-3.5" }),
+                          /* @__PURE__ */ o.jsx(xv, { className: "h-3.5 w-3.5" }),
                           " Advanced Details"
                         ] }),
                         U ? /* @__PURE__ */ o.jsx(jm, { className: "h-3.5 w-3.5 text-slate-500" }) : /* @__PURE__ */ o.jsx(Nm, { className: "h-3.5 w-3.5 text-slate-500" })
@@ -10215,7 +10130,7 @@ function Zv({
                   U && /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-3 border-t border-white/5 px-3.5 py-3", children: [
                     (e.conversationId || e.executionId || e.profileId || L.execution) && /* @__PURE__ */ o.jsxs("div", { children: [
                       /* @__PURE__ */ o.jsxs("h5", { className: "mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500", children: [
-                        /* @__PURE__ */ o.jsx(jv, { className: "h-3 w-3" }),
+                        /* @__PURE__ */ o.jsx(kv, { className: "h-3 w-3" }),
                         " Execution Metadata"
                       ] }),
                       /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-1 text-[11px]", children: [
@@ -10242,7 +10157,7 @@ function Zv({
                           ] }),
                           /* @__PURE__ */ o.jsxs("div", { className: "flex items-center justify-between gap-2", children: [
                             /* @__PURE__ */ o.jsx("span", { className: "text-slate-500", children: "Elapsed" }),
-                            /* @__PURE__ */ o.jsx("span", { className: "text-slate-400", children: Xv(L.execution.startedAt, L.execution.updatedAt) })
+                            /* @__PURE__ */ o.jsx("span", { className: "text-slate-400", children: Yv(L.execution.startedAt, L.execution.updatedAt) })
                           ] }),
                           /* @__PURE__ */ o.jsxs("div", { className: "flex items-center justify-between gap-2", children: [
                             /* @__PURE__ */ o.jsx("span", { className: "text-slate-500", children: "Tokens (in / out)" }),
@@ -10286,7 +10201,7 @@ function Zv({
                 ] }),
                 /* @__PURE__ */ o.jsxs("div", { children: [
                   /* @__PURE__ */ o.jsxs("label", { className: "mb-1.5 flex items-center gap-1.5 text-xs font-medium text-slate-400", children: [
-                    /* @__PURE__ */ o.jsx(bv, { className: "h-3.5 w-3.5" }),
+                    /* @__PURE__ */ o.jsx(yv, { className: "h-3.5 w-3.5" }),
                     " Tags (comma-separated)"
                   ] }),
                   /* @__PURE__ */ o.jsx(
@@ -10349,7 +10264,7 @@ function Zv({
                     className: "flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-50",
                     title: r ? "Stop the task before deleting it." : "Delete task",
                     children: [
-                      /* @__PURE__ */ o.jsx(Dn, { className: "h-4 w-4" }),
+                      /* @__PURE__ */ o.jsx(Pn, { className: "h-4 w-4" }),
                       " Delete"
                     ]
                   }
@@ -10372,7 +10287,7 @@ function Zv({
           }
         ),
         /* @__PURE__ */ o.jsx(
-          Gv,
+          Hv,
           {
             open: I !== null,
             question: I === "stop" ? "Are you sure you want to stop this task?" : "Do you want to run this task again?",
@@ -10391,13 +10306,13 @@ function Zv({
     }
   );
 }
-const ey = [
+const qv = [
   { value: "todo", label: "To Do", dot: "bg-slate-400" },
   { value: "in_progress", label: "In Progress", dot: "bg-blue-500" },
   { value: "review", label: "Review", dot: "bg-amber-500" },
   { value: "done", label: "Done", dot: "bg-emerald-500" }
 ];
-function ty({ onClose: e, agents: t, onCreate: n }) {
+function Xv({ onClose: e, agents: t, onCreate: n }) {
   const [r, s] = g.useState(""), [l, i] = g.useState(""), [a, c] = g.useState(""), [u, p] = g.useState(""), [d, f] = g.useState("todo"), [k, N] = g.useState(""), [b, A] = g.useState(""), [h, m] = g.useState("medium");
   g.useEffect(() => {
     const v = (w) => {
@@ -10527,7 +10442,7 @@ function ty({ onClose: e, agents: t, onCreate: n }) {
                 ] }),
                 /* @__PURE__ */ o.jsxs("div", { children: [
                   /* @__PURE__ */ o.jsx("label", { className: "mb-1.5 block text-xs font-medium text-slate-400", children: "Status" }),
-                  /* @__PURE__ */ o.jsx("div", { className: "grid grid-cols-2 gap-2", children: ey.map((v) => /* @__PURE__ */ o.jsxs(
+                  /* @__PURE__ */ o.jsx("div", { className: "grid grid-cols-2 gap-2", children: qv.map((v) => /* @__PURE__ */ o.jsxs(
                     "button",
                     {
                       type: "button",
@@ -10561,7 +10476,7 @@ function ty({ onClose: e, agents: t, onCreate: n }) {
                 ] }),
                 /* @__PURE__ */ o.jsxs("div", { children: [
                   /* @__PURE__ */ o.jsxs("label", { className: "mb-1.5 flex items-center gap-1.5 text-xs font-medium text-slate-400", children: [
-                    /* @__PURE__ */ o.jsx(un, { className: "h-3.5 w-3.5" }),
+                    /* @__PURE__ */ o.jsx(cn, { className: "h-3.5 w-3.5" }),
                     " AI Agent (optional)"
                   ] }),
                   /* @__PURE__ */ o.jsxs(
@@ -10650,7 +10565,7 @@ function kl() {
     ] })
   ] });
 }
-function Sn() {
+function jn() {
   return /* @__PURE__ */ o.jsxs("div", { className: "kb-glass flex items-center gap-3 rounded-2xl px-4 py-3", children: [
     /* @__PURE__ */ o.jsx(ze, { className: "h-4 w-4 rounded-full" }),
     /* @__PURE__ */ o.jsxs("div", { className: "min-w-0 flex-1", children: [
@@ -10663,13 +10578,13 @@ function Sn() {
     ] })
   ] });
 }
-function Cn() {
+function Sn() {
   return /* @__PURE__ */ o.jsxs("div", { className: "kb-glass rounded-2xl p-4", children: [
     /* @__PURE__ */ o.jsx(ze, { className: "mb-2 h-3 w-16" }),
     /* @__PURE__ */ o.jsx(ze, { className: "h-6 w-12" })
   ] });
 }
-const Ca = ["todo", "in_progress", "review", "done"], ny = {
+const Ca = ["todo", "in_progress", "review", "done"], Jv = {
   todo: "To Do",
   in_progress: "In Progress",
   review: "Review",
@@ -10684,11 +10599,11 @@ function Ea(e) {
   }
   return Ca.map((n) => ({
     status: n,
-    title: ny[n],
+    title: Jv[n],
     tasks: t.get(n) ?? []
   }));
 }
-function ry(e) {
+function Zv(e) {
   const t = { todo: 0, in_progress: 0, review: 0, done: 0 }, n = {}, r = {};
   let s = 0, l = 0, i = 0;
   const a = _m(), c = Rm(a, 3);
@@ -10703,7 +10618,7 @@ function ry(e) {
   }
   return { total: e.length, byStatus: t, blocked: s, overdue: l, dueSoon: i, byTag: n, byProject: r };
 }
-class sy {
+class ey {
   constructor() {
     Me(this, "state");
     Me(this, "listeners", /* @__PURE__ */ new Set());
@@ -10779,26 +10694,26 @@ function Ul(e, t) {
   const n = ko(), s = { ...n[e] ?? {} };
   return t.tags !== void 0 && (s.tags = t.tags), t.dueDate !== void 0 && (s.dueDate = t.dueDate), t.scheduledAt !== void 0 && (s.scheduledAt = t.scheduledAt), n[e] = s, Mm(n), n;
 }
-function ly(e) {
+function ty(e) {
   const t = ko();
   return e in t && (delete t[e], Mm(t)), t;
 }
-const oy = 1;
-function iy(e) {
+const ny = 1;
+function ry(e) {
   return {
-    version: oy,
+    version: ny,
     exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
     tasks: e.map((t) => ({ ...t }))
   };
 }
-function ay(e) {
+function sy(e) {
   return JSON.stringify(e, null, 2);
 }
-function cy(e, t = "kanban-board-export.json") {
-  const n = new Blob([ay(e)], { type: "application/json" }), r = URL.createObjectURL(n), s = document.createElement("a");
+function ly(e, t = "kanban-board-export.json") {
+  const n = new Blob([sy(e)], { type: "application/json" }), r = URL.createObjectURL(n), s = document.createElement("a");
   s.href = r, s.download = t, document.body.appendChild(s), s.click(), s.remove(), URL.revokeObjectURL(r);
 }
-function uy(e) {
+function oy(e) {
   let t;
   try {
     t = JSON.parse(e);
@@ -10829,9 +10744,9 @@ function uy(e) {
   }
   return { ok: !0, tasks: r };
 }
-async function dy(e) {
+async function iy(e) {
   const t = await e.text();
-  return uy(t);
+  return oy(t);
 }
 const Pm = "/home/razvijalec/.kanban-board/board.json";
 let gd = Promise.resolve();
@@ -10856,7 +10771,7 @@ function Dm(e) {
   }
   return [...t.values()];
 }
-async function On(e) {
+async function Dn(e) {
   try {
     const t = await e.agentServer.request({
       method: "GET",
@@ -10885,7 +10800,7 @@ async function nl(e, t) {
 }
 async function hd(e, t, n, r, s, l, i, a, c, u, p, d) {
   return tl(async () => {
-    const f = await On(e), k = {
+    const f = await Dn(e), k = {
       id: p ?? crypto.randomUUID(),
       title: t,
       status: n,
@@ -10902,26 +10817,26 @@ async function hd(e, t, n, r, s, l, i, a, c, u, p, d) {
     return f.push(k), await nl(e, f), k;
   });
 }
-async function fy(e, t, n) {
+async function ay(e, t, n) {
   await tl(async () => {
-    const r = await On(e), s = r.find((l) => l.id === t);
+    const r = await Dn(e), s = r.find((l) => l.id === t);
     s && (s.status = n), await nl(e, r);
   });
 }
 async function Om(e, t, n) {
   await tl(async () => {
-    const r = await On(e), s = r.find((l) => l.id === t);
+    const r = await Dn(e), s = r.find((l) => l.id === t);
     s && (n.title !== void 0 && (s.title = n.title), n.assignee !== void 0 && (s.assignee = n.assignee), n.agentId !== void 0 && (s.agentId = n.agentId), n.conversationId !== void 0 && (s.conversationId = n.conversationId), n.executionId !== void 0 && (s.executionId = n.executionId), n.profileId !== void 0 && (s.profileId = n.profileId), n.status !== void 0 && (s.status = n.status), n.agentPrompt !== void 0 && (s.agentPrompt = n.agentPrompt), n.expectedOutput !== void 0 && (s.expectedOutput = n.expectedOutput), n.successCriteria !== void 0 && (s.successCriteria = n.successCriteria), n.priority !== void 0 && (s.priority = n.priority)), await nl(e, r);
   });
 }
-async function py(e, t) {
+async function cy(e, t) {
   await tl(async () => {
-    const r = (await On(e)).filter((s) => s.id !== t);
+    const r = (await Dn(e)).filter((s) => s.id !== t);
     await nl(e, r);
   });
 }
-const my = 2e3, xd = { executions: [], events: [], links: [], updatedAt: 0 };
-function gy(e) {
+const uy = 2e3, xd = { executions: [], events: [], links: [], updatedAt: 0 };
+function dy(e) {
   const t = e.executions.map((s) => `${s.id}|${s.status}|${s.taskId ?? ""}|${s.agentId ?? ""}|${s.modelId ?? ""}|${s.startedAt ?? 0}|${s.updatedAt ?? 0}|${s.finishedAt ?? 0}|${s.tokensIn}|${s.tokensOut}|${s.cost}|${s.retries ?? 0}|${s.error ?? ""}`).join(";"), n = e.events.map((s) => `${s.id}|${s.type}|${s.status ?? ""}|${s.at}|${s.taskId ?? ""}|${s.executionId ?? ""}`).join(";"), r = e.links.map((s) => `${s.from.id}->${s.to.id}:${s.relation}`).join(";");
   return `${t}||${n}||${r}`;
 }
@@ -10951,7 +10866,7 @@ function Vo(e) {
       return t[n].filter((r) => !!J(r));
   return [];
 }
-function hy(e) {
+function fy(e) {
   if (Array.isArray(e)) return e.filter((n) => !!J(n));
   const t = J(e);
   if (!t) return [];
@@ -10965,7 +10880,7 @@ function Lc(e) {
   const t = (n = D(e)) == null ? void 0 : n.toLowerCase();
   return t === "running" || t === "waiting_for_confirmation" || t === "executing" || t === "started" ? "running" : t === "finished" || t === "succeeded" || t === "success" || t === "completed" ? "completed" : t === "error" || t === "stuck" || t === "failed" ? "failed" : t === "deleting" || t === "cancelled" || t === "canceled" || t === "stopped" ? "cancelled" : t === "pending" ? "pending" : "queued";
 }
-const xy = {
+const py = {
   pending: "todo",
   queued: "todo",
   running: "in_progress",
@@ -10974,13 +10889,13 @@ const xy = {
   cancelled: "review"
 };
 function Lm(e) {
-  return xy[e];
+  return py[e];
 }
 function rl(e) {
   const t = J(e.tags);
   return t ? Object.fromEntries(Object.entries(t).filter(([, n]) => typeof n == "string")) : {};
 }
-function vy(e) {
+function my(e) {
   const t = J(e.stats) ?? {}, n = J(e.metrics) ?? {}, r = J(n.accumulated_token_usage), s = J(t.usage_to_metrics) ?? {};
   let l = 0, i = 0, a = 0;
   for (const d of Object.values(s)) {
@@ -11000,11 +10915,11 @@ function vy(e) {
     costReported: c !== 0 || n.accumulated_cost !== void 0 || t.cost !== void 0 || t.total_cost !== void 0 || t.accumulated_cost !== void 0
   };
 }
-function yy(e) {
+function gy(e) {
   const t = e.toLowerCase();
   return t.includes("error") ? "error" : t.includes("commit") ? "commit" : t.includes("pull") ? "pull_request" : t.includes("action") || t.includes("observation") || t.includes("tool") ? "tool" : t.includes("message") || t.includes("conversation") ? "conversation" : "execution";
 }
-function wy(e) {
+function hy(e) {
   for (const n of ["detail", "message", "content", "text", "observation", "action", "key"]) {
     const r = e[n];
     if (typeof r == "string") return r;
@@ -11027,7 +10942,7 @@ function vd(e) {
   }
   if (typeof n == "string") return n;
 }
-function ky(e, t) {
+function xy(e, t) {
   const n = D(e.tool_name), r = J(e.action), s = D(r == null ? void 0 : r.kind), l = D(r == null ? void 0 : r.command);
   if (n) {
     const a = n.replace(/[_-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
@@ -11037,15 +10952,15 @@ function ky(e, t) {
   const i = D(e.source);
   return t.toLowerCase().includes("message") ? i === "user" ? "User message" : "Agent message" : t.toLowerCase().includes("observation") ? "Observation" : t.replace(/[_-]/g, " ").replace(/\b\w/g, (a) => a.toUpperCase());
 }
-function by(e) {
+function vy(e) {
   const t = D(e.reasoning_content);
   if (t) return t;
   const n = vd(e.llm_message);
   if (n) return n;
   const r = J(e.observation), s = vd(r == null ? void 0 : r.content) ?? D(r == null ? void 0 : r.text);
-  return s || wy(e);
+  return s || hy(e);
 }
-function Ny(e) {
+function yy(e) {
   const t = J(e);
   if (t != null && t.executions || t != null && t.events || t != null && t.links)
     return {
@@ -11055,7 +10970,7 @@ function Ny(e) {
       updatedAt: typeof t.updatedAt == "number" ? t.updatedAt : Date.now()
     };
   const r = Vo(e).map((i) => {
-    const a = rl(i), c = vy(i), u = Lc(i.execution_status), p = js(i.created_at), d = js(i.updated_at, p), f = J(i.launched_agent_profile), k = Ye(i.retry_count ?? i.retries ?? i.attempt_count), N = D(i.error) ?? D(i.error_message) ?? (i.execution_status === "error" ? D(i.message) : void 0);
+    const a = rl(i), c = my(i), u = Lc(i.execution_status), p = js(i.created_at), d = js(i.updated_at, p), f = J(i.launched_agent_profile), k = Ye(i.retry_count ?? i.retries ?? i.attempt_count), N = D(i.error) ?? D(i.error_message) ?? (i.execution_status === "error" ? D(i.message) : void 0);
     return {
       id: D(i.id) ?? "",
       taskId: a.taskid,
@@ -11104,11 +11019,11 @@ function Ny(e) {
   }
   return { executions: r, events: s, links: l, updatedAt: Date.now() };
 }
-async function jy(e) {
+async function wy(e) {
   const t = await e.agentServer.request({
     method: "GET",
     path: "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC"
-  }), n = Ny(t), r = Vo(t), s = [];
+  }), n = yy(t), r = Vo(t), s = [];
   for (const l of r) {
     const i = D(l.id);
     if (i)
@@ -11117,13 +11032,13 @@ async function jy(e) {
           method: "GET",
           path: `/api/conversations/${encodeURIComponent(i)}/events/search?limit=100&sort_order=TIMESTAMP`
         }), c = rl(l);
-        for (const u of hy(a)) {
+        for (const u of fy(a)) {
           const p = D(u.kind) ?? D(u.type) ?? D(u.key) ?? "execution", d = D(u.source), f = D(u.id) ?? D(u.event_id) ?? `${i}-${p}-${js(u.timestamp)}`;
           s.push({
             id: f,
-            type: yy(d ? `${d}-${p}` : p),
-            title: ky(u, p),
-            detail: by(u),
+            type: gy(d ? `${d}-${p}` : p),
+            title: xy(u, p),
+            detail: vy(u),
             status: Lc(l.execution_status),
             at: js(u.timestamp, js(l.created_at)),
             taskId: c.taskid,
@@ -11137,7 +11052,7 @@ async function jy(e) {
   }
   return s.sort((l, i) => i.at - l.at), s.sort((l, i) => i.at - l.at), { ...n, events: s.length > 0 ? s : n.events, updatedAt: Date.now() };
 }
-const Sy = [
+const ky = [
   { name: "terminal", label: "Terminal" },
   { name: "file_editor", label: "File Editor" },
   { name: "task_tracker", label: "Task Tracker" },
@@ -11162,7 +11077,7 @@ async function Ia(e) {
     return [];
   }
 }
-async function Cy(e, t) {
+async function by(e, t) {
   if (!t) return !1;
   try {
     return await e.agentServer.request({
@@ -11173,7 +11088,7 @@ async function Cy(e, t) {
     return !1;
   }
 }
-async function Ey(e, t) {
+async function Ny(e, t) {
   const n = t.trim();
   if (!n) return !1;
   try {
@@ -11185,7 +11100,7 @@ async function Ey(e, t) {
     return !1;
   }
 }
-async function Iy(e, t) {
+async function jy(e, t) {
   const n = t.trim();
   if (!n) return null;
   try {
@@ -11193,12 +11108,12 @@ async function Iy(e, t) {
       method: "GET",
       path: `/api/agent-profiles/${encodeURIComponent(n)}`
     }), s = J(r), l = s ? J(s.profile) : null;
-    return l ? _y(l, n) : null;
+    return l ? Sy(l, n) : null;
   } catch {
     return null;
   }
 }
-function _y(e, t) {
+function Sy(e, t) {
   const n = Array.isArray(e.tools) ? e.tools.filter((r) => !!J(r)).map((r) => ({
     name: D(r.name) ?? "",
     params: J(r.params) ?? void 0
@@ -11219,27 +11134,27 @@ function _y(e, t) {
     toolConcurrencyLimit: typeof e.tool_concurrency_limit == "number" ? e.tool_concurrency_limit : void 0
   };
 }
-function Ry(e) {
+function Cy(e) {
   const t = {
     agent_kind: "openhands",
     llm_profile_ref: e.llmProfileRef ?? ""
   };
   return e.agent && (t.agent = e.agent), e.tools !== void 0 && (t.tools = e.tools), e.persona !== void 0 && (t.persona = e.persona), e.systemMessageSuffix !== void 0 && (t.system_message_suffix = e.systemMessageSuffix), e.mcpServerRefs !== void 0 && (t.mcp_server_refs = e.mcpServerRefs), e.secretRefs !== void 0 && (t.secret_refs = e.secretRefs), e.publicSkills !== void 0 && (t.public_skills = e.publicSkills), e.disabledSkills !== void 0 && (t.disabled_skills = e.disabledSkills), e.toolConcurrencyLimit !== void 0 && (t.tool_concurrency_limit = e.toolConcurrencyLimit), t;
 }
-async function Ay(e, t, n) {
+async function Ey(e, t, n) {
   const r = t.trim();
   if (!r) return null;
   try {
     return await e.agentServer.request({
       method: "POST",
       path: `/api/agent-profiles/${encodeURIComponent(r)}`,
-      body: Ry(n)
+      body: Cy(n)
     }), r;
   } catch {
     return null;
   }
 }
-async function Ty(e, t, n) {
+async function Iy(e, t, n) {
   const r = t.trim(), s = n.trim();
   if (!r || !s) return null;
   try {
@@ -11263,7 +11178,7 @@ async function yd(e) {
     return [];
   }
 }
-async function My(e, t) {
+async function _y(e, t) {
   const n = t.trim();
   if (!n) return null;
   try {
@@ -11352,15 +11267,15 @@ function kd(e, t) {
   const n = t.boardstatus;
   return n && ["todo", "in_progress", "review", "done"].includes(n) ? n : Lm(Lc(e.execution_status));
 }
-async function Py(e, t) {
+async function Ry(e, t) {
   try {
     const n = await e.agentServer.request({
       method: "GET",
       path: "/api/conversations/search?limit=100&sort_order=CREATED_AT_DESC"
     }), r = Vo(n);
-    return r.length === 0 ? On(e) : tl(async () => {
+    return r.length === 0 ? Dn(e) : tl(async () => {
       var c;
-      const s = await On(e), l = Dm(s);
+      const s = await Dn(e), l = Dm(s);
       let i = l.length !== s.length;
       const a = /* @__PURE__ */ new Set();
       for (const u of r) {
@@ -11401,7 +11316,7 @@ async function Py(e, t) {
       return i && await nl(e, l), l;
     });
   } catch {
-    return On(e);
+    return Dn(e);
   }
 }
 async function bd(e, t) {
@@ -11485,7 +11400,7 @@ async function $m(e, t) {
     throw n;
   }
 }
-async function Dy(e, t, n) {
+async function Ay(e, t, n) {
   const r = Math.max(1, 5), s = Math.max(0, 400);
   for (let l = 0; l < r; l += 1)
     try {
@@ -11507,7 +11422,7 @@ async function Dy(e, t, n) {
     }
   return !1;
 }
-async function Oy(e, t, n) {
+async function Ty(e, t, n) {
   const r = zc({
     taskId: t,
     title: n.title ?? "Board task",
@@ -11592,7 +11507,7 @@ async function ds(e, t, n, r) {
   }
   return null;
 }
-class Ly {
+class My {
   constructor(t) {
     Me(this, "state", { snapshot: xd, loading: !0, error: null, lastSyncedAt: null });
     Me(this, "listeners", /* @__PURE__ */ new Set());
@@ -11636,12 +11551,12 @@ class Ly {
       };
       for (const t of this.listeners) t();
     });
-    this.host = t, window.addEventListener("focus", this.handleFocus), document.addEventListener("visibilitychange", this.handleVisibilityChange), this.refresh(), this.timer = setInterval(() => void this.refresh(), my);
+    this.host = t, window.addEventListener("focus", this.handleFocus), document.addEventListener("visibilitychange", this.handleVisibilityChange), this.refresh(), this.timer = setInterval(() => void this.refresh(), uy);
   }
   async refresh() {
     if (!this.disposed) {
       try {
-        const t = await jy(this.host), n = this.resetAt, r = n ? t.executions.filter((u) => (u.startedAt ?? 0) >= n) : t.executions, s = { ...t, executions: r, updatedAt: Date.now() }, l = gy(s), i = this.state, a = l !== this.lastFingerprint, c = i.loading !== !1 || i.error !== null;
+        const t = await wy(this.host), n = this.resetAt, r = n ? t.executions.filter((u) => (u.startedAt ?? 0) >= n) : t.executions, s = { ...t, executions: r, updatedAt: Date.now() }, l = dy(s), i = this.state, a = l !== this.lastFingerprint, c = i.loading !== !1 || i.error !== null;
         if (!a && !c)
           return;
         this.lastFingerprint = l, this.state = {
@@ -11666,12 +11581,12 @@ class Ly {
     this.disposed = !0, this.timer && clearInterval(this.timer), window.removeEventListener("focus", this.handleFocus), document.removeEventListener("visibilitychange", this.handleVisibilityChange), this.listeners.clear();
   }
 }
-function $y(e) {
-  const [t] = g.useState(() => new Ly(e)), n = g.useSyncExternalStore(t.subscribe, t.get, t.get);
+function Py(e) {
+  const [t] = g.useState(() => new My(e)), n = g.useSyncExternalStore(t.subscribe, t.get, t.get);
   return g.useEffect(() => () => t.dispose(), [t]), { state: n, reset: t.reset };
 }
-const zy = 15e3;
-function Fy(e) {
+const Dy = 15e3;
+function Oy(e) {
   return e.map(
     (t) => [
       t.id,
@@ -11689,7 +11604,7 @@ function Fy(e) {
     ].join("|")
   ).join(";;");
 }
-function Uy(e, t) {
+function Ly(e, t) {
   let n = null, r = !1;
   const s = 3e4, l = /* @__PURE__ */ new Map();
   function i() {
@@ -11705,7 +11620,7 @@ function Uy(e, t) {
     if (!r) {
       t.setUiState({ syncing: !0 });
       try {
-        const w = await Py(e, i()), j = Dm(w), S = md(j, ko()), y = Fy(S);
+        const w = await Ry(e, i()), j = Dm(w), S = md(j, ko()), y = Oy(S);
         y !== a && (a = y, t.setColumns(Ea(S)), t.markLoaded());
       } catch (w) {
         console.error("[kanban-board] failed to load tasks:", w);
@@ -11726,7 +11641,7 @@ function Uy(e, t) {
     })), y = S.find((R) => R.status === j), M = t.get().columns.flatMap((R) => R.tasks).find((R) => R.id === w);
     y && M && (y.tasks = [...y.tasks, { ...M, status: j }]), t.setColumns(S);
     try {
-      await fy(e, w, j), ds(e, "moved", w, { status: j }).catch((R) => {
+      await ay(e, w, j), ds(e, "moved", w, { status: j }).catch((R) => {
         console.error("[kanban-board] OpenHands move sync failed:", R);
       });
     } catch (R) {
@@ -11763,14 +11678,14 @@ function Uy(e, t) {
     };
     try {
       j("deleting"), S();
-      const F = ((M = (await On(e)).find((G) => G.id === w)) == null ? void 0 : M.conversationId) ?? null;
-      if (F && (j("removing_conversation"), await $m(e, F)), j("syncing"), F && !await Dy(e, F)) {
+      const F = ((M = (await Dn(e)).find((G) => G.id === w)) == null ? void 0 : M.conversationId) ?? null;
+      if (F && (j("removing_conversation"), await $m(e, F)), j("syncing"), F && !await Ay(e, F)) {
         y("Conversation could not be confirmed deleted");
         return;
       }
       await ds(e, "deleted", w).catch((G) => {
         console.error("[kanban-board] OpenHands delete sync failed:", G);
-      }), j("fading"), await new Promise((G) => setTimeout(G, 400)), await py(e, w), ly(w), l.set(w, Date.now()), await c();
+      }), j("fading"), await new Promise((G) => setTimeout(G, 400)), await cy(e, w), ty(w), l.set(w, Date.now()), await c();
     } catch (R) {
       console.error("[kanban-board] delete failed:", R), y(R instanceof Error ? R.message : "Unexpected error during deletion");
     } finally {
@@ -11794,7 +11709,7 @@ function Uy(e, t) {
     try {
       const te = M ? "todo" : j, fe = crypto.randomUUID();
       let q = null;
-      M && (q = await Oy(e, fe, {
+      M && (q = await Ty(e, fe, {
         title: w,
         agentPrompt: R,
         expectedOutput: F,
@@ -11817,11 +11732,11 @@ function Uy(e, t) {
   }
   function m() {
     const w = t.get().columns.flatMap((j) => j.tasks);
-    cy(iy(w));
+    ly(ry(w));
   }
   async function x(w) {
     if (r) return { ok: !1, tasks: [], error: "Controller disposed." };
-    const j = await dy(w);
+    const j = await iy(w);
     if (!j.ok) return j;
     const S = new Set(t.get().columns.flatMap((y) => y.tasks).map((y) => y.id));
     for (const y of j.tasks) {
@@ -11843,7 +11758,7 @@ function Uy(e, t) {
   function v() {
     n || (n = setInterval(() => {
       c();
-    }, zy));
+    }, Dy));
   }
   return c(), v(), {
     load: c,
@@ -11862,15 +11777,15 @@ function Uy(e, t) {
     }
   };
 }
-function Wy(e) {
-  const [t] = g.useState(() => new sy()), [n] = g.useState(() => Uy(e, t)), r = g.useSyncExternalStore(
+function $y(e) {
+  const [t] = g.useState(() => new ey()), [n] = g.useState(() => Ly(e, t)), r = g.useSyncExternalStore(
     (s) => t.subscribe(s),
     () => t.get(),
     () => t.get()
   );
   return g.useEffect(() => () => n.dispose(), [n]), { state: r, controller: n };
 }
-function By(e) {
+function zy(e) {
   const [t, n] = g.useState(null), r = Dh(
     Ph(Rc, { activationConstraint: { distance: 6 } })
   );
@@ -11900,7 +11815,7 @@ function By(e) {
     n(String(i.active.id));
   }, activeTaskId: t };
 }
-const ji = 420, Nd = 200, Vy = 700, Hy = "cubic-bezier(0.22, 1, 0.36, 1)", Ky = "cubic-bezier(0.34, 1.56, 0.64, 1)", jd = {
+const ji = 420, Nd = 200, Fy = 700, Uy = "cubic-bezier(0.22, 1, 0.36, 1)", Wy = "cubic-bezier(0.34, 1.56, 0.64, 1)", jd = {
   done: "34, 197, 94",
   // green-500 — success
   review: "245, 158, 11",
@@ -11910,10 +11825,10 @@ const ji = 420, Nd = 200, Vy = 700, Hy = "cubic-bezier(0.22, 1, 0.36, 1)", Ky = 
   todo: "99, 102, 241"
   // indigo-500 — neutral
 };
-function Yy(e) {
+function By(e) {
   return jd[e ?? ""] ?? jd.todo;
 }
-function Qy(e) {
+function Vy(e) {
   var r;
   const t = /* @__PURE__ */ new Map(), n = e.getBoundingClientRect();
   for (const s of e.querySelectorAll("[data-task-id]")) {
@@ -11926,7 +11841,7 @@ function Qy(e) {
   }
   return t;
 }
-function Gy(e, t) {
+function Hy(e, t) {
   const n = g.useRef(/* @__PURE__ */ new Map()), r = g.useRef(null);
   g.useLayoutEffect(() => {
     const s = e.current;
@@ -11936,7 +11851,7 @@ function Gy(e, t) {
     }
     if (r.current === t) return;
     r.current = t;
-    const l = Qy(s), i = [];
+    const l = Vy(s), i = [];
     for (const [a, c] of l) {
       const u = n.current.get(a);
       if (!u || u.status === c.status) continue;
@@ -11947,16 +11862,16 @@ function Gy(e, t) {
     }
     if (n.current = l, i.length !== 0)
       for (const { el: a, dx: c, dy: u, toStatus: p } of i) {
-        const d = Yy(p);
-        a.classList.remove("kb-fade-in"), a.style.setProperty("--kb-flip-accent", d), a.classList.add("kb-flip-lift"), a.style.zIndex = "60", a.style.transform = `translate(${c}px, ${u}px) scale(1.02)`, a.style.transition = "none", a.offsetHeight, a.style.transition = `transform ${ji}ms ${Hy}`, a.style.transform = "scale(1.02)";
+        const d = By(p);
+        a.classList.remove("kb-fade-in"), a.style.setProperty("--kb-flip-accent", d), a.classList.add("kb-flip-lift"), a.style.zIndex = "60", a.style.transform = `translate(${c}px, ${u}px) scale(1.02)`, a.style.transition = "none", a.offsetHeight, a.style.transition = `transform ${ji}ms ${Uy}`, a.style.transform = "scale(1.02)";
         const f = () => {
-          a.style.transition = `transform ${Nd}ms ${Ky}`, a.style.transform = "", a.removeEventListener("transitionend", f);
+          a.style.transition = `transform ${Nd}ms ${Wy}`, a.style.transform = "", a.removeEventListener("transitionend", f);
         };
         if (a.addEventListener("transitionend", f), setTimeout(f, ji + 50), p) {
           const N = s.querySelector(`[data-drop-status="${p}"]`);
           N && (N.style.setProperty("--kb-col-accent", d), N.classList.add("kb-column-highlight"), setTimeout(() => {
             N.classList.remove("kb-column-highlight"), N.style.removeProperty("--kb-col-accent");
-          }, Vy));
+          }, Fy));
         }
         const k = () => {
           a.classList.remove("kb-flip-lift"), a.style.zIndex = "", a.style.transform = "", a.style.transition = "", a.style.removeProperty("--kb-flip-accent"), a.removeEventListener("transitionend", k);
@@ -11965,7 +11880,7 @@ function Gy(e, t) {
       }
   });
 }
-const zm = "kanban-board.ai-overlay.v1", Fm = "kanban-board.ai-config.v1", Um = "/home/razvijalec/.kanban-board/routing-rules.json", qy = [
+const zm = "kanban-board.ai-overlay.v1", Fm = "kanban-board.ai-config.v1", Um = "/home/razvijalec/.kanban-board/routing-rules.json", Ky = [
   {
     id: "gpt-5",
     name: "GPT-5",
@@ -12072,7 +11987,7 @@ const zm = "kanban-board.ai-overlay.v1", Fm = "kanban-board.ai-config.v1", Um = 
     status: "idle",
     avatar: "from-pink-500 to-rose-500"
   }
-], Xy = [
+], Yy = [
   {
     id: "team-build",
     name: "Build Crew",
@@ -12087,7 +12002,7 @@ const zm = "kanban-board.ai-overlay.v1", Fm = "kanban-board.ai-config.v1", Um = 
     memberIds: ["agent-writer", "agent-ops"],
     leadAgentId: "agent-ops"
   }
-], Jy = [
+], Qy = [
   {
     id: "rule-review",
     name: "Reviews go to Sentinel",
@@ -12116,7 +12031,7 @@ const zm = "kanban-board.ai-overlay.v1", Fm = "kanban-board.ai-config.v1", Um = 
     condition: { type: "always" },
     target: { agentId: "agent-research" }
   }
-], Zy = [
+], Gy = [
   {
     id: "wf-feature",
     name: "Feature Pipeline",
@@ -12135,13 +12050,13 @@ const zm = "kanban-board.ai-overlay.v1", Fm = "kanban-board.ai-config.v1", Um = 
     ]
   }
 ];
-function hn() {
+function gn() {
   return {
     agents: _a.map((e) => ({ ...e })),
-    models: qy.map((e) => ({ ...e })),
-    teams: Xy.map((e) => ({ ...e, memberIds: [...e.memberIds] })),
-    routingRules: Jy.map((e) => ({ ...e, condition: { ...e.condition }, target: { ...e.target } })),
-    workflows: Zy.map((e) => ({ ...e, nodes: e.nodes.map((t) => ({ ...t })), edges: e.edges.map((t) => ({ ...t })) }))
+    models: Ky.map((e) => ({ ...e })),
+    teams: Yy.map((e) => ({ ...e, memberIds: [...e.memberIds] })),
+    routingRules: Qy.map((e) => ({ ...e, condition: { ...e.condition }, target: { ...e.target } })),
+    workflows: Gy.map((e) => ({ ...e, nodes: e.nodes.map((t) => ({ ...t })), edges: e.edges.map((t) => ({ ...t })) }))
   };
 }
 function Wm() {
@@ -12154,14 +12069,14 @@ function Wm() {
     return {};
   }
 }
-function e1(e) {
+function qy(e) {
   try {
     localStorage.setItem(zm, JSON.stringify(e));
   } catch {
   }
 }
 const Nl = /* @__PURE__ */ new Map();
-function t1(e, t) {
+function Xy(e, t) {
   const n = t ?? {};
   return [
     e.id,
@@ -12181,10 +12096,10 @@ function t1(e, t) {
     (n.dependsOn ?? []).join(",")
   ].join("|");
 }
-function n1(e, t) {
+function Jy(e, t) {
   const n = /* @__PURE__ */ new Set(), r = e.map((s) => {
     n.add(s.id);
-    const l = t[s.id], i = t1(s, l), a = Nl.get(s.id);
+    const l = t[s.id], i = Xy(s, l), a = Nl.get(s.id);
     if (a && a.taskRef === s && a.overlayFingerprint === i)
       return a.enriched;
     const c = {
@@ -12200,28 +12115,28 @@ function n1(e, t) {
     n.has(s) || Nl.delete(s);
   return r;
 }
-function r1(e, t) {
+function Zy(e, t) {
   const n = Wm(), s = { ...n[e] ?? {} };
   for (const [l, i] of Object.entries(t))
     i === null ? delete s[l] : s[l] = i;
-  return n[e] = s, e1(n), n;
+  return n[e] = s, qy(n), n;
 }
-function s1() {
+function e1() {
   try {
     const e = localStorage.getItem(Fm);
-    if (!e) return hn();
+    if (!e) return gn();
     const t = JSON.parse(e);
-    if (!t || typeof t != "object") return hn();
+    if (!t || typeof t != "object") return gn();
     const n = t;
     return {
-      agents: Array.isArray(n.agents) ? n.agents : hn().agents,
-      models: Array.isArray(n.models) ? n.models : hn().models,
-      teams: Array.isArray(n.teams) ? n.teams : hn().teams,
-      routingRules: Array.isArray(n.routingRules) ? n.routingRules : hn().routingRules,
-      workflows: Array.isArray(n.workflows) ? n.workflows : hn().workflows
+      agents: Array.isArray(n.agents) ? n.agents : gn().agents,
+      models: Array.isArray(n.models) ? n.models : gn().models,
+      teams: Array.isArray(n.teams) ? n.teams : gn().teams,
+      routingRules: Array.isArray(n.routingRules) ? n.routingRules : gn().routingRules,
+      workflows: Array.isArray(n.workflows) ? n.workflows : gn().workflows
     };
   } catch {
-    return hn();
+    return gn();
   }
 }
 function Si(e) {
@@ -12235,7 +12150,7 @@ function jl(e) {
   const t = e;
   return typeof t.id == "string" && typeof t.name == "string" && typeof t.priority == "number" && !!t.condition && !!t.target;
 }
-async function l1(e) {
+async function t1(e) {
   try {
     const t = await e.agentServer.request({
       method: "GET",
@@ -12253,7 +12168,7 @@ async function l1(e) {
   }
   return [];
 }
-async function o1(e, t) {
+async function n1(e, t) {
   const n = new FormData();
   n.append("file", new Blob([JSON.stringify(t, null, 2)], { type: "application/json" }), "routing-rules.json"), await e.agentServer.request({
     method: "POST",
@@ -12261,7 +12176,7 @@ async function o1(e, t) {
     body: n
   });
 }
-const Bm = "/home/razvijalec/.kanban-board/workflows.json", i1 = ["task", "agent", "condition", "approval", "start", "end", "delay", "relay"], a1 = [
+const Bm = "/home/razvijalec/.kanban-board/workflows.json", r1 = ["task", "agent", "condition", "approval", "start", "end", "delay", "relay"], s1 = [
   "IF_SUCCESS",
   "IF_FAILURE",
   "IF_ALWAYS",
@@ -12291,7 +12206,7 @@ function Sd(e) {
     delaySeconds: typeof t.delaySeconds == "number" ? t.delaySeconds : 0
   };
 }
-function c1(e) {
+function l1(e) {
   if (!Array.isArray(e)) return;
   const t = e.filter((n) => !!n && typeof n == "object").map((n) => ({
     afterHours: typeof n.afterHours == "number" ? n.afterHours : 0,
@@ -12300,7 +12215,7 @@ function c1(e) {
   })).filter((n) => n.escalateTo !== "");
   return t.length > 0 ? t : void 0;
 }
-function u1(e) {
+function o1(e) {
   if (!e || typeof e != "object") return;
   const t = e, n = {};
   typeof t.agentProfile == "string" && (n.agentProfile = t.agentProfile), typeof t.prompt == "string" && (n.prompt = t.prompt), Array.isArray(t.tools) && (n.tools = t.tools.filter((u) => typeof u == "string")), ["none", "session", "persistent"].includes(t.memory) && (n.memory = t.memory), typeof t.timeoutSeconds == "number" && (n.timeoutSeconds = t.timeoutSeconds);
@@ -12312,12 +12227,12 @@ function u1(e) {
   l && (n.outputs = l), typeof t.expression == "string" && (n.expression = t.expression);
   const i = Ci(t.variables);
   i && (n.variables = i), typeof t.validation == "string" && (n.validation = t.validation), typeof t.approver == "string" && (n.approver = t.approver);
-  const a = c1(t.escalationRules);
+  const a = l1(t.escalationRules);
   a && (n.escalationRules = a), typeof t.slaHours == "number" && (n.slaHours = t.slaHours), typeof t.durationSeconds == "number" && (n.durationSeconds = t.durationSeconds), typeof t.schedule == "string" && (n.schedule = t.schedule), typeof t.routeTarget == "string" && (n.routeTarget = t.routeTarget);
   const c = Sd(t.retryStrategy);
   return c && (n.retryStrategy = c), Object.keys(n).length > 0 ? n : void 0;
 }
-function d1(e) {
+function i1(e) {
   if (!e || typeof e != "object") return null;
   const t = e;
   if (typeof t.id != "string" || typeof t.name != "string") return null;
@@ -12325,7 +12240,7 @@ function d1(e) {
   if (Array.isArray(t.nodes)) {
     const s = t.nodes.filter((i) => !!i && typeof i == "object").map((i) => ({
       id: String(i.id),
-      type: i1.includes(i.type) ? i.type : "task",
+      type: r1.includes(i.type) ? i.type : "task",
       label: typeof i.label == "string" ? i.label : String(i.id),
       x: typeof i.x == "number" ? i.x : 0,
       y: typeof i.y == "number" ? i.y : 0,
@@ -12333,13 +12248,13 @@ function d1(e) {
       agentId: typeof i.agentId == "string" ? i.agentId : null,
       modelId: typeof i.modelId == "string" ? i.modelId : null,
       taskId: typeof i.taskId == "string" ? i.taskId : null,
-      config: u1(i.config)
+      config: o1(i.config)
     })), l = Array.isArray(t.edges) ? t.edges.filter((i) => !!i && typeof i == "object").map((i, a) => ({
       id: typeof i.id == "string" ? i.id : `e-${a}`,
       from: String(i.from),
       to: String(i.to),
       name: typeof i.name == "string" ? i.name : void 0,
-      condition: a1.includes(i.condition) ? i.condition : "IF_SUCCESS",
+      condition: s1.includes(i.condition) ? i.condition : "IF_SUCCESS",
       expression: typeof i.expression == "string" ? i.expression : void 0,
       priority: typeof i.priority == "number" ? i.priority : void 0,
       successPath: typeof i.successPath == "boolean" ? i.successPath : void 0,
@@ -12356,7 +12271,7 @@ function d1(e) {
   }
   return null;
 }
-async function f1(e) {
+async function a1(e) {
   try {
     const t = await e.agentServer.request({
       method: "GET",
@@ -12370,12 +12285,12 @@ async function f1(e) {
       } catch {
       }
     else t && typeof t == "object" && Array.isArray(t.workflows) && n.push(...t.workflows);
-    return n.map(d1).filter((r) => r !== null);
+    return n.map(i1).filter((r) => r !== null);
   } catch {
     return [];
   }
 }
-async function p1(e, t) {
+async function c1(e, t) {
   const n = JSON.stringify(t, null, 2), r = new FormData();
   r.append("file", new Blob([n], { type: "application/json" }), "workflows.json"), await e.agentServer.request({
     method: "POST",
@@ -12383,14 +12298,14 @@ async function p1(e, t) {
     body: r
   });
 }
-class m1 {
+class u1 {
   constructor() {
     Me(this, "state");
     Me(this, "listeners", /* @__PURE__ */ new Set());
     Me(this, "tasks", []);
     Me(this, "host", null);
     this.state = {
-      config: s1(),
+      config: e1(),
       overlay: Wm()
     };
   }
@@ -12405,21 +12320,21 @@ class m1 {
   }
   async loadFileWorkflows() {
     if (!this.host) return;
-    const t = await f1(this.host), n = await l1(this.host);
+    const t = await a1(this.host), n = await t1(this.host);
     t.length > 0 ? (this.state = {
       ...this.state,
       config: { ...this.state.config, workflows: t, routingRules: n.length > 0 ? n : this.state.config.routingRules }
     }, Si(this.state.config), this.notify()) : n.length > 0 && (this.state = { ...this.state, config: { ...this.state.config, routingRules: n } }, Si(this.state.config), this.notify());
   }
   setConfig(t) {
-    this.state = { ...this.state, config: t }, Si(t), this.host && (p1(this.host, t.workflows).catch((n) => {
+    this.state = { ...this.state, config: t }, Si(t), this.host && (c1(this.host, t.workflows).catch((n) => {
       console.error("[kanban-board] failed to persist workflows:", n);
-    }), o1(this.host, t.routingRules).catch((n) => {
+    }), n1(this.host, t.routingRules).catch((n) => {
       console.error("[kanban-board] failed to persist routing rules:", n);
     })), this.notify();
   }
   setTaskAi(t, n) {
-    const r = r1(t, n);
+    const r = Zy(t, n);
     this.state = { ...this.state, overlay: r }, this.tasks = this.tasks.map(
       (s) => s.id === t ? { ...s, ai: { ...s.ai, ...n } } : s
     ), this.notify();
@@ -12434,8 +12349,8 @@ class m1 {
     this.listeners.clear();
   }
 }
-function g1(e) {
-  const [t] = g.useState(() => new m1());
+function d1(e) {
+  const [t] = g.useState(() => new u1());
   g.useEffect(() => {
     t.setHost(e), t.loadFileWorkflows();
   }, [e, t]);
@@ -12446,7 +12361,7 @@ function g1(e) {
   );
   return g.useEffect(() => () => t.dispose(), [t]), { state: n, store: t };
 }
-function h1(e, t) {
+function f1(e, t) {
   switch (e.type) {
     case "always":
       return !0;
@@ -12465,7 +12380,7 @@ function Cd(e, t) {
     return { agentId: e.ai.agentId ?? null, modelId: e.ai.modelId ?? null, rule: null };
   const n = [...t.routingRules].sort((r, s) => r.priority - s.priority);
   for (const r of n)
-    if (h1(r.condition, e))
+    if (f1(r.condition, e))
       return {
         agentId: r.target.agentId ?? null,
         modelId: r.target.modelId ?? null,
@@ -12479,7 +12394,7 @@ function Ho(e) {
 function Br(e) {
   return e.toLocaleString("en-US");
 }
-function x1(e) {
+function p1(e) {
   const t = {}, n = {}, r = (s) => {
     if (t[s] !== void 0) return t[s];
     if (n[s]) return 0;
@@ -12492,13 +12407,13 @@ function x1(e) {
   for (const s of Object.keys(e)) r(s);
   return t;
 }
-function v1(e, t) {
+function m1(e, t) {
   const n = new Set(e.map((d) => d.id)), r = {}, s = {};
   for (const d of e)
     r[d.id] = [], s[d.id] = [];
   for (const d of t)
     n.has(d.from) && n.has(d.to) && (r[d.to].push(d.from), s[d.from].push(d.to));
-  const l = x1(r), i = e.reduce((d, f) => Math.max(d, l[f.id] ?? 0), 0), a = [];
+  const l = p1(r), i = e.reduce((d, f) => Math.max(d, l[f.id] ?? 0), 0), a = [];
   for (let d = 0; d <= i; d++) a.push([]);
   for (const d of e)
     a[l[d.id] ?? 0].push(d.id);
@@ -12523,14 +12438,14 @@ function v1(e, t) {
     });
   return { nodes: p, layers: i + 1 };
 }
-const y1 = g.lazy(() => Promise.resolve().then(() => B1).then((e) => ({ default: e.WorkflowView }))), w1 = g.lazy(() => Promise.resolve().then(() => K1).then((e) => ({ default: e.MonitoringView }))), k1 = g.lazy(() => Promise.resolve().then(() => Z1).then((e) => ({ default: e.AgentRoster }))), b1 = g.lazy(() => Promise.resolve().then(() => rw).then((e) => ({ default: e.ExecutionHistory }))), N1 = g.lazy(() => Promise.resolve().then(() => lw).then((e) => ({ default: e.AnalyticsView })));
-function j1() {
+const g1 = g.lazy(() => Promise.resolve().then(() => z1).then((e) => ({ default: e.WorkflowView }))), h1 = g.lazy(() => Promise.resolve().then(() => W1).then((e) => ({ default: e.MonitoringView }))), x1 = g.lazy(() => Promise.resolve().then(() => G1).then((e) => ({ default: e.AgentRoster }))), v1 = g.lazy(() => Promise.resolve().then(() => Z1).then((e) => ({ default: e.ExecutionHistory }))), y1 = g.lazy(() => Promise.resolve().then(() => tw).then((e) => ({ default: e.AnalyticsView })));
+function w1() {
   return /* @__PURE__ */ o.jsx("div", { className: "flex h-64 items-center justify-center", children: /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-2 text-sm text-slate-500", children: [
     /* @__PURE__ */ o.jsx("span", { className: "h-3 w-3 animate-spin rounded-full border-2 border-slate-600 border-t-transparent" }),
     "Loading view…"
   ] }) });
 }
-function S1(e, t) {
+function k1(e, t) {
   switch (t) {
     case "all":
       return !0;
@@ -12544,14 +12459,14 @@ function S1(e, t) {
       return !0;
   }
 }
-function C1({ host: e }) {
+function b1({ host: e }) {
   var P;
-  const { state: t, controller: n } = Wy(e), { sensors: r, onDragEnd: s, onDragStart: l, activeTaskId: i } = By(
+  const { state: t, controller: n } = $y(e), { sensors: r, onDragEnd: s, onDragStart: l, activeTaskId: i } = zy(
     (_, $) => {
       n.move(_, $);
     }
-  ), { state: a, store: c } = g1(e), { state: u, reset: p } = $y(e), [d, f] = g.useState("board"), [k, N] = g.useState(null), [b, A] = g.useState(null), [h, m] = g.useState(!1), [x, v] = g.useState([]), [w, j] = g.useState(/* @__PURE__ */ new Set()), [S, y] = g.useState(/* @__PURE__ */ new Set()), M = g.useRef(null);
-  Gy(M, t.columns), g.useEffect(() => {
+  ), { state: a, store: c } = d1(e), { state: u, reset: p } = Py(e), [d, f] = g.useState("board"), [k, N] = g.useState(null), [b, A] = g.useState(null), [h, m] = g.useState(!1), [x, v] = g.useState([]), [w, j] = g.useState(/* @__PURE__ */ new Set()), [S, y] = g.useState(/* @__PURE__ */ new Set()), M = g.useRef(null);
+  Hy(M, t.columns), g.useEffect(() => {
     let _ = !1;
     return Ia(e).then(($) => {
       if (!_) {
@@ -12580,8 +12495,8 @@ function C1({ host: e }) {
   const R = g.useMemo(
     () => t.columns.flatMap((_) => _.tasks),
     [t.columns]
-  ), F = g.useMemo(() => ry(R), [R]), G = g.useRef(/* @__PURE__ */ new Map()), Z = g.useMemo(() => {
-    const _ = G.current, $ = /* @__PURE__ */ new Set(), Y = n1(R, a.overlay).map((ee) => {
+  ), F = g.useMemo(() => Zv(R), [R]), G = g.useRef(/* @__PURE__ */ new Map()), Z = g.useMemo(() => {
+    const _ = G.current, $ = /* @__PURE__ */ new Set(), Y = Jy(R, a.overlay).map((ee) => {
       $.add(ee.id);
       const X = u.snapshot.executions.find((pe) => pe.taskId === ee.id), Ce = X == null ? void 0 : X.status, ve = X == null ? void 0 : X.id, ye = _.get(ee.id);
       if (ye && ye.base === ee && ye.status === Ce && ye.execId === ve)
@@ -12600,7 +12515,7 @@ function C1({ host: e }) {
     const _ = new Map(Z.map(($) => [$.id, $]));
     return t.columns.map(($) => ({
       ...$,
-      tasks: $.tasks.filter((Y) => S1(Y, t.uiState.filter)).map((Y) => _.get(Y.id) ?? Y)
+      tasks: $.tasks.filter((Y) => k1(Y, t.uiState.filter)).map((Y) => _.get(Y.id) ?? Y)
     }));
   }, [t.columns, t.uiState.filter, Z]), fe = (_, $, Y, ee, X, Ce, ve, ye) => {
     n.create(_, $, Y, void 0, ee, X, Ce, ve, ye);
@@ -12661,19 +12576,19 @@ function C1({ host: e }) {
   }, ge = (_) => {
     f(_), _ === "board" && n.load();
   };
-  return /* @__PURE__ */ o.jsxs("div", { className: "kb-app flex flex-col gap-4 p-3 sm:p-4 lg:p-5", children: [
-    /* @__PURE__ */ o.jsx(Tv, { onCreate: () => m(!0), syncing: t.uiState.syncing }),
-    /* @__PURE__ */ o.jsx(Qv, { view: d, onView: ge }),
+  return /* @__PURE__ */ o.jsxs("div", { className: "kb-app flex flex-col gap-6 p-4 sm:p-6 lg:p-8", children: [
+    /* @__PURE__ */ o.jsx(_v, { onCreate: () => m(!0), syncing: t.uiState.syncing }),
+    /* @__PURE__ */ o.jsx(Vv, { view: d, onView: ge }),
     d === "board" ? /* @__PURE__ */ o.jsx(o.Fragment, { children: t.uiState.lastLoadedAt === 0 ? (
       /* Initial load — show skeleton placeholders */
       /* @__PURE__ */ o.jsxs(o.Fragment, { children: [
         /* @__PURE__ */ o.jsxs("div", { className: "grid grid-cols-2 gap-3 sm:grid-cols-4", children: [
-          /* @__PURE__ */ o.jsx(Cn, {}),
-          /* @__PURE__ */ o.jsx(Cn, {}),
-          /* @__PURE__ */ o.jsx(Cn, {}),
-          /* @__PURE__ */ o.jsx(Cn, {})
+          /* @__PURE__ */ o.jsx(Sn, {}),
+          /* @__PURE__ */ o.jsx(Sn, {}),
+          /* @__PURE__ */ o.jsx(Sn, {}),
+          /* @__PURE__ */ o.jsx(Sn, {})
         ] }),
-        /* @__PURE__ */ o.jsxs("div", { className: "relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4", children: [
+        /* @__PURE__ */ o.jsxs("div", { className: "relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4", children: [
           /* @__PURE__ */ o.jsx(kl, {}),
           /* @__PURE__ */ o.jsx(kl, {}),
           /* @__PURE__ */ o.jsx(kl, {}),
@@ -12681,17 +12596,17 @@ function C1({ host: e }) {
         ] })
       ] })
     ) : /* @__PURE__ */ o.jsxs(o.Fragment, { children: [
-      /* @__PURE__ */ o.jsx(Mv, { stats: F }),
+      /* @__PURE__ */ o.jsx(Rv, { stats: F }),
       /* @__PURE__ */ o.jsx(
-        Ov,
+        Tv,
         {
           filter: t.uiState.filter,
           onFilter: (_) => n.setUiState({ filter: _ })
         }
       ),
       /* @__PURE__ */ o.jsxs(Tx, { sensors: r, onDragStart: l, onDragEnd: s, children: [
-        /* @__PURE__ */ o.jsx("div", { ref: M, className: "relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4", children: te.map((_) => /* @__PURE__ */ o.jsx(
-          Kv,
+        /* @__PURE__ */ o.jsx("div", { ref: M, className: "relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4", children: te.map((_) => /* @__PURE__ */ o.jsx(
+          Wv,
           {
             column: _,
             agents: x,
@@ -12719,8 +12634,8 @@ function C1({ host: e }) {
           ) : null;
         })() : null })
       ] })
-    ] }) }) : /* @__PURE__ */ o.jsx(g.Suspense, { fallback: /* @__PURE__ */ o.jsx(j1, {}), children: d === "workflow" ? /* @__PURE__ */ o.jsx(
-      y1,
+    ] }) }) : /* @__PURE__ */ o.jsx(g.Suspense, { fallback: /* @__PURE__ */ o.jsx(w1, {}), children: d === "workflow" ? /* @__PURE__ */ o.jsx(
+      g1,
       {
         aiState: a,
         tasks: Z,
@@ -12740,7 +12655,7 @@ function C1({ host: e }) {
         })
       }
     ) : d === "monitoring" ? /* @__PURE__ */ o.jsx(
-      w1,
+      h1,
       {
         workflows: a.config.workflows,
         selectedId: k ?? ((P = a.config.workflows[0]) == null ? void 0 : P.id) ?? null,
@@ -12750,9 +12665,9 @@ function C1({ host: e }) {
         profiles: x,
         onCommand: Se
       }
-    ) : d === "agents" ? /* @__PURE__ */ o.jsx(k1, { host: e, openHandsState: u }) : d === "history" ? /* @__PURE__ */ o.jsx(b1, { openHandsState: u, aiState: a, profiles: x, onReset: p }) : /* @__PURE__ */ o.jsx(N1, { aiState: a, openHandsState: u, onReset: p }) }),
+    ) : d === "agents" ? /* @__PURE__ */ o.jsx(x1, { host: e, openHandsState: u }) : d === "history" ? /* @__PURE__ */ o.jsx(v1, { openHandsState: u, aiState: a, profiles: x, onReset: p }) : /* @__PURE__ */ o.jsx(y1, { aiState: a, openHandsState: u, onReset: p }) }),
     b && /* @__PURE__ */ o.jsx(
-      Zv,
+      Gv,
       {
         task: b,
         agents: x,
@@ -12775,7 +12690,7 @@ function C1({ host: e }) {
       }
     ),
     h && /* @__PURE__ */ o.jsx(
-      ty,
+      Xv,
       {
         onClose: () => m(!1),
         agents: x,
@@ -12784,22 +12699,22 @@ function C1({ host: e }) {
     )
   ] });
 }
-function E1() {
+function N1() {
   if (typeof document > "u" || document.getElementById("kanban-nunito-font")) return;
   const e = document.createElement("link");
   e.id = "kanban-nunito-font", e.rel = "stylesheet", e.href = "https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap", document.head.appendChild(e);
 }
-function iw(e) {
+function rw(e) {
   let t = null;
-  E1();
+  N1();
   const n = e.registerPage("board", (r) => {
-    r.container.id = "kanban-extension-root", t = em(r.container), t.render(/* @__PURE__ */ o.jsx(C1, { host: e }));
+    r.container.id = "kanban-extension-root", t = em(r.container), t.render(/* @__PURE__ */ o.jsx(b1, { host: e }));
   });
   return () => {
     t && (t.unmount(), t = null), n();
   };
 }
-const I1 = {
+const j1 = {
   success: ["IF_SUCCESS"],
   failure: ["IF_FAILURE"],
   retry: ["IF_RETRY_EXHAUSTED"],
@@ -12809,15 +12724,15 @@ const I1 = {
   conditional: ["IF_TRUE", "IF_FALSE"],
   loop: ["IF_LOOP"]
 };
-function _1(e) {
-  for (const [t, n] of Object.entries(I1))
+function S1(e) {
+  for (const [t, n] of Object.entries(j1))
     if (n.includes(e)) return t;
   return "success";
 }
-function R1(e) {
+function C1(e) {
   return e === "completed" || e === "failed" || e === "cancelled" || e === "timed_out" || e === "awaiting_approval";
 }
-function A1(e, t) {
+function E1(e, t) {
   switch (e.condition) {
     case "IF_SUCCESS":
       return t.state === "completed";
@@ -12911,13 +12826,13 @@ function Id(e, t) {
 function _d(e) {
   return typeof e == "boolean" ? e : typeof e == "number" ? e !== 0 : e.length > 0 && e !== "false" && e !== "0";
 }
-function T1(e) {
-  const { nodes: t, edges: n, states: r, loopCounts: s = {} } = e, l = new Map(t.map((w) => [w.id, w])), i = (w) => r[w] ?? { state: "idle" }, a = t.find((w) => i(w.id).state === "running"), c = t.find((w) => i(w.id).state === "queued"), u = a ?? c, p = u ? null : t.filter((w) => R1(i(w.id).state)).sort((w, j) => {
+function I1(e) {
+  const { nodes: t, edges: n, states: r, loopCounts: s = {} } = e, l = new Map(t.map((w) => [w.id, w])), i = (w) => r[w] ?? { state: "idle" }, a = t.find((w) => i(w.id).state === "running"), c = t.find((w) => i(w.id).state === "queued"), u = a ?? c, p = u ? null : t.filter((w) => C1(i(w.id).state)).sort((w, j) => {
     const S = i(w.id).completedAt, y = i(j.id).completedAt;
     if (S !== void 0 && y !== void 0) return y - S;
     const M = Ei(t, n, w.id).length;
     return Ei(t, n, j.id).length - M;
-  })[0] ?? null, d = u ?? p, f = d ? n.filter((w) => w.from === d.id && l.has(w.to)).sort((w, j) => (w.priority ?? 0) - (j.priority ?? 0)) : [], k = d ? f.filter((w) => A1(w, i(d.id))) : [], N = [], b = k.filter((w) => {
+  })[0] ?? null, d = u ?? p, f = d ? n.filter((w) => w.from === d.id && l.has(w.to)).sort((w, j) => (w.priority ?? 0) - (j.priority ?? 0)) : [], k = d ? f.filter((w) => E1(w, i(d.id))) : [], N = [], b = k.filter((w) => {
     if (w.condition === "IF_LOOP") {
       const j = w.loopLimit ?? 10;
       if ((s[w.id] ?? 0) >= j)
@@ -12960,7 +12875,7 @@ function Ei(e, t, n) {
   }
   return u;
 }
-function M1(e, t) {
+function _1(e, t) {
   const n = new Set(e.map((c) => c.id)), r = /* @__PURE__ */ new Map();
   for (const c of t) {
     if (!n.has(c.from) || !n.has(c.to)) continue;
@@ -12981,8 +12896,8 @@ function M1(e, t) {
     i.has(c.id) || (a(c.id, c.id, [c.id], /* @__PURE__ */ new Set([c.id])), i.add(c.id));
   return s;
 }
-function P1(e, t) {
-  const n = M1(e, t), r = /* @__PURE__ */ new Set(), s = new Set(e.map((l) => l.id));
+function R1(e, t) {
+  const n = _1(e, t), r = /* @__PURE__ */ new Set(), s = new Set(e.map((l) => l.id));
   for (const l of n) {
     const i = l[l.length - 1], a = l[0], c = t.find((u) => u.from === i && u.to === a && s.has(u.from) && s.has(u.to));
     c && r.add(c.id);
@@ -12990,7 +12905,7 @@ function P1(e, t) {
   return r;
 }
 const Bt = 180, Qe = 64;
-function D1(e, t, n = 0, r = 1) {
+function A1(e, t, n = 0, r = 1) {
   const s = r > 1 ? (n / (r - 1) - 0.5) * (Qe - 24) : 0, l = e.x + Bt, i = e.y + Qe / 2 + s, a = t.x, c = t.y + Qe / 2, u = a - l, p = c - i, d = t.x - e.x, f = t.y - e.y, k = d < -Bt / 2, N = Math.abs(d) < Bt / 2 && Math.abs(f) > Qe;
   let b, A, h, m;
   if (k) {
@@ -13010,7 +12925,7 @@ function Fc(e, t) {
   const n = t.snapshot.executions.find((r) => r.taskId === e.taskId);
   return n ? n.status : "idle";
 }
-function O1(e, t) {
+function T1(e, t) {
   var l;
   const n = Fc(e, t), s = { state: n === "pending" ? "queued" : n };
   return (l = e.config) != null && l.retryPolicy && (s.retriesExhausted = n === "failed" && (e.config.retryPolicy.maxAttempts ?? 0) > 0), e.type === "approval" && (s.approved = n === "completed"), s;
@@ -13018,9 +12933,9 @@ function O1(e, t) {
 function Vm(e, t, n) {
   const r = g.useMemo(() => new Map(e.map((d) => [d.id, d])), [e]), s = n.snapshot.executions, l = g.useMemo(() => {
     const d = {};
-    for (const f of e) d[f.id] = O1(f, n);
+    for (const f of e) d[f.id] = T1(f, n);
     return d;
-  }, [e, n]), i = g.useMemo(() => new Set(P1(e, t)), [e, t]), a = g.useMemo(() => {
+  }, [e, n]), i = g.useMemo(() => new Set(R1(e, t)), [e, t]), a = g.useMemo(() => {
     const d = {};
     for (const f of t) {
       if (f.condition !== "IF_LOOP") continue;
@@ -13029,7 +12944,7 @@ function Vm(e, t, n) {
     }
     return d;
   }, [t, r, s]), c = g.useMemo(
-    () => T1({ nodes: e, edges: t, states: l, loopCounts: a }),
+    () => I1({ nodes: e, edges: t, states: l, loopCounts: a }),
     [e, t, l, a]
   ), u = g.useMemo(() => new Set(c.firingEdges.map((d) => d.id)), [c]), p = g.useMemo(() => {
     const d = /* @__PURE__ */ new Set();
@@ -13047,25 +12962,25 @@ function Vm(e, t, n) {
   };
 }
 const Rd = 7, Ad = 1600, Td = 900, fr = {
-  task: { label: "Task", badge: "bg-blue-500/15 text-blue-300 ring-blue-400/30", accent: "#3b82f6", icon: on },
-  agent: { label: "Agent", badge: "bg-purple-500/15 text-purple-300 ring-purple-400/30", accent: "#a855f7", icon: un },
+  task: { label: "Task", badge: "bg-blue-500/15 text-blue-300 ring-blue-400/30", accent: "#3b82f6", icon: $n },
+  agent: { label: "Agent", badge: "bg-purple-500/15 text-purple-300 ring-purple-400/30", accent: "#a855f7", icon: cn },
   condition: { label: "Condition", badge: "bg-orange-500/15 text-orange-300 ring-orange-400/30", accent: "#f97316", icon: iv },
   approval: { label: "Approval", badge: "bg-yellow-500/15 text-yellow-300 ring-yellow-400/30", accent: "#eab308", icon: Oc },
   start: { label: "Start", badge: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30", accent: "#10b981", icon: Mc },
   end: { label: "End", badge: "bg-red-500/15 text-red-300 ring-red-400/30", accent: "#ef4444", icon: el },
   delay: { label: "Delay", badge: "bg-violet-500/15 text-violet-300 ring-violet-400/30", accent: "#8b5cf6", icon: yo },
-  relay: { label: "Relay", badge: "bg-sky-500/15 text-sky-300 ring-sky-400/30", accent: "#0ea5e9", icon: yv },
+  relay: { label: "Relay", badge: "bg-sky-500/15 text-sky-300 ring-sky-400/30", accent: "#0ea5e9", icon: hv },
   loop: { label: "Loop", badge: "bg-cyan-500/15 text-cyan-300 ring-cyan-400/30", accent: "#06b6d4", icon: Pc }
-}, L1 = {
-  success: { label: "Success", icon: on },
+}, M1 = {
+  success: { label: "Success", icon: $n },
   failure: { label: "Failure", icon: sr },
-  retry: { label: "Retry", icon: an },
-  timeout: { label: "Timeout", icon: Sv },
+  retry: { label: "Retry", icon: on },
+  timeout: { label: "Timeout", icon: bv },
   cancel: { label: "Cancel", icon: nv },
-  manual_approval: { label: "Manual Approval", icon: Ev },
-  conditional: { label: "Conditional", icon: uv },
+  manual_approval: { label: "Manual Approval", icon: jv },
+  conditional: { label: "Conditional", icon: cv },
   loop: { label: "Loop", icon: Pc }
-}, $1 = [
+}, P1 = [
   { value: "IF_SUCCESS", label: "On success" },
   { value: "IF_FAILURE", label: "On failure" },
   { value: "IF_RETRY_EXHAUSTED", label: "Retries exhausted" },
@@ -13098,19 +13013,19 @@ function Md(e) {
       return "";
   }
 }
-function z1(e, t) {
+function D1(e, t) {
   return e ? e.type === "condition" ? t === 0 ? "IF_TRUE" : "IF_FALSE" : e.type === "approval" ? t === 0 ? "IF_APPROVED" : "IF_REJECTED" : "IF_SUCCESS" : "IF_SUCCESS";
 }
-const F1 = {
+const O1 = {
   idle: { label: "Idle", icon: sv, spin: !1 },
   pending: { label: "Pending", icon: yo, spin: !1 },
   queued: { label: "Queued", icon: yo, spin: !1 },
   running: { label: "Running", icon: Jn, spin: !0 },
-  completed: { label: "Completed", icon: on, spin: !1 },
+  completed: { label: "Completed", icon: $n, spin: !1 },
   failed: { label: "Failed", icon: sr, spin: !1 },
   cancelled: { label: "Cancelled", icon: el, spin: !1 }
 };
-function U1({
+function L1({
   aiState: e,
   tasks: t,
   openHandsState: n,
@@ -13162,7 +13077,7 @@ function U1({
     k(W), P();
   }, Ce = (C, O, W = 0) => {
     if (C === O || N.some((Q) => Q.from === C && Q.to === O)) return;
-    const H = f.find((Q) => Q.id === C), ae = z1(H, W), E = {
+    const H = f.find((Q) => Q.id === C), ae = D1(H, W), E = {
       id: `e-${Date.now()}-${Math.floor(Math.random() * 1e3)}`,
       from: C,
       to: O,
@@ -13176,7 +13091,7 @@ function U1({
     const W = N.map((H) => H.id === C ? { ...H, ...O } : H);
     b(W), P();
   }, Te = () => {
-    const C = v1(f, N), O = new Map(C.nodes.map((H) => [H.id, H])), W = f.map((H) => {
+    const C = m1(f, N), O = new Map(C.nodes.map((H) => [H.id, H])), W = f.map((H) => {
       const ae = O.get(H.id);
       return ae ? { ...H, x: 80 + ae.layer * 240, y: 80 + ae.row * 140 } : H;
     });
@@ -13194,7 +13109,7 @@ function U1({
     if (!O) return { x: 0, y: 0 };
     const W = O.getBoundingClientRect();
     return { x: C.clientX - W.left, y: C.clientY - W.top };
-  }, dn = (C, O) => {
+  }, un = (C, O) => {
     C.stopPropagation();
     const W = Et(C);
     fe({ kind: "node", nodeId: O.id, offsetX: W.x - O.x, offsetY: W.y - O.y }), h(O.id), x(null);
@@ -13215,7 +13130,7 @@ function U1({
     ie(null), fe(null);
   }, Wn = () => {
     (te == null ? void 0 : te.kind) === "node" && P(), fe(null);
-  }, fn = g.useMemo(() => {
+  }, dn = g.useMemo(() => {
     const C = /* @__PURE__ */ new Map();
     for (const W of N) {
       const H = C.get(W.from);
@@ -13232,11 +13147,11 @@ function U1({
     for (const O of N) {
       const W = U.get(O.from), H = U.get(O.to);
       if (!W || !H) continue;
-      const { index: ae, count: E } = fn.get(O.id) ?? { index: 0, count: 1 };
-      C.set(O.id, D1(W, H, ae, E).d);
+      const { index: ae, count: E } = dn.get(O.id) ?? { index: 0, count: 1 };
+      C.set(O.id, A1(W, H, ae, E).d);
     }
     return C;
-  }, [N, U, fn]), ne = A ? U.get(A) ?? null : null, ue = m ? N.find((C) => C.id === m) ?? null : null;
+  }, [N, U, dn]), ne = A ? U.get(A) ?? null : null, ue = m ? N.find((C) => C.id === m) ?? null : null;
   return c.length === 0 ? /* @__PURE__ */ o.jsxs("div", { className: "flex h-full flex-col items-center justify-center gap-4 p-8", children: [
     /* @__PURE__ */ o.jsx("div", { className: "kb-glass flex h-16 w-16 items-center justify-center rounded-2xl", children: /* @__PURE__ */ o.jsx(Sa, { className: "h-8 w-8 text-indigo-300", strokeWidth: 1.5 }) }),
     /* @__PURE__ */ o.jsxs("div", { className: "text-center", children: [
@@ -13304,7 +13219,7 @@ function U1({
             onClick: Te,
             className: "kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white",
             children: [
-              /* @__PURE__ */ o.jsx(Iv, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
+              /* @__PURE__ */ o.jsx(Sv, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
               "Auto-arrange"
             ]
           }
@@ -13354,7 +13269,7 @@ function U1({
             onClick: st,
             className: "kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-rose-300 hover:text-rose-200",
             children: [
-              /* @__PURE__ */ o.jsx(Dn, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
+              /* @__PURE__ */ o.jsx(Pn, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
               "Delete"
             ]
           }
@@ -13443,7 +13358,7 @@ function U1({
           );
         }),
         /* @__PURE__ */ o.jsxs("div", { className: "mt-auto rounded-xl bg-white/5 p-2.5 text-[10px] leading-relaxed text-slate-500", children: [
-          /* @__PURE__ */ o.jsx(xv, { className: "mb-1 h-3.5 w-3.5 text-indigo-300", strokeWidth: 2 }),
+          /* @__PURE__ */ o.jsx(mv, { className: "mb-1 h-3.5 w-3.5 text-indigo-300", strokeWidth: 2 }),
           "Drag a node to move it. Drag from an output port (right) to an input port (left) to connect."
         ] })
       ] }),
@@ -13510,13 +13425,13 @@ function U1({
               );
             })(),
             f.map((C) => {
-              const O = fr[C.type], W = O.icon, H = C.id === A, ae = L.has(C.id), E = Fc(C, n), V = F1[E], Q = V.icon, ke = (q == null ? void 0 : q.from) === C.id;
+              const O = fr[C.type], W = O.icon, H = C.id === A, ae = L.has(C.id), E = Fc(C, n), V = O1[E], Q = V.icon, ke = (q == null ? void 0 : q.from) === C.id;
               return /* @__PURE__ */ o.jsxs(
                 "g",
                 {
                   transform: `translate(${C.x}, ${C.y})`,
                   className: "cursor-grab active:cursor-grabbing",
-                  onPointerDown: (Re) => dn(Re, C),
+                  onPointerDown: (Re) => un(Re, C),
                   onPointerUp: Wn,
                   children: [
                     /* @__PURE__ */ o.jsx(
@@ -13658,7 +13573,7 @@ function U1({
             )
           ] }),
           /* @__PURE__ */ o.jsx(
-            W1,
+            $1,
             {
               node: ne,
               onPatch: (C) => X(ne.id, { config: { ...ne.config, ...C } })
@@ -13693,7 +13608,7 @@ function U1({
               onClick: () => ee(ne.id),
               className: "mt-auto flex items-center justify-center gap-2 rounded-xl bg-rose-500/15 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-500/25",
               children: [
-                /* @__PURE__ */ o.jsx(Dn, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
+                /* @__PURE__ */ o.jsx(Pn, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
                 "Delete node"
               ]
             }
@@ -13725,14 +13640,14 @@ function U1({
                 value: ue.condition,
                 onChange: (C) => ye(ue.id, { condition: C.target.value }),
                 className: "rounded-xl border-0 bg-white/5 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50",
-                children: $1.map((C) => /* @__PURE__ */ o.jsx("option", { value: C.value, className: "bg-slate-900", children: C.label }, C.value))
+                children: P1.map((C) => /* @__PURE__ */ o.jsx("option", { value: C.value, className: "bg-slate-900", children: C.label }, C.value))
               }
             )
           ] }),
           /* @__PURE__ */ o.jsxs("div", { className: "rounded-xl bg-white/5 p-2.5 text-[11px] text-slate-400", children: [
             /* @__PURE__ */ o.jsx("p", { className: "font-semibold text-slate-300", children: "Branch type" }),
             (() => {
-              const C = _1(ue.condition), O = L1[C], W = O.icon;
+              const C = S1(ue.condition), O = M1[C], W = O.icon;
               return /* @__PURE__ */ o.jsxs("p", { className: "mt-0.5 flex items-center gap-1.5 text-slate-200", children: [
                 /* @__PURE__ */ o.jsx(W, { className: "h-3.5 w-3.5 text-indigo-300", strokeWidth: 2 }),
                 O.label
@@ -13776,7 +13691,7 @@ function U1({
               onClick: () => ve(ue.id),
               className: "mt-auto flex items-center justify-center gap-2 rounded-xl bg-rose-500/15 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-500/25",
               children: [
-                /* @__PURE__ */ o.jsx(Dn, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
+                /* @__PURE__ */ o.jsx(Pn, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
                 "Delete connection"
               ]
             }
@@ -13786,7 +13701,7 @@ function U1({
     ] })
   ] });
 }
-function W1({ node: e, onPatch: t }) {
+function $1({ node: e, onPatch: t }) {
   const n = e.config ?? {}, r = (i) => t(i), s = (i, a) => /* @__PURE__ */ o.jsxs("label", { className: "flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500", children: [
     i,
     a
@@ -13883,14 +13798,14 @@ function W1({ node: e, onPatch: t }) {
       return null;
   }
 }
-const B1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const z1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  WorkflowView: U1
+  WorkflowView: L1
 }, Symbol.toStringTag, { value: "Module" }));
-function V1(e) {
-  return e.workflowId ? { label: "Workflow", icon: Rv, cls: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30" } : e.taskId ? { label: "Task", icon: Cm, cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" } : { label: "Workflow", icon: _v, cls: "bg-amber-500/15 text-amber-300 ring-amber-400/30" };
+function F1(e) {
+  return e.workflowId ? { label: "Workflow", icon: Ev, cls: "bg-indigo-500/15 text-indigo-300 ring-indigo-400/30" } : e.taskId ? { label: "Task", icon: Cm, cls: "bg-emerald-500/15 text-emerald-300 ring-emerald-400/30" } : { label: "Workflow", icon: Cv, cls: "bg-amber-500/15 text-amber-300 ring-amber-400/30" };
 }
-function H1({
+function U1({
   workflows: e,
   selectedId: t,
   onSelectId: n,
@@ -13938,7 +13853,7 @@ function H1({
             /* @__PURE__ */ o.jsx("span", { className: "text-sm font-medium text-white", children: f.label }),
             (() => {
               const y = Fc(f, r);
-              return jn(y) ? /* @__PURE__ */ o.jsx(lr, { style: jn(y), pulse: y === "running" }) : null;
+              return Nn(y) ? /* @__PURE__ */ o.jsx(lr, { style: Nn(y), pulse: y === "running" }) : null;
             })()
           ] }) : /* @__PURE__ */ o.jsx("p", { className: "mt-1 text-sm text-slate-500", children: "Nothing in progress" })
         ] }),
@@ -13990,9 +13905,9 @@ function H1({
             /* @__PURE__ */ o.jsx(Od, {}),
             /* @__PURE__ */ o.jsx(Od, {})
           ] }) : b.length === 0 ? /* @__PURE__ */ o.jsx(Dd, { label: "No executions reported yet." }) : b.map((y) => {
-            const M = V1(y), R = M.icon;
+            const M = F1(y), R = M.icon;
             return /* @__PURE__ */ o.jsxs("div", { className: "kb-glass flex items-center gap-3 rounded-2xl px-4 py-3", children: [
-              jn(y.status) && /* @__PURE__ */ o.jsx(lr, { style: jn(y.status), pulse: y.status === "running" || y.status === "queued" }),
+              Nn(y.status) && /* @__PURE__ */ o.jsx(lr, { style: Nn(y.status), pulse: y.status === "running" || y.status === "queued" }),
               /* @__PURE__ */ o.jsxs("div", { className: "min-w-0 flex-1", children: [
                 /* @__PURE__ */ o.jsxs("div", { className: "flex items-center gap-2", children: [
                   /* @__PURE__ */ o.jsx("span", { className: "truncate text-sm font-medium text-white", children: y.title }),
@@ -14014,7 +13929,7 @@ function H1({
               ] }),
               /* @__PURE__ */ o.jsxs("div", { className: "flex gap-1", children: [
                 y.status === "running" && /* @__PURE__ */ o.jsx("button", { className: "kb-glass-sm rounded-lg p-2 text-slate-300", title: "Stop execution", onClick: () => i("stop", y.id), children: /* @__PURE__ */ o.jsx(el, { className: "h-3.5 w-3.5" }) }),
-                y.status === "failed" && /* @__PURE__ */ o.jsx("button", { className: "kb-glass-sm rounded-lg p-2 text-slate-300", title: "Retry execution", onClick: () => i("retry", y.id), children: /* @__PURE__ */ o.jsx(an, { className: "h-3.5 w-3.5" }) }),
+                y.status === "failed" && /* @__PURE__ */ o.jsx("button", { className: "kb-glass-sm rounded-lg p-2 text-slate-300", title: "Retry execution", onClick: () => i("retry", y.id), children: /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5" }) }),
                 y.status === "queued" && /* @__PURE__ */ o.jsx("button", { className: "kb-glass-sm rounded-lg p-2 text-slate-300", title: "Start execution", onClick: () => i("start", y.id), children: /* @__PURE__ */ o.jsx(Mc, { className: "h-3.5 w-3.5" }) })
               ] })
             ] }, y.id);
@@ -14066,9 +13981,9 @@ function Od() {
     /* @__PURE__ */ o.jsx("div", { className: "h-3 w-10 animate-pulse rounded bg-slate-600/40" })
   ] });
 }
-const K1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const W1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  MonitoringView: H1
+  MonitoringView: U1
 }, Symbol.toStringTag, { value: "Module" })), Hm = {
   total: 0,
   running: 0,
@@ -14079,22 +13994,22 @@ const K1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   cost: 0,
   successRate: null
 };
-function Y1(e) {
+function B1(e) {
   const t = { ...Hm };
   for (const r of e)
     t.total += 1, r.status === "running" && (t.running += 1), r.status === "completed" && (t.completed += 1), r.status === "failed" && (t.failed += 1), t.tokensIn += r.tokensIn, t.tokensOut += r.tokensOut, t.cost += r.cost;
   const n = t.completed + t.failed;
   return t.successRate = n > 0 ? t.completed / n : null, t;
 }
-function Q1(e, t) {
+function V1(e, t) {
   const n = e.agentId;
   return n ? n === t.id || n === t.name : !1;
 }
 function Ii(e) {
   return e.split(",").map((t) => t.trim()).filter(Boolean);
 }
-function G1({ host: e, openHandsState: t }) {
-  const n = Ht(), [r, s] = g.useState([]), [l, i] = g.useState([]), [a, c] = g.useState([]), [u, p] = g.useState(!0), [d, f] = g.useState({ kind: "idle", message: "" }), [k, N] = g.useState(!1), [b, A] = g.useState(null), [h, m] = g.useState(""), [x, v] = g.useState(""), [w, j] = g.useState("CodeActAgent"), [S, y] = g.useState(!0), [M, R] = g.useState(/* @__PURE__ */ new Set()), [F, G] = g.useState(""), [Z, te] = g.useState(""), [fe, q] = g.useState("default"), [ie, I] = g.useState(""), [z, U] = g.useState("default"), [se, L] = g.useState(/* @__PURE__ */ new Set()), [Se, ge] = g.useState("default"), [P, _] = g.useState(""), [$, Y] = g.useState(""), [ee, X] = g.useState("1"), [Ce, ve] = g.useState(!1), [ye, Te] = g.useState(!1), [pe, st] = g.useState(null), [Et, dn] = g.useState(null), [Lt, ut] = g.useState(""), [oe, $t] = g.useState(null), Wn = g.useCallback(async () => {
+function H1({ host: e, openHandsState: t }) {
+  const n = Ht(), [r, s] = g.useState([]), [l, i] = g.useState([]), [a, c] = g.useState([]), [u, p] = g.useState(!0), [d, f] = g.useState({ kind: "idle", message: "" }), [k, N] = g.useState(!1), [b, A] = g.useState(null), [h, m] = g.useState(""), [x, v] = g.useState(""), [w, j] = g.useState("CodeActAgent"), [S, y] = g.useState(!0), [M, R] = g.useState(/* @__PURE__ */ new Set()), [F, G] = g.useState(""), [Z, te] = g.useState(""), [fe, q] = g.useState("default"), [ie, I] = g.useState(""), [z, U] = g.useState("default"), [se, L] = g.useState(/* @__PURE__ */ new Set()), [Se, ge] = g.useState("default"), [P, _] = g.useState(""), [$, Y] = g.useState(""), [ee, X] = g.useState("1"), [Ce, ve] = g.useState(!1), [ye, Te] = g.useState(!1), [pe, st] = g.useState(null), [Et, un] = g.useState(null), [Lt, ut] = g.useState(""), [oe, $t] = g.useState(null), Wn = g.useCallback(async () => {
     const [E, V, Q] = await Promise.all([
       Ia(e),
       wd(e),
@@ -14115,14 +14030,14 @@ function G1({ host: e, openHandsState: t }) {
       E = !0;
     };
   }, [e]);
-  const fn = t.snapshot.executions, Gr = g.useMemo(
+  const dn = t.snapshot.executions, Gr = g.useMemo(
     () => new Map(
       r.map((E) => [
         E.id,
-        Y1(fn.filter((V) => Q1(V, E)))
+        B1(dn.filter((V) => V1(V, E)))
       ])
     ),
-    [r, fn]
+    [r, dn]
   ), ne = g.useCallback(
     async (E, V) => {
       f({ kind: "working", message: "Syncing…" }), await Wn(), f({ kind: E ? "ok" : "error", message: V });
@@ -14136,7 +14051,7 @@ function G1({ host: e, openHandsState: t }) {
   }, zt = async (E) => {
     var Q;
     A(E.name), ue(), m(E.name), v(E.llmProfileRef ?? ((Q = l[0]) == null ? void 0 : Q.name) ?? ""), N(!0), Te(!0);
-    const V = await Iy(e, E.name);
+    const V = await jy(e, E.name);
     if (!V) {
       Te(!1);
       return;
@@ -14163,30 +14078,30 @@ function G1({ host: e, openHandsState: t }) {
   }, Bn = async () => {
     if (!h.trim() || !x.trim() || Ce || ye) return;
     ve(!0);
-    const E = await Ay(e, h, dt());
+    const E = await Ey(e, h, dt());
     ve(!1), E ? (await ne(!0, `${b ? "Updated" : "Created"} agent "${E}"`), Qt()) : f({ kind: "error", message: `Failed to save agent "${h}"` });
   }, ar = async (E) => {
     f({ kind: "working", message: `Activating "${E.name}"…` });
-    const V = await Cy(e, E.id);
+    const V = await by(e, E.id);
     await ne(V, V ? `Activated "${E.name}"` : `Failed to activate "${E.name}"`);
   }, cr = async () => {
     if (!pe) return;
     const E = pe;
     st(null), f({ kind: "working", message: `Deleting "${E}"…` });
-    const V = await Ey(e, E);
+    const V = await Ny(e, E);
     await ne(V, V ? `Deleted "${E}"` : `Failed to delete "${E}"`);
   }, C = (E) => {
-    dn(E.name), ut(E.name);
+    un(E.name), ut(E.name);
   }, O = async () => {
     if (!Et) return;
     const E = Et, V = Lt.trim();
-    if (dn(null), !V || V === E) return;
+    if (un(null), !V || V === E) return;
     f({ kind: "working", message: `Renaming "${E}"…` });
-    const Q = await Ty(e, E, V);
+    const Q = await Iy(e, E, V);
     await ne(!!Q, Q ? `Renamed "${E}" to "${V}"` : `Failed to rename "${E}"`);
   }, W = async (E) => {
     f({ kind: "working", message: `Materializing "${E.name}"…` });
-    const V = await My(e, E.name);
+    const V = await _y(e, E.name);
     V ? ($t({ name: E.name, report: V }), f({ kind: "ok", message: `Materialized "${E.name}"` })) : f({ kind: "error", message: `Failed to materialize "${E.name}"` });
   }, H = (E) => {
     R((V) => {
@@ -14241,7 +14156,7 @@ function G1({ host: e, openHandsState: t }) {
         "data-lifecycle-status": d.kind,
         className: `flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium ring-1 ${d.kind === "error" ? "bg-rose-500/10 text-rose-300 ring-rose-400/25" : d.kind === "ok" ? "bg-emerald-500/10 text-emerald-300 ring-emerald-400/25" : "bg-slate-800/40 text-slate-300 ring-white/10"}`,
         children: [
-          d.kind === "working" ? /* @__PURE__ */ o.jsx(Jn, { className: "h-3.5 w-3.5 animate-spin" }) : d.kind === "ok" ? /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5" }) : /* @__PURE__ */ o.jsx(sr, { className: "h-3.5 w-3.5" }),
+          d.kind === "working" ? /* @__PURE__ */ o.jsx(Jn, { className: "h-3.5 w-3.5 animate-spin" }) : d.kind === "ok" ? /* @__PURE__ */ o.jsx($n, { className: "h-3.5 w-3.5" }) : /* @__PURE__ */ o.jsx(sr, { className: "h-3.5 w-3.5" }),
           d.message
         ]
       }
@@ -14370,7 +14285,7 @@ function G1({ host: e, openHandsState: t }) {
               "Use standard tools"
             ] })
           ] }),
-          S ? /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 px-3 py-2 text-[11px] text-slate-500", children: "The agent uses the default tool set. Uncheck to pick specific tools." }) : /* @__PURE__ */ o.jsx("div", { className: "grid grid-cols-2 gap-1.5 sm:grid-cols-3", children: Sy.map((E) => /* @__PURE__ */ o.jsxs(
+          S ? /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 px-3 py-2 text-[11px] text-slate-500", children: "The agent uses the default tool set. Uncheck to pick specific tools." }) : /* @__PURE__ */ o.jsx("div", { className: "grid grid-cols-2 gap-1.5 sm:grid-cols-3", children: ky.map((E) => /* @__PURE__ */ o.jsxs(
             "label",
             {
               className: `flex cursor-pointer items-center gap-2 rounded-xl px-2.5 py-2 text-[11px] transition-colors ${M.has(E.name) ? "bg-indigo-500/15 text-indigo-200 ring-1 ring-indigo-400/30" : "bg-slate-900/40 text-slate-400 hover:bg-slate-900/60"}`,
@@ -14528,9 +14443,9 @@ function G1({ host: e, openHandsState: t }) {
     u && /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500", children: "Loading agents…" }),
     !u && r.length === 0 && /* @__PURE__ */ o.jsx("p", { className: "rounded-xl bg-slate-800/30 p-5 text-center text-xs text-slate-500", children: "No agents are available yet. They will appear once an agent profile is created." }),
     r.length > 0 && /* @__PURE__ */ o.jsxs("section", { children: [
-      /* @__PURE__ */ o.jsx(q1, { icon: un, label: "Agent Profiles" }),
+      /* @__PURE__ */ o.jsx(K1, { icon: cn, label: "Agent Profiles" }),
       /* @__PURE__ */ o.jsx("div", { className: "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3", children: r.map((E) => /* @__PURE__ */ o.jsx(
-        X1,
+        Y1,
         {
           profile: E,
           metrics: Gr.get(E.id) ?? Hm,
@@ -14545,7 +14460,7 @@ function G1({ host: e, openHandsState: t }) {
     ] }),
     pe && /* @__PURE__ */ o.jsx("div", { className: "fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm", children: /* @__PURE__ */ o.jsxs("div", { className: "kb-glass kb-fade-in w-full max-w-sm rounded-2xl p-5", children: [
       /* @__PURE__ */ o.jsxs("div", { className: "mb-3 flex items-center gap-2", children: [
-        /* @__PURE__ */ o.jsx(Dn, { className: "h-4 w-4 text-rose-400" }),
+        /* @__PURE__ */ o.jsx(Pn, { className: "h-4 w-4 text-rose-400" }),
         /* @__PURE__ */ o.jsx("h3", { className: "text-sm font-semibold text-white", children: "Delete Agent" })
       ] }),
       /* @__PURE__ */ o.jsxs("p", { className: "text-xs text-slate-400", children: [
@@ -14570,7 +14485,7 @@ function G1({ host: e, openHandsState: t }) {
             onClick: () => void cr(),
             className: "flex items-center gap-2 rounded-xl bg-rose-500/80 px-4 py-2 text-xs font-semibold text-white hover:bg-rose-500",
             children: [
-              /* @__PURE__ */ o.jsx(Dn, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
+              /* @__PURE__ */ o.jsx(Pn, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
               "Delete"
             ]
           }
@@ -14605,7 +14520,7 @@ function G1({ host: e, openHandsState: t }) {
           "button",
           {
             type: "button",
-            onClick: () => dn(null),
+            onClick: () => un(null),
             className: "kb-glass-sm rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white",
             children: "Cancel"
           }
@@ -14651,7 +14566,7 @@ function G1({ host: e, openHandsState: t }) {
           {
             className: `flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold ring-1 ${oe.report.valid ? "bg-emerald-500/10 text-emerald-300 ring-emerald-400/25" : "bg-rose-500/10 text-rose-300 ring-rose-400/25"}`,
             children: [
-              oe.report.valid ? /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5" }) : /* @__PURE__ */ o.jsx(sr, { className: "h-3.5 w-3.5" }),
+              oe.report.valid ? /* @__PURE__ */ o.jsx($n, { className: "h-3.5 w-3.5" }) : /* @__PURE__ */ o.jsx(sr, { className: "h-3.5 w-3.5" }),
               oe.report.valid ? "Profile materializes cleanly" : "Profile has materialization errors"
             ]
           }
@@ -14743,13 +14658,13 @@ function G1({ host: e, openHandsState: t }) {
     ] })
   ] });
 }
-function q1({ icon: e, label: t }) {
+function K1({ icon: e, label: t }) {
   return /* @__PURE__ */ o.jsxs("div", { className: "mb-3 flex items-center gap-2", children: [
     /* @__PURE__ */ o.jsx(e, { className: "h-4 w-4 text-indigo-400", strokeWidth: 1.75 }),
     /* @__PURE__ */ o.jsx("h3", { className: "text-sm font-semibold tracking-tight text-slate-200", children: t })
   ] });
 }
-function X1({
+function Y1({
   profile: e,
   metrics: t,
   onEdit: n,
@@ -14760,7 +14675,7 @@ function X1({
 }) {
   return /* @__PURE__ */ o.jsxs("div", { className: "kb-glass kb-fade-in group relative overflow-hidden rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-12px_rgba(99,102,241,0.4)]", children: [
     /* @__PURE__ */ o.jsxs("div", { className: "flex items-start gap-3", children: [
-      /* @__PURE__ */ o.jsx("div", { className: "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-500 shadow-lg", children: /* @__PURE__ */ o.jsx(un, { className: "h-5 w-5 text-white", strokeWidth: 1.75 }) }),
+      /* @__PURE__ */ o.jsx("div", { className: "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-500 shadow-lg", children: /* @__PURE__ */ o.jsx(cn, { className: "h-5 w-5 text-white", strokeWidth: 1.75 }) }),
       /* @__PURE__ */ o.jsxs("div", { className: "min-w-0 flex-1", children: [
         /* @__PURE__ */ o.jsxs("div", { className: "flex items-center justify-between gap-2", children: [
           /* @__PURE__ */ o.jsx("p", { className: "truncate text-sm font-semibold text-white", children: e.name }),
@@ -14772,7 +14687,7 @@ function X1({
         ] })
       ] })
     ] }),
-    /* @__PURE__ */ o.jsx(J1, { metrics: t }),
+    /* @__PURE__ */ o.jsx(Q1, { metrics: t }),
     /* @__PURE__ */ o.jsxs("div", { className: "mt-3 flex items-center gap-2 border-t border-white/5 pt-3", children: [
       !e.active && /* @__PURE__ */ o.jsxs(
         "button",
@@ -14781,7 +14696,7 @@ function X1({
           onClick: r,
           className: "flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-300 ring-1 ring-emerald-400/20 hover:bg-emerald-500/20",
           children: [
-            /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
+            /* @__PURE__ */ o.jsx($n, { className: "h-3.5 w-3.5", strokeWidth: 2 }),
             "Activate"
           ]
         }
@@ -14805,7 +14720,7 @@ function X1({
           onClick: s,
           "aria-label": `Rename ${e.name}`,
           className: "flex items-center justify-center gap-1.5 rounded-lg bg-slate-800/50 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 ring-1 ring-white/10 hover:bg-slate-800",
-          children: /* @__PURE__ */ o.jsx(vv, { className: "h-3.5 w-3.5", strokeWidth: 2 })
+          children: /* @__PURE__ */ o.jsx(gv, { className: "h-3.5 w-3.5", strokeWidth: 2 })
         }
       ),
       /* @__PURE__ */ o.jsx(
@@ -14825,13 +14740,13 @@ function X1({
           onClick: i,
           "aria-label": `Delete ${e.name}`,
           className: "flex items-center justify-center gap-1.5 rounded-lg bg-rose-500/10 px-2.5 py-1.5 text-[11px] font-semibold text-rose-300 ring-1 ring-rose-400/20 hover:bg-rose-500/20",
-          children: /* @__PURE__ */ o.jsx(Dn, { className: "h-3.5 w-3.5", strokeWidth: 2 })
+          children: /* @__PURE__ */ o.jsx(Pn, { className: "h-3.5 w-3.5", strokeWidth: 2 })
         }
       )
     ] })
   ] });
 }
-function J1({ metrics: e }) {
+function Q1({ metrics: e }) {
   const t = e.successRate === null ? "—" : `${Math.round(e.successRate * 100)}%`;
   return /* @__PURE__ */ o.jsxs("div", { className: "mt-3 grid grid-cols-3 gap-2 border-t border-white/5 pt-3 text-xs", children: [
     /* @__PURE__ */ o.jsx(_i, { label: "Runs", value: String(e.total) }),
@@ -14851,7 +14766,7 @@ function J1({ metrics: e }) {
         " running"
       ] }),
       /* @__PURE__ */ o.jsxs("span", { className: "flex items-center gap-1", children: [
-        /* @__PURE__ */ o.jsx(on, { className: "h-3 w-3 text-emerald-400" }),
+        /* @__PURE__ */ o.jsx($n, { className: "h-3 w-3 text-emerald-400" }),
         e.completed,
         " done"
       ] }),
@@ -14874,9 +14789,9 @@ function _i({ label: e, value: t, accent: n }) {
     /* @__PURE__ */ o.jsx("p", { className: `mt-0.5 text-sm font-semibold ${n ?? "text-slate-200"}`, children: t })
   ] });
 }
-const Z1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const G1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  AgentRoster: G1
+  AgentRoster: H1
 }, Symbol.toStringTag, { value: "Module" }));
 function Km({
   open: e,
@@ -14901,7 +14816,7 @@ function Km({
           onClick: (i) => i.stopPropagation(),
           children: [
             /* @__PURE__ */ o.jsxs("div", { className: "flex items-start gap-3", children: [
-              /* @__PURE__ */ o.jsx("div", { className: "kb-glass-sm flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-amber-300", children: /* @__PURE__ */ o.jsx(an, { className: "h-5 w-5", strokeWidth: 2 }) }),
+              /* @__PURE__ */ o.jsx("div", { className: "kb-glass-sm flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-amber-300", children: /* @__PURE__ */ o.jsx(on, { className: "h-5 w-5", strokeWidth: 2 }) }),
               /* @__PURE__ */ o.jsxs("div", { className: "min-w-0 flex-1", children: [
                 /* @__PURE__ */ o.jsx("h3", { className: "text-sm font-semibold text-white", children: t }),
                 /* @__PURE__ */ o.jsx("p", { className: "mt-1 text-xs leading-relaxed text-slate-400", children: n })
@@ -14934,7 +14849,7 @@ function Km({
                   onClick: s,
                   className: "kb-gradient kb-btn-glow flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold text-white",
                   children: [
-                    /* @__PURE__ */ o.jsx(an, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
+                    /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
                     /* @__PURE__ */ o.jsx("span", { children: r })
                   ]
                 }
@@ -14946,7 +14861,7 @@ function Km({
     }
   ) : null;
 }
-function ew({ openHandsState: e, profiles: t, onReset: n }) {
+function q1({ openHandsState: e, profiles: t, onReset: n }) {
   const r = Ht(), s = e.snapshot.executions, { loading: l, error: i } = e, [a, c] = g.useState(!1), u = s.filter((d) => d.status === "running" || d.status === "queued"), p = s.filter((d) => d.status === "completed" || d.status === "failed" || d.status === "cancelled").sort((d, f) => (f.finishedAt ?? 0) - (d.finishedAt ?? 0));
   return /* @__PURE__ */ o.jsxs("div", { ref: r, className: "kb-reveal relative z-10 flex flex-col gap-6", children: [
     /* @__PURE__ */ o.jsxs("div", { className: "flex items-start justify-between gap-4", children: [
@@ -14966,7 +14881,7 @@ function ew({ openHandsState: e, profiles: t, onReset: n }) {
           onClick: () => c(!0),
           className: "kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white",
           children: [
-            /* @__PURE__ */ o.jsx(an, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
+            /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
             /* @__PURE__ */ o.jsx("span", { children: "Clear History" })
           ]
         }
@@ -14979,8 +14894,8 @@ function ew({ openHandsState: e, profiles: t, onReset: n }) {
         " Active Runs"
       ] }),
       u.length === 0 ? l ? /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-2", children: [
-        /* @__PURE__ */ o.jsx(Sn, {}),
-        /* @__PURE__ */ o.jsx(Sn, {})
+        /* @__PURE__ */ o.jsx(jn, {}),
+        /* @__PURE__ */ o.jsx(jn, {})
       ] }) : /* @__PURE__ */ o.jsx(
         $d,
         {
@@ -14994,8 +14909,8 @@ function ew({ openHandsState: e, profiles: t, onReset: n }) {
         " Completed Runs"
       ] }),
       p.length === 0 ? l ? /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-2", children: [
-        /* @__PURE__ */ o.jsx(Sn, {}),
-        /* @__PURE__ */ o.jsx(Sn, {})
+        /* @__PURE__ */ o.jsx(jn, {}),
+        /* @__PURE__ */ o.jsx(jn, {})
       ] }) : /* @__PURE__ */ o.jsx($d, { label: "No completed runs yet." }) : /* @__PURE__ */ o.jsx("div", { className: "flex flex-col gap-2", children: p.map((d) => /* @__PURE__ */ o.jsx(Ld, { run: d, profiles: t }, d.id)) })
     ] }),
     /* @__PURE__ */ o.jsx(
@@ -15013,20 +14928,20 @@ function ew({ openHandsState: e, profiles: t, onReset: n }) {
     )
   ] });
 }
-function tw(e) {
+function X1(e) {
   if (e < 0) return "—";
   const t = Math.floor(e / 1e3);
   if (t < 60) return `${t}s`;
   const n = Math.floor(t / 60);
   return n < 60 ? `${n}m ${t % 60}s` : `${Math.floor(n / 60)}h ${n % 60}m`;
 }
-function nw(e) {
+function J1(e) {
   const t = new Date(e), n = t.getDate(), r = t.toLocaleString("en", { month: "short" }), s = t.getFullYear(), l = String(t.getHours()).padStart(2, "0"), i = String(t.getMinutes()).padStart(2, "0");
   return `${n} ${r} ${s} ${l}:${i}`;
 }
 function Ld({ run: e, profiles: t, active: n }) {
   var c;
-  const r = e.status === "completed" ? on : e.status === "failed" ? sr : Jn, s = e.status === "completed" ? "text-emerald-400" : e.status === "failed" ? "text-rose-400" : "text-blue-400", l = e.agentId ? ((c = t.find((u) => u.id === e.agentId || u.name === e.agentId)) == null ? void 0 : c.name) ?? "Unassigned" : null, i = e.startedAt && e.finishedAt ? tw(e.finishedAt - e.startedAt) : null, a = e.costReported === !1 ? null : `$${e.cost.toFixed(4)}`;
+  const r = e.status === "completed" ? $n : e.status === "failed" ? sr : Jn, s = e.status === "completed" ? "text-emerald-400" : e.status === "failed" ? "text-rose-400" : "text-blue-400", l = e.agentId ? ((c = t.find((u) => u.id === e.agentId || u.name === e.agentId)) == null ? void 0 : c.name) ?? "Unassigned" : null, i = e.startedAt && e.finishedAt ? X1(e.finishedAt - e.startedAt) : null, a = e.costReported === !1 ? null : `$${e.cost.toFixed(4)}`;
   return /* @__PURE__ */ o.jsxs(
     "div",
     {
@@ -15042,17 +14957,17 @@ function Ld({ run: e, profiles: t, active: n }) {
         /* @__PURE__ */ o.jsxs("div", { className: "min-w-0 flex-1", children: [
           /* @__PURE__ */ o.jsx("p", { className: "truncate text-sm font-medium text-white", children: e.title }),
           /* @__PURE__ */ o.jsxs("div", { className: "mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400", children: [
-            jn(e.status) && /* @__PURE__ */ o.jsx(lr, { style: jn(e.status), pulse: n }),
+            Nn(e.status) && /* @__PURE__ */ o.jsx(lr, { style: Nn(e.status), pulse: n }),
             e.startedAt && /* @__PURE__ */ o.jsxs("span", { className: "flex items-center gap-1", children: [
               /* @__PURE__ */ o.jsx(yo, { className: "h-3 w-3" }),
-              nw(e.startedAt)
+              J1(e.startedAt)
             ] }),
             i && /* @__PURE__ */ o.jsxs("span", { children: [
               "Duration: ",
               i
             ] }),
             l && /* @__PURE__ */ o.jsxs("span", { className: "flex items-center gap-1", children: [
-              /* @__PURE__ */ o.jsx(un, { className: "h-3 w-3 text-indigo-400" }),
+              /* @__PURE__ */ o.jsx(cn, { className: "h-3 w-3 text-indigo-400" }),
               " ",
               l
             ] }),
@@ -15074,11 +14989,11 @@ function Ld({ run: e, profiles: t, active: n }) {
 function $d({ label: e }) {
   return /* @__PURE__ */ o.jsx("div", { className: "kb-glass flex items-center justify-center rounded-2xl p-8 text-center", children: /* @__PURE__ */ o.jsx("p", { className: "text-xs text-slate-500", children: e }) });
 }
-const rw = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Z1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  ExecutionHistory: ew
+  ExecutionHistory: q1
 }, Symbol.toStringTag, { value: "Module" }));
-function sw({ aiState: e, openHandsState: t, onReset: n }) {
+function ew({ aiState: e, openHandsState: t, onReset: n }) {
   const r = Ht(), { config: s } = e, l = t.snapshot.executions, i = t.loading, [a, c] = g.useState(!1), u = g.useMemo(() => {
     const v = /* @__PURE__ */ new Map();
     for (const w of l) {
@@ -15123,17 +15038,17 @@ function sw({ aiState: e, openHandsState: t, onReset: n }) {
           onClick: () => c(!0),
           className: "kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white",
           children: [
-            /* @__PURE__ */ o.jsx(an, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
+            /* @__PURE__ */ o.jsx(on, { className: "h-3.5 w-3.5", strokeWidth: 2.5 }),
             /* @__PURE__ */ o.jsx("span", { children: "Clear Analytics" })
           ]
         }
       )
     ] }),
     i ? /* @__PURE__ */ o.jsxs("div", { className: "grid grid-cols-2 gap-4 lg:grid-cols-4", children: [
-      /* @__PURE__ */ o.jsx(Cn, {}),
-      /* @__PURE__ */ o.jsx(Cn, {}),
-      /* @__PURE__ */ o.jsx(Cn, {}),
-      /* @__PURE__ */ o.jsx(Cn, {})
+      /* @__PURE__ */ o.jsx(Sn, {}),
+      /* @__PURE__ */ o.jsx(Sn, {}),
+      /* @__PURE__ */ o.jsx(Sn, {}),
+      /* @__PURE__ */ o.jsx(Sn, {})
     ] }) : /* @__PURE__ */ o.jsxs("div", { className: "grid grid-cols-2 gap-4 lg:grid-cols-4", children: [
       /* @__PURE__ */ o.jsx(
         El,
@@ -15174,12 +15089,12 @@ function sw({ aiState: e, openHandsState: t, onReset: n }) {
     ] }),
     /* @__PURE__ */ o.jsxs("section", { children: [
       /* @__PURE__ */ o.jsxs("h3", { className: "mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200", children: [
-        /* @__PURE__ */ o.jsx(un, { className: "h-4 w-4 text-indigo-400" }),
+        /* @__PURE__ */ o.jsx(cn, { className: "h-4 w-4 text-indigo-400" }),
         " Per-Agent Usage"
       ] }),
       i ? /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-2", children: [
-        /* @__PURE__ */ o.jsx(Sn, {}),
-        /* @__PURE__ */ o.jsx(Sn, {})
+        /* @__PURE__ */ o.jsx(jn, {}),
+        /* @__PURE__ */ o.jsx(jn, {})
       ] }) : u.length === 0 ? /* @__PURE__ */ o.jsx(Fd, { label: "No agent usage yet — run a task to populate analytics." }) : /* @__PURE__ */ o.jsx("div", { className: "kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4", children: u.map((v) => /* @__PURE__ */ o.jsx(
         zd,
         {
@@ -15200,8 +15115,8 @@ function sw({ aiState: e, openHandsState: t, onReset: n }) {
         " Per-Model Usage"
       ] }),
       i ? /* @__PURE__ */ o.jsxs("div", { className: "flex flex-col gap-2", children: [
-        /* @__PURE__ */ o.jsx(Sn, {}),
-        /* @__PURE__ */ o.jsx(Sn, {})
+        /* @__PURE__ */ o.jsx(jn, {}),
+        /* @__PURE__ */ o.jsx(jn, {})
       ] }) : p.length === 0 ? /* @__PURE__ */ o.jsx(Fd, { label: "No model usage yet." }) : /* @__PURE__ */ o.jsx("div", { className: "kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4", children: p.map((v) => /* @__PURE__ */ o.jsx(
         zd,
         {
@@ -15289,10 +15204,10 @@ function zd({
 function Fd({ label: e }) {
   return /* @__PURE__ */ o.jsx("div", { className: "kb-glass flex items-center justify-center rounded-2xl p-8 text-center", children: /* @__PURE__ */ o.jsx("p", { className: "text-xs text-slate-500", children: e }) });
 }
-const lw = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const tw = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  AnalyticsView: sw
+  AnalyticsView: ew
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  iw as activate
+  rw as activate
 };

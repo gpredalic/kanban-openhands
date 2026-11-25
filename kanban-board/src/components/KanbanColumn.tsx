@@ -51,19 +51,19 @@ export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskId
     <div
       ref={setNodeRef}
       data-drop-status={column.status}
-      className={`kb-glass flex flex-col rounded-[20px] p-3 transition-all duration-200 ${
+      className={`kb-glass-sm flex flex-col rounded-[18px] p-4 transition-all duration-200 ${
         isOver ? "kb-drop-target" : ""
       }`}
     >
       {/* Column header */}
-      <div className="mb-3 flex items-center justify-between px-1.5">
+      <div className="mb-4 flex items-center justify-between px-1">
         <div className="flex items-center gap-2.5">
-          <span className={`h-2.5 w-2.5 rounded-full ${dot}`} style={{ boxShadow: `0 0 10px ${STATUS_GLOW[column.status]}` }} />
-          <h3 className="text-sm font-bold uppercase tracking-[0.12em] text-slate-300">
+          <span className={`h-2 w-2 rounded-full ${dot}`} style={{ boxShadow: `0 0 8px ${STATUS_GLOW[column.status]}` }} />
+          <h3 className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-slate-400">
             {column.title}
           </h3>
         </div>
-        <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400 ring-1 ring-white/10">
+        <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/[0.04] px-2 text-xs font-semibold tabular-nums text-slate-500 ring-1 ring-white/[0.06]">
           {column.tasks.length}
         </span>
       </div>

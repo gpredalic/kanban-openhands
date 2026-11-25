@@ -297,7 +297,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
   };
 
   return (
-    <div className="kb-app flex flex-col gap-4 p-3 sm:p-4 lg:p-5">
+    <div className="kb-app flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
       <Header onCreate={() => setShowCreateModal(true)} syncing={state.uiState.syncing} />
 
       <ViewSwitcher view={view} onView={handleViewChange} />
@@ -313,7 +313,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                 <SkeletonStat />
                 <SkeletonStat />
               </div>
-              <div className="relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <div className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <SkeletonColumn />
                 <SkeletonColumn />
                 <SkeletonColumn />
@@ -330,7 +330,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
               />
 
               <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-                <div ref={boardRef} className="relative z-10 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div ref={boardRef} className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                   {filteredColumns.map((col) => (
                     <KanbanColumn
                       key={col.status}

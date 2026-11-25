@@ -44,18 +44,12 @@
    * border. This is what makes a panel read as "raised from the canvas".
    * ------------------------------------------------------------------ */
   --kb-neu-raised:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
-    0 18px 40px -18px rgba(0, 0, 0, 0.7),
-    0 4px 12px -6px rgba(0, 0, 0, 0.5);
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 10px 30px -16px rgba(0, 0, 0, 0.5);
   --kb-neu-raised-sm:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
-    0 10px 24px -14px rgba(0, 0, 0, 0.6),
-    0 2px 6px -3px rgba(0, 0, 0, 0.4);
+    0 1px 2px rgba(0, 0, 0, 0.2);
   --kb-neu-inset:
-    0 2px 6px rgba(0, 0, 0, 0.5) inset,
-    0 -1px 0 rgba(255, 255, 255, 0.03) inset;
+    inset 0 1px 3px rgba(0, 0, 0, 0.35);
   --kb-neu-lift:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 -1px 0 rgba(0, 0, 0, 0.4) inset,
@@ -69,17 +63,17 @@
   /* ------------------------------------------------------------------ *
    * Editorial type scale — a deliberate ramp from display to meta.
    * ------------------------------------------------------------------ */
-  --kb-text-display: 2.25rem;
-  --kb-text-section: 1.25rem;
+  --kb-text-display: 2.5rem;
+  --kb-text-section: 1.375rem;
   --kb-text-card: 0.9375rem;
-  --kb-text-body: 0.8125rem;
+  --kb-text-body: 0.875rem;
   --kb-text-meta: 0.6875rem;
-  /* Spacing scale (8pt grid). */
+  /* Spacing scale (8pt grid) — generous, editorial whitespace. */
   --kb-space-1: 0.5rem;
-  --kb-space-2: 1rem;
-  --kb-space-3: 1.5rem;
-  --kb-space-4: 2rem;
-  --kb-space-5: 3rem;
+  --kb-space-2: 1.25rem;
+  --kb-space-3: 2rem;
+  --kb-space-4: 3rem;
+  --kb-space-5: 4.5rem;
   /* Radius system — card 20px, button 14px, badge pill. */
   --kb-radius-card: 20px;
   --kb-radius-button: 14px;
@@ -183,18 +177,16 @@
  * blue tint. This is the primary surface language of the design system.
  * ------------------------------------------------------------------ */
 .kb-glass {
-  background: linear-gradient(160deg, rgba(28, 28, 34, 0.92) 0%, rgba(16, 16, 20, 0.88) 100%);
-  backdrop-filter: blur(14px) saturate(120%);
-  -webkit-backdrop-filter: blur(14px) saturate(120%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(22, 22, 27, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   box-shadow: var(--kb-neu-raised);
 }
 
 .kb-glass-sm {
-  background: rgba(23, 23, 28, 0.72);
-  backdrop-filter: blur(10px) saturate(115%);
-  -webkit-backdrop-filter: blur(10px) saturate(115%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: var(--kb-neu-raised-sm);
 }
 
@@ -227,13 +219,11 @@
   transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
 }
 .kb-card:hover {
-  border-color: rgba(var(--kb-card-glow), 0.28);
+  border-color: rgba(var(--kb-card-glow), 0.22);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
-    0 0 0 1px rgba(var(--kb-card-glow), 0.16),
-    0 16px 40px -16px rgba(var(--kb-card-glow), 0.28),
-    0 6px 16px -8px rgba(0, 0, 0, 0.6);
+    0 0 0 1px rgba(var(--kb-card-glow), 0.12),
+    0 12px 32px -16px rgba(var(--kb-card-glow), 0.22),
+    0 4px 12px -8px rgba(0, 0, 0, 0.5);
 }
 
 /* Button hover — a quiet lift with a soft accent halo. */
@@ -278,7 +268,7 @@
 .kb-pill--active {
   background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 100%);
   color: #fff;
-  box-shadow: 0 6px 18px -6px rgba(10, 132, 255, 0.5), 0 0 0 1px rgba(10, 132, 255, 0.25);
+  box-shadow: 0 4px 14px -6px rgba(10, 132, 255, 0.4);
 }
 
 /* Dragging card — the floating DragOverlay clone: lifted, glowing, slightly
@@ -538,48 +528,6 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Bento grid — clean, balanced sections with strong hierarchy.
- * Used by Dashboard, Analytics, Reports, and Activity views.
- * ------------------------------------------------------------------ */
-.kb-bento {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-.kb-bento--2col {
-  grid-template-columns: repeat(2, 1fr);
-}
-.kb-bento--3col {
-  grid-template-columns: repeat(3, 1fr);
-}
-.kb-bento--4col {
-  grid-template-columns: repeat(4, 1fr);
-}
-@media (max-width: 768px) {
-  .kb-bento--2col,
-  .kb-bento--3col,
-  .kb-bento--4col {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Bento cell — a glass panel with generous padding and a subtle
-   inner highlight that gives depth without a hard border. */
-.kb-bento-cell {
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-.kb-bento-cell::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.04) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-/* ------------------------------------------------------------------ *
  * Page transition — smooth fade + slide when switching views.
  * Applied to the Suspense fallback and the view container.
  * ------------------------------------------------------------------ */
@@ -670,28 +618,5 @@
   .kb-btn-glow,
   .kb-pill {
     transition: none;
-  }
-}
-
-/* ------------------------------------------------------------------ *
- * Bento grid — an asymmetric, responsive card grid. Columns auto-fit to
- * the available width; individual cells can span extra columns or rows to
- * create the editorial, magazine-style rhythm.
- * ------------------------------------------------------------------ */
-.kb-bento {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: var(--kb-space-2);
-  align-items: start;
-}
-.kb-bento--wide {
-  grid-column: span 2;
-}
-.kb-bento--tall {
-  grid-row: span 2;
-}
-@media (max-width: 640px) {
-  .kb-bento--wide {
-    grid-column: span 1;
   }
 }

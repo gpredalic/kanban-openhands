@@ -23,35 +23,35 @@ export function Header({ onCreate, syncing = false }: HeaderProps) {
   const actionRef = useReveal<HTMLDivElement>({ delay: 180 });
 
   return (
-    <header className="relative z-10 flex flex-col gap-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <header className="relative z-10 flex flex-col gap-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
         {/* Title block */}
-        <div className="flex items-center gap-4">
-          <div className="kb-glass flex h-14 w-14 shrink-0 items-center justify-center rounded-[20px]">
+        <div className="flex items-center gap-5">
+          <div className="kb-glass-sm flex h-12 w-12 shrink-0 items-center justify-center rounded-[16px]">
             <img
               src={kanbanAiIcon}
               alt="Kanban AI"
-              width={40}
-              height={40}
-              className="h-10 w-10"
+              width={36}
+              height={36}
+              className="h-9 w-9"
             />
           </div>
           <div>
             <p
               ref={eyebrowRef}
-              className="kb-reveal text-[0.6875rem] font-semibold uppercase tracking-[0.22em] text-slate-500"
+              className="kb-reveal text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-slate-500"
             >
               Workspace
             </p>
             <h1
               ref={titleRef}
-              className="kb-reveal mt-1 text-[2.25rem] font-extrabold leading-[1.05] tracking-[-0.02em] text-slate-50"
+              className="kb-reveal mt-2 text-[2.5rem] font-bold leading-[1.05] tracking-[-0.025em] text-slate-50"
             >
               Kanban Board
             </h1>
             <p
               ref={subRef}
-              className="kb-reveal mt-1.5 text-sm text-slate-400"
+              className="kb-reveal mt-2 text-[0.9375rem] text-slate-400"
             >
               Plan, track and ship work across your team — in one place.
             </p>
@@ -62,7 +62,7 @@ export function Header({ onCreate, syncing = false }: HeaderProps) {
         <div ref={actionRef} className="kb-reveal flex items-center gap-3">
           {/* Sync indicator — always visible, pulses while syncing */}
           <div
-            className="flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-medium ring-1 ring-white/10"
+            className="flex items-center gap-1.5 rounded-full bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium ring-1 ring-white/[0.08]"
             title={syncing ? "Syncing…" : "Synced"}
           >
             <span
@@ -74,7 +74,7 @@ export function Header({ onCreate, syncing = false }: HeaderProps) {
               {syncing ? "Syncing" : "Synced"}
             </span>
           </div>
-          <div className="kb-glass flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-semibold text-white">
+          <div className="kb-glass-sm flex h-10 w-10 items-center justify-center rounded-[14px] text-sm font-semibold text-white">
             GP
           </div>
 
