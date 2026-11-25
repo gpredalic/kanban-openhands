@@ -15,6 +15,7 @@ import type { AiState } from "../types/ai";
 import type { OpenHandsState } from "../types/openhands";
 import { formatCost, formatTokens } from "../lib/ai-engine";
 import { ConfirmResetModal } from "./ConfirmResetModal";
+import { useReveal } from "../hooks/useReveal";
 import { SkeletonStat, SkeletonRow } from "./Skeleton";
 
 interface AnalyticsViewProps {
@@ -34,6 +35,7 @@ interface Breakdown {
 }
 
 export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsViewProps) {
+  const rootRef = useReveal<HTMLDivElement>();
   const { config } = aiState;
   const executions = openHandsState.snapshot.executions;
   const loading = openHandsState.loading;
@@ -97,7 +99,7 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
   const maxModelCost = Math.max(...perModel.map((m) => m.cost), 0.0001);
 
   return (
-    <div className="relative z-10 flex flex-col gap-6">
+    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold tracking-tight text-white">Analytics</h2>

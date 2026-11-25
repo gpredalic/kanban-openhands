@@ -30,6 +30,7 @@ import type { OpenHandsState, OpenHandsExecution } from "../types/openhands";
 import { formatCost, formatTokens } from "../lib/ai-engine";
 import { Badge, statusBadge } from "../lib/badges";
 import { useWorkflowRouting, nodeExecState } from "../hooks/useWorkflowRouting";
+import { useReveal } from "../hooks/useReveal";
 
 /** Derive the execution type label from its identifiers. */
 function executionType(run: OpenHandsExecution): { label: string; icon: LucideIcon; cls: string } {
@@ -58,6 +59,7 @@ export function MonitoringView({
   profiles,
   onCommand,
 }: MonitoringViewProps) {
+  const rootRef = useReveal<HTMLDivElement>();
   // Default to the first workflow when none is selected, so the routing readout
   // and orchestration panel are visible the moment the view opens.
   const effectiveId = selectedId ?? workflows[0]?.id ?? null;
@@ -94,7 +96,7 @@ export function MonitoringView({
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 p-6">
+    <div ref={rootRef} className="kb-reveal flex h-full flex-col gap-4 p-6">
       {/* Toolbar — pick which workflow to observe */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">

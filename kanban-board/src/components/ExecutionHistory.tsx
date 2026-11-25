@@ -13,6 +13,7 @@ import type { OpenHandsExecution, OpenHandsState } from "../types/openhands";
 import type { AiState, Agent } from "../types/ai";
 import { Badge, statusBadge } from "../lib/badges";
 import { ConfirmResetModal } from "./ConfirmResetModal";
+import { useReveal } from "../hooks/useReveal";
 import { SkeletonRow } from "./Skeleton";
 
 interface ExecutionHistoryProps {
@@ -24,6 +25,7 @@ interface ExecutionHistoryProps {
 }
 
 export function ExecutionHistory({ openHandsState, profiles, onReset }: ExecutionHistoryProps) {
+  const rootRef = useReveal<HTMLDivElement>();
   const executions = openHandsState.snapshot.executions;
   const { loading, error } = openHandsState;
   const [confirmReset, setConfirmReset] = useState(false);
@@ -33,7 +35,7 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
     .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
 
   return (
-    <div className="relative z-10 flex flex-col gap-6">
+    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold tracking-tight text-white">Execution History</h2>

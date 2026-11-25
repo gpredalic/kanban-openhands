@@ -213,7 +213,7 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
         if (moved > 5 || wasDrag) return;
         onEdit?.(task);
       }}
-      className={`kb-glass kb-card kb-fade-in group cursor-grab rounded-2xl p-4 active:cursor-grabbing ${
+      className={`kb-glass kb-card kb-fade-in group cursor-grab rounded-[20px] p-4 active:cursor-grabbing ${
         isOverlay ? "kb-dragging kb-drag-overlay" : isDragging ? "kb-drag-placeholder" : ""
       } ${deleting ? "opacity-60" : ""} ${deleteError ? "kb-delete-failed" : ""} ${deletePhase === "fading" ? "kb-delete-fading" : ""} ${running ? "kb-running" : ""} ${animClass}`}
     >
@@ -364,7 +364,7 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-white/5 ring-1 ring-white/10">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500 transition-all duration-300"
+              className="h-full rounded-full bg-gradient-to-r from-[#0A84FF] to-[#5E5CE6] transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

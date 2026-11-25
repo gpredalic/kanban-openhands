@@ -1,11 +1,13 @@
 /**
- * StatsCards — a row of premium glass metric cards above the columns:
- * Total Tasks, In Progress, Review, Completed. Each card has an icon in a
- * tinted chip, a glass surface, and a hover lift animation.
+ * StatsCards — a bento grid of neumorphic metric cards above the columns:
+ * Total Tasks (a wide hero cell), In Progress, Review, Completed. Each cell
+ * has an icon in a tinted chip and reveals on scroll with a staggered
+ * cascade. The asymmetric span is the editorial bento rhythm.
  */
 
 import { ListTodo, Loader, Eye, CheckCircle2 } from "lucide-react";
 import type { BoardStats } from "../types/task";
+import { useReveal } from "../hooks/useReveal";
 
 interface StatsCardsProps {
   stats: BoardStats;
@@ -19,6 +21,8 @@ interface Metric {
   accent: string;
   /** Tailwind text color for the value. */
   valueCls: string;
+  /** Whether this cell spans two columns (the hero metric). */
+  wide?: boolean;
 }
 
 export function StatsCards({ stats }: StatsCardsProps) {
@@ -28,7 +32,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
       value: stats.total,
       icon: ListTodo,
       accent: "from-slate-500 to-slate-600",
-      valueCls: "text-slate-100",
+      valueCls: "text-slate-50",
+      wide: true,
     },
     {
       label: "In Progress",
@@ -54,34 +59,43 @@ export function StatsCards({ stats }: StatsCardsProps) {
   ];
 
   return (
-    <div className="relative z-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-      {metrics.map((m) => {
-        const Icon = m.icon;
-        return (
-          <div
-            key={m.label}
-            className="kb-glass kb-card kb-fade-in group relative overflow-hidden rounded-2xl p-4"
-          >
-            {/* Soft corner glow that intensifies on hover. */}
-            <div
-              className={`absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${m.accent} opacity-15 blur-2xl transition-opacity duration-200 group-hover:opacity-30`}
-            />
-            <div className="relative flex items-center gap-3">
-              <div
-                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${m.accent} shadow-lg`}
-              >
-                <Icon className="h-5 w-5 text-white" strokeWidth={2} />
-              </div>
-              <div className="min-w-0">
-                <p className={`text-2xl font-bold tabular-nums tracking-tight ${m.valueCls}`}>
-                  {m.value}
-                </p>
-                <p className="truncate text-xs font-medium text-slate-400">{m.label}</p>
-              </div>
-            </div>
-          </div>
-        );
-      })}
+    <div className="kb-bento relative z-10">
+      {metrics.map((m, i) => (
+        <MetricCell key={m.label} metric={m} delay={i * 70} />
+      ))}
+    </div>
+  );
+}
+
+function MetricCell({ metric, delay }: { metric: Metric; delay: number }) {
+  const ref = useReveal<HTMLDivElement>({ delay });
+  const Icon = metric.icon;
+  return (
+    <div
+      ref={ref}
+      className={`kb-reveal kb-glass kb-card kb-fade-in group relative overflow-hidden rounded-[20px] p-5 ${
+        metric.wide ? "kb-bento--wide" : ""
+      }`}
+    >
+      {/* Soft corner glow that intensifies on hover. */}
+      <div
+        className={`absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${metric.accent} opacity-15 blur-2xl transition-opacity duration-300 group-hover:opacity-30`}
+      />
+      <div className="relative flex items-center gap-4">
+        <div
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br ${metric.accent} shadow-lg`}
+        >
+          <Icon className="h-5 w-5 text-white" strokeWidth={2} />
+        </div>
+        <div className="min-w-0">
+          <p className={`text-3xl font-extrabold tabular-nums tracking-tight ${metric.valueCls}`}>
+            {metric.value}
+          </p>
+          <p className="truncate text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
+            {metric.label}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

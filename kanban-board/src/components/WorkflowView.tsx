@@ -63,6 +63,7 @@ import {
   NODE_H,
 } from "../lib/workflow-engine";
 import { useWorkflowRouting, nodeExecState } from "../hooks/useWorkflowRouting";
+import { useReveal } from "../hooks/useReveal";
 
 /* ------------------------------------------------------------------ *
  * Geometry + node metadata.
@@ -212,6 +213,7 @@ export function WorkflowView({
   onUpdate,
   onDelete,
 }: WorkflowViewProps) {
+  const rootRef = useReveal<HTMLDivElement>();
   const workflows = aiState.config.workflows;
   const [selectedId, setSelectedId] = useState<string | null>(workflows[0]?.id ?? null);
   const workflow = workflows.find((w) => w.id === selectedId) ?? null;
@@ -558,7 +560,7 @@ export function WorkflowView({
   /* ------------------------- main render ------------------------- */
 
   return (
-    <div className="flex h-full flex-col gap-4 p-6">
+    <div ref={rootRef} className="kb-reveal flex h-full flex-col gap-4 p-6">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">

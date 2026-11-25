@@ -14,39 +14,87 @@
  * ------------------------------------------------------------------ */
 
 #kanban-extension-root {
-  --kb-bg-900: #0f172a;
-  --kb-bg-800: #111827;
-  --kb-bg-700: #1e293b;
-  --kb-accent-blue: #3b82f6;
-  --kb-accent-indigo: #6366f1;
-  --kb-accent-violet: #8b5cf6;
-  --kb-status-todo: #64748b;
-  --kb-status-progress: #3b82f6;
-  --kb-status-review: #f59e0b;
-  --kb-status-done: #22c55e;
+  /* ------------------------------------------------------------------ *
+   * Apple Design System 2.0 — palette.
+   * A near-black canvas with soft neutral surfaces and a single refined
+   * accent (Apple system blue). Status colors are desaturated to read as
+   * quiet signals, not neon.
+   * ------------------------------------------------------------------ */
+  --kb-bg-900: #0a0a0c;
+  --kb-bg-800: #101014;
+  --kb-bg-700: #17171c;
+  --kb-accent-blue: #0a84ff;
+  --kb-accent-indigo: #5e5ce6;
+  --kb-accent-violet: #bf5af2;
+  --kb-status-todo: #8e8e93;
+  --kb-status-progress: #0a84ff;
+  --kb-status-review: #ff9f0a;
+  --kb-status-done: #30d158;
   /* Status-aware glow colors — the card's ambient glow matches its status. */
-  --kb-glow-todo: 100, 116, 139;
-  --kb-glow-progress: 59, 130, 246;
-  --kb-glow-review: 245, 158, 11;
-  --kb-glow-done: 34, 197, 94;
-  --kb-glow-waiting: 234, 179, 8;
-  --kb-glow-blocked: 239, 68, 68;
-  --kb-glow-neutral: 99, 102, 241;
-  /* Premium shadow tokens. */
+  --kb-glow-todo: 142, 142, 147;
+  --kb-glow-progress: 10, 132, 255;
+  --kb-glow-review: 255, 159, 10;
+  --kb-glow-done: 48, 209, 88;
+  --kb-glow-waiting: 255, 204, 0;
+  --kb-glow-blocked: 255, 69, 58;
+  --kb-glow-neutral: 94, 92, 230;
+  /* ------------------------------------------------------------------ *
+   * Soft neumorphism — surfaces are defined by a dual shadow (a faint
+   * light edge top-left, a deep dark edge bottom-right) rather than a hard
+   * border. This is what makes a panel read as "raised from the canvas".
+   * ------------------------------------------------------------------ */
+  --kb-neu-raised:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
+    0 18px 40px -18px rgba(0, 0, 0, 0.7),
+    0 4px 12px -6px rgba(0, 0, 0, 0.5);
+  --kb-neu-raised-sm:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.35) inset,
+    0 10px 24px -14px rgba(0, 0, 0, 0.6),
+    0 2px 6px -3px rgba(0, 0, 0, 0.4);
+  --kb-neu-inset:
+    0 2px 6px rgba(0, 0, 0, 0.5) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.03) inset;
+  --kb-neu-lift:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
+    0 28px 56px -20px rgba(0, 0, 0, 0.8),
+    0 10px 24px -10px rgba(0, 0, 0, 0.55);
+  /* Legacy shadow tokens — kept for any direct references, now softer. */
   --kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
   --kb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
   --kb-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.25);
   --kb-shadow-glow: 0 0 0 1px rgba(var(--kb-glow-neutral), 0.25), 0 8px 24px rgba(var(--kb-glow-neutral), 0.18);
+  /* ------------------------------------------------------------------ *
+   * Editorial type scale — a deliberate ramp from display to meta.
+   * ------------------------------------------------------------------ */
+  --kb-text-display: 2.25rem;
+  --kb-text-section: 1.25rem;
+  --kb-text-card: 0.9375rem;
+  --kb-text-body: 0.8125rem;
+  --kb-text-meta: 0.6875rem;
+  /* Spacing scale (8pt grid). */
+  --kb-space-1: 0.5rem;
+  --kb-space-2: 1rem;
+  --kb-space-3: 1.5rem;
+  --kb-space-4: 2rem;
+  --kb-space-5: 3rem;
+  /* Radius system — card 20px, button 14px, badge pill. */
+  --kb-radius-card: 20px;
+  --kb-radius-button: 14px;
+  --kb-radius-badge: 999px;
   /* Self-contained height floor (does not depend on the host height chain). */
   min-height: 100vh;
   margin: 0;
   background: var(--kb-bg-900);
-  color: #e2e8f0;
+  color: #f5f5f7;
   font-family: "Nunito", "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
 }
 
 /* Scoped box-sizing reset. */
@@ -108,9 +156,10 @@
 }
 
 /* ------------------------------------------------------------------ *
- * App background — layered radial gradients + floating blur blobs.
- * The blobs are fixed, blurred, low-opacity accent orbs in the corners
- * that give the board depth without competing with content.
+ * App background — a deep, layered canvas.
+ * A near-black base with a single, very subtle radial glow at the top.
+ * No drifting blobs: depth comes from the neumorphic surfaces, not from
+ * animated background noise.
  * ------------------------------------------------------------------ */
 .kb-app {
   position: relative;
@@ -123,79 +172,48 @@
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(1200px 600px at 85% -10%, rgba(99, 102, 241, 0.16), transparent 60%),
-    radial-gradient(900px 500px at -10% 110%, rgba(139, 92, 246, 0.14), transparent 60%),
-    radial-gradient(700px 400px at 50% 120%, rgba(59, 130, 246, 0.1), transparent 60%),
+    radial-gradient(1100px 520px at 50% -12%, rgba(94, 92, 230, 0.1) 0%, transparent 62%),
     linear-gradient(180deg, var(--kb-bg-900) 0%, var(--kb-bg-800) 100%);
 }
 
-/* Floating blur blobs — decorative, non-interactive. */
-.kb-blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  opacity: 0.5;
-  pointer-events: none;
-  z-index: 0;
-}
-.kb-blob--tl {
-  top: -120px;
-  left: -120px;
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.5), transparent 70%);
-}
-.kb-blob--tr {
-  top: -80px;
-  right: -100px;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.45), transparent 70%);
-}
-.kb-blob--bl {
-  bottom: -140px;
-  left: 10%;
-  width: 360px;
-  height: 360px;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.4), transparent 70%);
-}
-.kb-blob--br {
-  bottom: -100px;
-  right: -80px;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.4), transparent 70%);
-}
-
 /* ------------------------------------------------------------------ *
- * Glassmorphism surfaces. Semi-transparent dark panels with a backdrop
- * blur, a subtle 1px border, and a premium shadow.
+ * Neumorphic surfaces. Soft, raised panels defined by a dual shadow
+ * (faint light edge top-left, deep dark edge bottom-right) plus a hairline
+ * border. A whisper of backdrop blur keeps the "glass" feel without the
+ * blue tint. This is the primary surface language of the design system.
  * ------------------------------------------------------------------ */
 .kb-glass {
-  background: linear-gradient(160deg, rgba(30, 41, 59, 0.72) 0%, rgba(17, 24, 39, 0.6) 100%);
-  backdrop-filter: blur(16px) saturate(140%);
-  -webkit-backdrop-filter: blur(16px) saturate(140%);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  box-shadow: var(--kb-shadow-md);
+  background: linear-gradient(160deg, rgba(28, 28, 34, 0.92) 0%, rgba(16, 16, 20, 0.88) 100%);
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--kb-neu-raised);
 }
 
 .kb-glass-sm {
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(12px) saturate(130%);
-  -webkit-backdrop-filter: blur(12px) saturate(130%);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  box-shadow: var(--kb-shadow-sm);
+  background: rgba(23, 23, 28, 0.72);
+  backdrop-filter: blur(10px) saturate(115%);
+  -webkit-backdrop-filter: blur(10px) saturate(115%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: var(--kb-neu-raised-sm);
 }
 
-/* Accent gradient — blue → indigo → violet, used for primary buttons
- * and active filter pills. */
+/* Inset surface — for wells, inputs, and recessed areas. */
+.kb-inset {
+  background: rgba(10, 10, 12, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: var(--kb-neu-inset);
+}
+
+/* Accent gradient — a refined, restrained blue → indigo ramp. Used for
+ * primary buttons and the active filter pill. Less saturated than the old
+ * tri-color gradient so it reads as a single confident accent. */
 .kb-gradient {
-  background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 50%, var(--kb-accent-violet) 100%);
+  background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 100%);
 }
 
 /* ------------------------------------------------------------------ *
- * Task card — glass surface with a hover highlight (border + indigo
- * glow) and a 200ms transition. Rounded 16px.
+ * Task card — neumorphic surface with a soft hover lift.
  *
  * No scale transform on hover: scaling the card makes it visually
  * overflow its column, which widens the board and triggers a
@@ -206,31 +224,33 @@
  * ------------------------------------------------------------------ */
 .kb-card {
   --kb-card-glow: var(--kb-glow-neutral);
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
 }
 .kb-card:hover {
-  border-color: rgba(var(--kb-card-glow), 0.35);
+  border-color: rgba(var(--kb-card-glow), 0.28);
   box-shadow:
-    0 0 0 1px rgba(var(--kb-card-glow), 0.2),
-    0 4px 16px rgba(var(--kb-card-glow), 0.12),
-    0 12px 32px rgba(var(--kb-card-glow), 0.1);
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
+    0 0 0 1px rgba(var(--kb-card-glow), 0.16),
+    0 16px 40px -16px rgba(var(--kb-card-glow), 0.28),
+    0 6px 16px -8px rgba(0, 0, 0, 0.6);
 }
 
-/* Button hover — glow + slight lift. */
+/* Button hover — a quiet lift with a soft accent halo. */
 .kb-btn-glow {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease;
 }
 .kb-btn-glow:hover {
   transform: translateY(-1px);
-  filter: brightness(1.08);
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4), 0 8px 24px rgba(99, 102, 241, 0.35);
+  filter: brightness(1.06);
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.35), 0 10px 28px -8px rgba(10, 132, 255, 0.4);
 }
 
-/* Dashed add-task button — animated background sweep on hover. */
+/* Dashed add-task button — a soft accent wash on hover. */
 .kb-add {
-  border: 1.5px dashed rgba(148, 163, 184, 0.25);
+  border: 1.5px dashed rgba(142, 142, 147, 0.28);
   background: transparent;
-  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
   position: relative;
   overflow: hidden;
 }
@@ -238,26 +258,27 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.12));
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.1), rgba(94, 92, 230, 0.1));
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.25s ease;
 }
 .kb-add:hover {
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2), 0 4px 16px rgba(99, 102, 241, 0.15);
+  border-color: rgba(10, 132, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.18), 0 6px 18px -8px rgba(10, 132, 255, 0.2);
 }
 .kb-add:hover::before {
   opacity: 1;
 }
 
-/* Filter pill — gradient background + subtle shadow when active. */
+/* Filter pill — a solid accent fill when active, a soft neumorphic
+ * recess when idle. */
 .kb-pill {
-  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
 }
 .kb-pill--active {
-  background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 50%, var(--kb-accent-violet) 100%);
+  background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 100%);
   color: #fff;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 6px 18px -6px rgba(10, 132, 255, 0.5), 0 0 0 1px rgba(10, 132, 255, 0.25);
 }
 
 /* Dragging card — the floating DragOverlay clone: lifted, glowing, slightly
@@ -606,4 +627,71 @@
 .kb-running {
   animation: kb-running-pulse 2s ease-in-out infinite;
   border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.4);
+}
+
+/* ------------------------------------------------------------------ *
+ * Scroll-driven motion — reveal on scroll.
+ * Elements start hidden (faded, nudged down, softly blurred) and settle
+ * into place when they enter the viewport. The `useReveal` hook adds the
+ * `kb-reveal--in` class via an IntersectionObserver. A per-element
+ * `--kb-reveal-delay` staggers siblings into a gentle cascade.
+ *
+ * The hidden state uses opacity/transform/filter only — never display or
+ * visibility — so the content stays in the DOM and in the accessibility
+ * tree, and text-based assertions still match.
+ * ------------------------------------------------------------------ */
+.kb-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(6px);
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--kb-reveal-delay, 0ms);
+  will-change: opacity, transform, filter;
+}
+.kb-reveal--in {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Respect users who prefer reduced motion: reveal instantly, no blur. */
+@media (prefers-reduced-motion: reduce) {
+  .kb-reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+  .kb-app,
+  .kb-card,
+  .kb-btn-glow,
+  .kb-pill {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Bento grid — an asymmetric, responsive card grid. Columns auto-fit to
+ * the available width; individual cells can span extra columns or rows to
+ * create the editorial, magazine-style rhythm.
+ * ------------------------------------------------------------------ */
+.kb-bento {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--kb-space-2);
+  align-items: start;
+}
+.kb-bento--wide {
+  grid-column: span 2;
+}
+.kb-bento--tall {
+  grid-row: span 2;
+}
+@media (max-width: 640px) {
+  .kb-bento--wide {
+    grid-column: span 1;
+  }
 }

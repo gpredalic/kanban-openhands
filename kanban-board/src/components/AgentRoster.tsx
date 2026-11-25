@@ -46,6 +46,7 @@ import {
   TOOL_CATALOG,
 } from "../lib/openhands";
 import type { AgentProfile, LlmProfile, MaterializeDiagnostics, SecretRef } from "../lib/openhands";
+import { useReveal } from "../hooks/useReveal";
 
 interface AgentRosterProps {
   host: Host;
@@ -115,6 +116,7 @@ function parseList(value: string): string[] {
 }
 
 export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
+  const rootRef = useReveal<HTMLDivElement>();
   const [profiles, setProfiles] = useState<AgentProfile[]>([]);
   const [llmProfiles, setLlmProfiles] = useState<LlmProfile[]>([]);
   const [secrets, setSecrets] = useState<SecretRef[]>([]);
@@ -389,7 +391,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
   };
 
   return (
-    <div className="relative z-10 flex flex-col gap-6">
+    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
       {/* Header row */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
