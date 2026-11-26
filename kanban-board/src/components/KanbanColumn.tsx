@@ -28,13 +28,14 @@ interface KanbanColumnProps {
   onCancelDelete?: (taskId: string) => void;
 }
 
-/* Status-aware gradient accent — the column header's left bar gives each
- * column a branded, Apple-like identity instead of a bare dot. */
-const STATUS_ACCENT: Record<TaskStatus, string> = {
-  todo: "from-slate-400 to-slate-500",
-  in_progress: "from-blue-400 to-indigo-500",
-  review: "from-amber-400 to-orange-500",
-  done: "from-emerald-400 to-teal-500",
+/* Status-aware quiet indicator — a small, solid dot gives each column a
+ * calm identity. No gradient, no glow: the dot is a structural signal, the
+ * way Linear marks a lane. */
+const STATUS_DOT: Record<TaskStatus, string> = {
+  todo: "bg-slate-500",
+  in_progress: "bg-blue-400",
+  review: "bg-amber-400",
+  done: "bg-emerald-400",
 };
 
 export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
@@ -48,12 +49,11 @@ export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskId
         isOver ? "kb-drop-target" : ""
       }`}
     >
-      {/* Column header — a gradient status bar on the left, the lane title,
-          and a count badge. The gradient bar gives each column a branded,
-          Apple-like identity instead of a bare dot. */}
+      {/* Column header — a quiet status dot, the lane title, and a count
+          badge. The dot is a structural signal, not a decorative gradient. */}
       <div className="mb-4 flex items-center justify-between px-1">
-        <div className="flex items-center gap-2.5">
-          <span className={`h-4 w-1 rounded-full bg-gradient-to-b ${STATUS_ACCENT[column.status]}`} />
+        <div className="flex items-center gap-2">
+          <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[column.status]}`} />
           <h3 className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-slate-300">
             {column.title}
           </h3>

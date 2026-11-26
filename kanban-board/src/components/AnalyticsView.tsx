@@ -1,16 +1,16 @@
 /**
  * AnalyticsView — the "Analytics" view.
  *
- * Token and cost tracking (OpenRouter-style). Shows:
- *   - Totals: tokens in/out, total cost, runs completed.
- *   - Per-agent breakdown (tokens + cost, with a proportional bar).
- *   - Per-model breakdown (tokens + cost, with a proportional bar).
+ * Token and cost tracking. The hierarchy is deliberate:
+ *   - Total Cost is the hero KPI — large, centered, the number that matters.
+ *   - Supporting metrics (tokens in/out, runs) are smaller, quiet tiles.
+ *   - Per-agent and per-model breakdowns use clean, solid bars.
  *
  * All numbers are derived from the real OpenHands execution snapshot.
  */
 
 import { useMemo, useState } from "react";
-import { BarChart3, Coins, Cpu, Bot, Activity, RotateCcw } from "lucide-react";
+import { Coins, RotateCcw } from "lucide-react";
 import type { AiState } from "../types/ai";
 import type { OpenHandsState } from "../types/openhands";
 import { formatCost, formatTokens } from "../lib/ai-engine";
@@ -48,7 +48,7 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
       const agent = config.agents.find((a) => a.id === agentId);
       const entry = map.get(agentId) ?? {
         id: agentId,
-        name: agent?.name ?? "Unassigned Agent",
+        name: agent?.name ?? "Unassigned",
         tokensIn: 0,
         tokensOut: 0,
         cost: 0,
@@ -70,7 +70,7 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
       const model = config.models.find((m) => m.id === modelId);
       const entry = map.get(modelId) ?? {
         id: modelId,
-        name: model?.name ?? "Unassigned Model",
+        name: model?.name ?? "Unassigned",
         tokensIn: 0,
         tokensOut: 0,
         cost: 0,
@@ -99,13 +99,11 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
   const maxModelCost = Math.max(...perModel.map((m) => m.cost), 0.0001);
 
   return (
-    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
+    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-8">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-white">Analytics</h2>
-          <p className="mt-0.5 text-xs text-slate-400">
-            Token and cost usage across all executions
-          </p>
+          <h2 className="text-2xl font-bold tracking-tight text-white">Analytics</h2>
+          <p className="mt-1 text-sm text-slate-400">Token and cost usage</p>
         </div>
         <button
           type="button"
@@ -113,11 +111,11 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
           className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white"
         >
           <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
-          <span>Clear Analytics</span>
+          <span>Clear</span>
         </button>
       </div>
 
-      {/* Totals */}
+      {/* Hero KPI — Total Cost. The number that matters, shown large. */}
       {loading ? (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <SkeletonStat />
@@ -127,37 +125,35 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <TotalCard
-            icon={Activity}
-            label="Total Tokens In"
+          {/* Hero — Total Cost */}
+          <div className="kb-glass col-span-2 flex flex-col items-center justify-center rounded-3xl p-8 lg:col-span-2">
+            <div className="flex items-center gap-2 text-sm font-medium text-slate-400">
+              <Coins className="h-4 w-4" strokeWidth={1.75} />
+              Total Cost
+            </div>
+            <p className="mt-3 text-5xl font-bold tracking-tight text-white">
+              {reportedCost.length ? formatCost(totalCost) : "—"}
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              {completedRuns} runs completed
+            </p>
+          </div>
+          {/* Supporting metrics */}
+          <SupportingMetric
+            label="Tokens In"
             value={reportedTokenIn.length ? formatTokens(totalTokensIn) : "—"}
-            accent="from-blue-500 to-indigo-500"
           />
-          <TotalCard
-            icon={Activity}
-            label="Total Tokens Out"
+          <SupportingMetric
+            label="Tokens Out"
             value={reportedTokenOut.length ? formatTokens(totalTokensOut) : "—"}
-            accent="from-violet-500 to-purple-500"
-          />
-          <TotalCard
-            icon={Coins}
-            label="Total Cost"
-            value={reportedCost.length ? formatCost(totalCost) : "—"}
-            accent="from-emerald-500 to-teal-500"
-          />
-          <TotalCard
-            icon={BarChart3}
-            label="Runs Completed"
-            value={String(completedRuns)}
-            accent="from-amber-500 to-orange-500"
           />
         </div>
       )}
 
       {/* Per-agent breakdown */}
       <section>
-        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
-          <Bot className="h-4 w-4 text-indigo-400" /> Per-Agent Usage
+        <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          Per-Agent Usage
         </h3>
         {loading ? (
           <div className="flex flex-col gap-2">
@@ -165,9 +161,9 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
             <SkeletonRow />
           </div>
         ) : perAgent.length === 0 ? (
-          <EmptyState label="No agent usage yet — run a task to populate analytics." />
+          <EmptyState label="No agent usage yet." />
         ) : (
-          <div className="kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4">
+          <div className="kb-glass kb-fade-in flex flex-col gap-4 rounded-2xl p-5">
             {perAgent.map((a) => (
               <BreakdownRow
                 key={a.id}
@@ -177,7 +173,6 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
                 cost={a.cost}
                 runs={a.runs}
                 pct={(a.cost / maxAgentCost) * 100}
-                barClass="bg-gradient-to-r from-blue-500 to-indigo-500"
               />
             ))}
           </div>
@@ -186,8 +181,8 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
 
       {/* Per-model breakdown */}
       <section>
-        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
-          <Cpu className="h-4 w-4 text-violet-400" /> Per-Model Usage
+        <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          Per-Model Usage
         </h3>
         {loading ? (
           <div className="flex flex-col gap-2">
@@ -197,7 +192,7 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
         ) : perModel.length === 0 ? (
           <EmptyState label="No model usage yet." />
         ) : (
-          <div className="kb-glass kb-fade-in flex flex-col gap-3 rounded-2xl p-4">
+          <div className="kb-glass kb-fade-in flex flex-col gap-4 rounded-2xl p-5">
             {perModel.map((m) => (
               <BreakdownRow
                 key={m.id}
@@ -207,7 +202,6 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
                 cost={m.cost}
                 runs={m.runs}
                 pct={(m.cost / maxModelCost) * 100}
-                barClass="bg-gradient-to-r from-violet-500 to-purple-500"
               />
             ))}
           </div>
@@ -217,8 +211,8 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
       <ConfirmResetModal
         open={confirmReset}
         question="Clear analytics?"
-        detail="This clears the surfaced executions and resets the metrics baseline to now. Executions started before the reset will no longer be counted."
-        confirmLabel="Clear Analytics"
+        detail="This clears the surfaced executions and resets the metrics baseline to now."
+        confirmLabel="Clear"
         onConfirm={() => {
           onReset();
           setConfirmReset(false);
@@ -229,29 +223,11 @@ export function AnalyticsView({ aiState, openHandsState, onReset }: AnalyticsVie
   );
 }
 
-function TotalCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: typeof Activity;
-  label: string;
-  value: string;
-  accent: string;
-}) {
+function SupportingMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="kb-glass kb-fade-in relative overflow-hidden rounded-2xl p-4">
-      <div
-        className={`absolute -right-6 -top-6 h-20 w-20 rounded-full bg-gradient-to-br ${accent} opacity-20 blur-2xl`}
-      />
-      <div className="relative">
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-          {label}
-        </div>
-        <p className="mt-2 text-2xl font-bold tracking-tight text-white">{value}</p>
-      </div>
+    <div className="kb-glass-sm flex flex-col justify-center rounded-2xl p-5">
+      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold tracking-tight text-white">{value}</p>
     </div>
   );
 }
@@ -263,7 +239,6 @@ function BreakdownRow({
   cost,
   runs,
   pct,
-  barClass,
 }: {
   name: string;
   tokensIn: number;
@@ -271,20 +246,18 @@ function BreakdownRow({
   cost: number;
   runs: number;
   pct: number;
-  barClass: string;
 }) {
   return (
     <div>
-      <div className="flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-sm">
         <span className="font-medium text-slate-200">{name}</span>
-        <span className="text-slate-400">
-          {formatTokens(tokensIn)} in · {formatTokens(tokensOut)} out · {formatCost(cost)} ·{" "}
-          {runs} runs
+        <span className="text-xs text-slate-400">
+          {formatTokens(tokensIn)} in · {formatTokens(tokensOut)} out · {formatCost(cost)} · {runs} runs
         </span>
       </div>
-      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-700/40">
+      <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/5">
         <div
-          className={`h-full rounded-full ${barClass} transition-all duration-500`}
+          className="h-full rounded-full bg-blue-400/70 transition-all duration-500"
           style={{ width: `${Math.max(pct, 2)}%` }}
         />
       </div>
@@ -295,7 +268,7 @@ function BreakdownRow({
 function EmptyState({ label }: { label: string }) {
   return (
     <div className="kb-glass flex items-center justify-center rounded-2xl p-8 text-center">
-      <p className="text-xs text-slate-500">{label}</p>
+      <p className="text-sm text-slate-500">{label}</p>
     </div>
   );
 }

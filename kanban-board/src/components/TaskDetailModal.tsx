@@ -188,7 +188,7 @@ export function TaskDetailModal({
             <span className="mb-1 inline-block rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-300 ring-1 ring-indigo-400/25">
               {STATUS_LABELS[task.status]}
             </span>
-            <h3 className="text-lg font-semibold text-white">Edit Task</h3>
+            <h3 className="text-lg font-bold text-white">Edit Task</h3>
           </div>
           <button
             type="button"

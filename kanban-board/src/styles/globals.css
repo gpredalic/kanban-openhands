@@ -230,11 +230,11 @@
   transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
 }
 .kb-card:hover {
-  border-color: rgba(var(--kb-card-glow), 0.22);
+  border-color: rgba(var(--kb-card-glow), 0.16);
   box-shadow:
-    0 0 0 1px rgba(var(--kb-card-glow), 0.12),
-    0 12px 32px -16px rgba(var(--kb-card-glow), 0.22),
-    0 4px 12px -8px rgba(0, 0, 0, 0.5);
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 14px 36px -18px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(var(--kb-card-glow), 0.08);
 }
 
 /* Button hover — a quiet lift with a soft accent halo. */
@@ -463,6 +463,21 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Running pulse — quiet, slow breathing glow on active execution rows.
+ * ------------------------------------------------------------------ */
+@keyframes kb-running-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+.kb-running-pulse {
+  animation: kb-running-pulse 2.4s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------ *
  * FLIP column-move animation — the card lifts, glides across the board,
  * and settles into its destination column. The destination column pulses
  * with a soft border glow and background tint that fade out.
@@ -572,45 +587,32 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Running task — a distinct "live" state, not just a pulsing dot.
- * The card wears a soft blue left accent bar, an elevated surface, and a
- * gentle breathing glow that matches the status color. The accent is set
- * inline as --kb-running-accent by the component.
+ * Running task — a distinct "live" state carried by depth, not by glow.
+ * The card sits slightly raised (a stronger elevation shadow) and wears a
+ * quiet, solid accent bar on the left. No pulsing, no ambient glow: the
+ * state reads as a premium elevation change, the way Apple and Linear
+ * indicate an active item — structure, not effect.
+ * The accent is set inline as --kb-running-accent by the component.
  * ------------------------------------------------------------------ */
-@keyframes kb-running-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.28),
-      0 0 16px rgba(var(--kb-running-accent, 99, 102, 241), 0.14),
-      0 12px 32px -16px rgba(0, 0, 0, 0.5);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.45),
-      0 0 28px rgba(var(--kb-running-accent, 99, 102, 241), 0.28),
-      0 12px 32px -16px rgba(0, 0, 0, 0.5);
-  }
-}
 .kb-running {
   position: relative;
-  animation: kb-running-pulse 2.4s ease-in-out infinite;
-  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.35);
-  background: rgba(22, 22, 27, 0.72);
+  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.28);
+  background: rgba(24, 24, 30, 0.78);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 14px 36px -18px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.12);
 }
-/* Left accent bar — a quiet "live" signal that reads at a glance. */
+/* Left accent bar — a quiet, solid "live" signal that reads at a glance. */
 .kb-running::before {
   content: "";
   position: absolute;
   left: 0;
-  top: 14px;
-  bottom: 14px;
+  top: 16px;
+  bottom: 16px;
   width: 2.5px;
   border-radius: 0 2px 2px 0;
-  background: linear-gradient(
-    180deg,
-    rgba(var(--kb-running-accent, 99, 102, 241), 0.9),
-    rgba(var(--kb-running-accent, 99, 102, 241), 0.3)
-  );
+  background: rgba(var(--kb-running-accent, 99, 102, 241), 0.85);
 }
 
 /* ------------------------------------------------------------------ *

@@ -8,7 +8,7 @@
  */
 
 import { useState } from "react";
-import { History, Loader2, CheckCircle2, XCircle, Clock, Bot, RotateCcw } from "lucide-react";
+import { Loader2, CheckCircle2, XCircle, RotateCcw } from "lucide-react";
 import type { OpenHandsExecution, OpenHandsState } from "../types/openhands";
 import type { AiState, Agent } from "../types/ai";
 import { Badge, statusBadge } from "../lib/badges";
@@ -38,8 +38,8 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
     <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-white">Execution History</h2>
-          <p className="mt-0.5 text-xs text-slate-400">
+          <h2 className="text-2xl font-bold tracking-tight text-white">Execution History</h2>
+          <p className="mt-1 text-sm text-slate-400">
             {active.length} active · {completed.length} completed
           </p>
         </div>
@@ -57,11 +57,9 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
         <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{error}</div>
       )}
 
-      {/* Active runs — a timeline with a blue gradient line. */}
+      {/* Active runs — a quiet timeline. */}
       <section>
-        <h3 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-          <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-400" /> Active Runs
-        </h3>
+        <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active</h3>
         {active.length === 0 ? (
           loading ? (
             <div className="flex flex-col gap-2">
@@ -74,8 +72,8 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
             />
           )
         ) : (
-          <div className="relative flex flex-col gap-3 pl-5">
-            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500/50 via-white/10 to-transparent" />
+          <div className="relative flex flex-col gap-4 pl-5">
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-white/10" />
             {active.map((run) => (
               <TimelineNode key={run.id} run={run} profiles={profiles} active />
             ))}
@@ -83,11 +81,9 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
         )}
       </section>
 
-      {/* Completed runs — a timeline with an emerald gradient line. */}
+      {/* Completed runs — a quiet timeline. */}
       <section>
-        <h3 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-          <History className="h-3.5 w-3.5 text-slate-400" /> Completed Runs
-        </h3>
+        <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Completed</h3>
         {completed.length === 0 ? (
           loading ? (
             <div className="flex flex-col gap-2">
@@ -98,8 +94,8 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
             <EmptyState label="No completed runs yet." />
           )
         ) : (
-          <div className="relative flex flex-col gap-3 pl-5">
-            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-emerald-500/40 via-white/10 to-transparent" />
+          <div className="relative flex flex-col gap-4 pl-5">
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-white/10" />
             {completed.map((run) => (
               <TimelineNode key={run.id} run={run} profiles={profiles} />
             ))}
@@ -194,25 +190,15 @@ function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; prof
           strokeWidth={1.75}
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-white">{run.title}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
+          <p className="truncate text-base font-semibold text-white">{run.title}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
             {statusBadge(run.status) && (
               <Badge style={statusBadge(run.status)!} pulse={active} />
             )}
-            {run.startedAt && (
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {formatDateTime(run.startedAt)}
-              </span>
-            )}
-            {duration && <span>Duration: {duration}</span>}
-            {agentName && (
-              <span className="flex items-center gap-1">
-                <Bot className="h-3 w-3 text-indigo-400" /> {agentName}
-              </span>
-            )}
-            {typeof run.retries === "number" && run.retries > 0 && <span>Retries: {run.retries}</span>}
-            {run.error && <span className="text-rose-400">Error: {run.error}</span>}
+            {run.startedAt && <span>{formatDateTime(run.startedAt)}</span>}
+            {duration && <span>{duration}</span>}
+            {agentName && <span>{agentName}</span>}
+            {run.error && <span className="text-rose-400">{run.error}</span>}
           </div>
         </div>
         <div className="shrink-0 text-right text-xs">

@@ -417,45 +417,24 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
           clean; they remain in the DOM (opacity, not display) so they stay
           clickable and discoverable. */}
       <div className="mt-3 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2.5">
+        <div className="flex min-w-0 items-center gap-2">
           {assignedAgent ? (
             <div
-              className="flex min-w-0 items-center gap-2.5 rounded-full bg-white/[0.04] py-1 pl-1 pr-3 ring-1 ring-white/10"
+              className="flex min-w-0 items-center gap-1.5"
               title={`${assignedAgent.name} — ${assignedAgent.role}`}
             >
-              {/* Agent identity — a first-class "person chip": the agent's own
-                  gradient avatar with its initials (not a generic bot glyph),
-                  wrapped in a subtle pill so it reads as a distinct identity
-                  element rather than a line of metadata. When the task is
-                  running, the avatar wears a pulsing status ring so the card
-                  reads as "live" at a glance. */}
-              <div className="relative shrink-0">
-                <div
-                  className={`flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br text-[11px] font-bold text-white shadow-sm ring-1 ring-white/25 ${
-                    assignedAgent.avatar || avatarColor(assignedAgent.name)
-                  }`}
-                >
-                  {initials(assignedAgent.name)}
-                </div>
-                {running && (
-                  <span
-                    className="kb-sync-dot absolute -inset-0.5 rounded-full ring-2 ring-blue-400/60"
-                    aria-hidden="true"
-                  />
-                )}
-              </div>
-              <div className="flex min-w-0 flex-col leading-tight">
-                <span className="truncate text-[0.8125rem] font-semibold tracking-tight text-slate-100">
-                  {assignedAgent.name}
-                </span>
-                <span className="truncate text-[0.6875rem] font-medium text-slate-500">
-                  {assignedAgent.role}
-                </span>
-              </div>
+              <span
+                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white ${assignedAgent.avatar || avatarColor(assignedAgent.name)}`}
+              >
+                {initials(assignedAgent.name)}
+              </span>
+              <span className="truncate text-[0.6875rem] font-medium text-slate-500">
+                {assignedAgent.name}
+              </span>
             </div>
           ) : task.assignee ? (
             <div
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ring-1 ring-white/10 ${avatarColor(task.assignee)}`}
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white ${avatarColor(task.assignee)}`}
               title={task.assignee}
             >
               {initials(task.assignee)}

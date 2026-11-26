@@ -80,7 +80,7 @@ export function CreateTaskModal({ onClose, agents, onCreate }: CreateTaskModalPr
       >
         <div className="mb-5 flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-white">Create Task</h3>
+            <h3 className="text-lg font-bold text-white">Create Task</h3>
             <p className="mt-0.5 text-xs text-slate-400">Add a new task to the board.</p>
           </div>
           <button

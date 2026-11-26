@@ -395,7 +395,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
       {/* Header row */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-white">Agents</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-white">Agents</h2>
           <p className="mt-0.5 text-xs text-slate-400">
             {profiles.length} agent profiles · full lifecycle management · updated live
           </p>

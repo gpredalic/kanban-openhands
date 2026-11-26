@@ -523,7 +523,7 @@ export function WorkflowView({
           <GitBranch className="h-8 w-8 text-indigo-300" strokeWidth={1.5} />
         </div>
         <div className="text-center">
-          <h2 className="text-lg font-semibold text-white">No workflows defined</h2>
+          <h2 className="text-lg font-bold text-white">No workflows defined</h2>
           <p className="mt-1 text-sm text-slate-400">Create a workflow to design a node graph.</p>
         </div>
         <button
