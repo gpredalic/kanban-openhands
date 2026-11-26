@@ -21,8 +21,8 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { memo, useState, useRef, useEffect, type CSSProperties } from "react";
-import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, Bot } from "lucide-react";
+import { memo, useState, useRef, useEffect, useCallback, type CSSProperties } from "react";
+import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, Bot, MoreHorizontal } from "lucide-react";
 import type { Task, DeletePhase } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import { dueState } from "../lib/date";
@@ -82,6 +82,103 @@ function formatDue(iso: string): string {
   const d = new Date(iso + "T00:00:00");
   if (isNaN(d.getTime())) return iso;
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+/**
+ * CardMenu — a single ellipsis ("…") that opens a clean popover with Edit
+ * and Delete. Replaces the two always-hover-revealed icon buttons with the
+ * Apple-style pattern: one quiet affordance, a menu that appears on demand.
+ *
+ * The popover closes on outside click, Escape, or after an action is chosen.
+ * It renders inside the card (which is not overflow-hidden), so it is never
+ * clipped by the column's overflow container.
+ */
+function CardMenu({
+  onEdit,
+  onDelete,
+  disabled,
+  disabledReason,
+}: {
+  onEdit: () => void;
+  onDelete: () => void;
+  disabled?: boolean;
+  disabledReason?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) close();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, close]);
+
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        aria-label={disabledReason ?? "Card actions"}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        disabled={disabled}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        <MoreHorizontal className="h-4 w-4" />
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 top-8 z-50 w-40 overflow-hidden rounded-xl border border-white/[0.08] bg-[#1c1c1e] py-1 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6)]"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+              onEdit();
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] font-medium text-slate-200 transition-colors hover:bg-white/[0.06]"
+          >
+            <Pencil className="h-3.5 w-3.5 text-slate-400" />
+            Edit task
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+              onDelete();
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] font-medium text-rose-400 transition-colors hover:bg-rose-500/10"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Delete task
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
@@ -373,40 +470,14 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
               {formatDue(task.dueDate)}
             </span>
           )}
-          <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-            {onEdit && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(task);
-                }}
-                onPointerDown={(e) => e.stopPropagation()}
-                disabled={running}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label={running ? "Task is running — editing locked" : "Edit task"}
-                title={running ? "Task is currently running and cannot be edited." : "Edit task"}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </button>
-            )}
-            {onDelete && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(task.id);
-                }}
-                onPointerDown={(e) => e.stopPropagation()}
-                disabled={running}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 hover:bg-rose-500/15 hover:text-rose-400 disabled:cursor-not-allowed disabled:opacity-40"
-                aria-label={running ? "Task is running — stop it before deleting" : "Delete task"}
-                title={running ? "Stop the task before deleting it." : "Delete task"}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
+          {(onEdit || onDelete) && (
+            <CardMenu
+              disabled={running}
+              disabledReason={running ? "Task is running — actions locked" : undefined}
+              onEdit={() => onEdit?.(task)}
+              onDelete={() => onDelete?.(task.id)}
+            />
+          )}
         </div>
       </div>
     </div>
