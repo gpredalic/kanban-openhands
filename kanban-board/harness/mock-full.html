@@ -223,7 +223,9 @@ const host = {
     async request({ method, path }) {
       // File downloads: distinguish board.json / workflows.json / routing-rules.json.
       if (method === "GET" && path.startsWith("/api/file/download")) {
-        const decoded = decodeURIComponent(path.split("path=")[1] ?? "");
+        // fetchTasks appends a `&_cb=<ts>` cache-buster to defeat browser
+        // heuristic caching; strip it so the filename match still works.
+        const decoded = decodeURIComponent(path.split("path=")[1] ?? "").split("&")[0];
         if (decoded.endsWith("board.json")) return JSON.stringify(tasks);
         if (decoded.endsWith("workflows.json")) return JSON.stringify(workflows);
         if (decoded.endsWith("routing-rules.json")) return JSON.stringify(routingRules);
