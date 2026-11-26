@@ -96,7 +96,7 @@ export function MonitoringView({
   }
 
   return (
-    <div ref={rootRef} className="kb-reveal flex h-full flex-col gap-4 p-6">
+    <div ref={rootRef} className="kb-reveal flex h-full flex-col gap-5 p-6">
       {/* Toolbar — pick which workflow to observe */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -120,47 +120,60 @@ export function MonitoringView({
         </div>
       </div>
 
-      {/* Current Activity — now working on, up next, progress */}
+      {/* Current Activity — a hero readout. The node the workflow is working on
+          is shown large, with a visual progress stepper of the full execution
+          path and the next node called out. This is the "what is happening
+          right now" surface, not an operational log. */}
       {workflow && workflow.nodes.length > 0 && (
-        <div className="kb-glass rounded-2xl p-4">
-          <div className="mb-3 flex items-center gap-2">
-            <GitCommit className="h-4 w-4 text-indigo-400" strokeWidth={2} />
-            <h3 className="text-sm font-semibold text-white">Current Activity</h3>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Now Working On</p>
-              {currentNode ? (
-                <div className="mt-1 flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
-                  <span className="text-sm font-medium text-white">{currentNode.label}</span>
-                  {(() => {
-                    const s = nodeExecState(currentNode, openHandsState);
-                    return statusBadge(s) ? <Badge style={statusBadge(s)!} pulse={s === "running"} /> : null;
-                  })()}
-                </div>
-              ) : (
-                <p className="mt-1 text-sm text-slate-500">Nothing in progress</p>
-              )}
+        <div className="kb-glass relative overflow-hidden rounded-3xl p-6">
+          {/* Soft accent wash behind the hero so it reads as the focal point. */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-transparent" />
+          <div className="relative">
+            <div className="mb-4 flex items-center gap-2">
+              <GitCommit className="h-4 w-4 text-indigo-400" strokeWidth={2} />
+              <h3 className="text-sm font-semibold text-white">Current Activity</h3>
             </div>
-            <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Up Next</p>
-              {nextNode ? (
-                <div className="mt-1 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-amber-400" />
-                  <span className="text-sm font-medium text-white">{nextNode.label}</span>
-                </div>
-              ) : (
-                <p className="mt-1 text-sm text-slate-500">Nothing queued</p>
-              )}
+
+            {/* Now Working On — the focal node, shown large. */}
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">Now Working On</p>
+                {currentNode ? (
+                  <div className="mt-1 flex items-center gap-3">
+                    <span className={`h-2.5 w-2.5 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
+                    <span className="truncate text-2xl font-bold text-white">{currentNode.label}</span>
+                    {(() => {
+                      const s = nodeExecState(currentNode, openHandsState);
+                      return statusBadge(s) ? <Badge style={statusBadge(s)!} pulse={s === "running"} /> : null;
+                    })()}
+                  </div>
+                ) : (
+                  <p className="mt-1 text-2xl font-bold text-slate-600">Nothing in progress</p>
+                )}
+              </div>
+              {/* Up Next — a quiet secondary callout. */}
+              <div className="shrink-0">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">Up Next</p>
+                {nextNode ? (
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-amber-400" />
+                    <span className="text-sm font-semibold text-slate-200">{nextNode.label}</span>
+                  </div>
+                ) : (
+                  <p className="mt-1 text-sm text-slate-500">Nothing queued</p>
+                )}
+              </div>
             </div>
-            <div className="rounded-xl bg-white/5 p-3">
-              <p className="text-[11px] font-medium text-slate-500">Progress</p>
+
+            {/* Progress — a visual stepper of the full execution path. */}
+            <div className="mt-5">
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-slate-500">Progress</p>
               {path.length > 0 ? (
-                <div className="mt-1 flex flex-wrap items-center gap-1">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {path.map((n, i) => (
-                    <span key={n.id} className="flex items-center gap-1">
-                      <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${i === path.length - 1 ? "bg-blue-500/20 text-blue-300" : "bg-white/5 text-slate-400"}`}>
+                    <span key={n.id} className="flex items-center gap-1.5">
+                      <span className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium ring-1 ${i === path.length - 1 ? "bg-blue-500/20 text-blue-200 ring-blue-400/40" : "bg-white/5 text-slate-400 ring-white/10"}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${i === path.length - 1 ? "bg-blue-400" : "bg-slate-600"}`} />
                         {n.label}
                       </span>
                       {i < path.length - 1 && <span className="text-slate-600">→</span>}
@@ -168,7 +181,7 @@ export function MonitoringView({
                   ))}
                 </div>
               ) : (
-                <p className="mt-1 text-sm text-slate-500">No progress yet</p>
+                <p className="text-sm text-slate-500">No progress yet</p>
               )}
             </div>
           </div>
@@ -176,11 +189,11 @@ export function MonitoringView({
       )}
 
       {/* Activity panel — metrics, live executions, connections */}
-      <div className="kb-glass rounded-2xl">
+      <div className="kb-glass rounded-3xl">
         <button
           type="button"
           onClick={() => setOrchOpen((open) => !open)}
-          className="flex w-full items-center justify-between px-4 py-3 text-left"
+          className="flex w-full items-center justify-between px-5 py-4 text-left"
           aria-expanded={orchOpen}
         >
           <span className="flex items-center gap-2 text-sm font-semibold text-white">
@@ -193,12 +206,16 @@ export function MonitoringView({
           {orchOpen ? <ChevronUp className="h-4 w-4 text-slate-400" /> : <ChevronDown className="h-4 w-4 text-slate-400" />}
         </button>
         {orchOpen && (
-          <div className="flex flex-col gap-4 border-t border-white/5 p-4">
+          <div className="flex flex-col gap-5 border-t border-white/5 p-5">
             {openHandsState.error && <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{openHandsState.error}</div>}
 
-            {/* Metrics */}
+            {/* Metrics — a Bento grid. The "Active" metric is the hero (larger,
+                accent-filled); the rest are quiet supporting tiles. */}
             <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-              <OrchMetric label="Active" value={active} accent="text-blue-400" />
+              <div className="kb-glass-sm col-span-2 flex flex-col justify-between rounded-2xl bg-gradient-to-br from-blue-500/15 to-indigo-500/10 p-4 ring-1 ring-blue-400/20 lg:col-span-1">
+                <p className="text-[11px] font-medium uppercase tracking-wider text-blue-300/80">Active</p>
+                <p className="mt-1 text-4xl font-bold text-white">{active}</p>
+              </div>
               <OrchMetric label="Queued" value={queued} accent="text-amber-400" />
               <OrchMetric label="Failed" value={failed} accent="text-rose-400" />
               <OrchMetric label="Completed" value={completed} accent="text-emerald-400" />
@@ -220,19 +237,19 @@ export function MonitoringView({
                     const etype = executionType(run);
                     const EIcon = etype.icon;
                     return (
-                    <div key={run.id} className="kb-glass flex items-center gap-3 rounded-2xl px-4 py-3">
+                    <div key={run.id} className="kb-glass-sm flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors hover:bg-white/[0.07]">
                       {statusBadge(run.status) && (
                         <Badge style={statusBadge(run.status)!} pulse={run.status === "running" || run.status === "queued"} />
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="truncate text-sm font-medium text-white">{run.title}</span>
+                          <span className="truncate text-sm font-semibold text-white">{run.title}</span>
                           <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${etype.cls}`}>
                             <EIcon className="h-3 w-3" strokeWidth={2} />
                             {etype.label}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? "Untitled task" : "Workflow execution"} · {agentNames.get(run.agentId ?? "") ?? "Unassigned"}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-500">{run.taskId ? taskNames.get(run.taskId) ?? "Untitled task" : "Workflow execution"} · {agentNames.get(run.agentId ?? "") ?? "Unassigned"}</p>
                       </div>
                       <span className="text-right text-[11px] text-slate-400">
                         {run.tokensInReported === false && run.tokensOutReported === false
@@ -255,7 +272,7 @@ export function MonitoringView({
             {/* Workflow structure */}
             <section>
               <OrchSectionTitle icon={GitCommit} label="Workflow Structure" />
-              <div className="kb-glass rounded-2xl p-4">
+              <div className="kb-glass-sm rounded-2xl p-4">
                 <p className="mb-3 text-xs text-slate-500">How your tasks and agents relate to each other.</p>
                 <div className="flex flex-wrap gap-2">
                   {links.length === 0 && <OrchEmpty label="Workflow structure will appear as work is reported." />}
@@ -276,9 +293,9 @@ export function MonitoringView({
 
 function OrchMetric({ label, value, accent }: { label: string; value: number; accent: string }) {
   return (
-    <div className="kb-glass rounded-2xl p-3">
-      <p className={`text-2xl font-bold ${accent}`}>{value}</p>
-      <p className="mt-1 text-[11px] text-slate-500">{label}</p>
+    <div className="kb-glass-sm flex flex-col justify-between rounded-2xl p-4">
+      <p className="text-[11px] font-medium uppercase tracking-wider text-slate-500">{label}</p>
+      <p className={`mt-1 text-3xl font-bold ${accent}`}>{value}</p>
     </div>
   );
 }

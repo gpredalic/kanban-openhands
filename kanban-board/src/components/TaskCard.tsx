@@ -22,7 +22,7 @@
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { memo, useState, useRef, useEffect, useCallback, type CSSProperties } from "react";
-import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, Bot, MoreHorizontal } from "lucide-react";
+import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, MoreHorizontal } from "lucide-react";
 import type { Task, DeletePhase } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import { dueState } from "../lib/date";
@@ -417,25 +417,43 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
           clean; they remain in the DOM (opacity, not display) so they stay
           clickable and discoverable. */}
       <div className="mt-3 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2.5">
           {assignedAgent ? (
-            <>
-              <div
-                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white ring-1 ring-white/10 ${avatarColor(assignedAgent.name)}`}
-                title={assignedAgent.name}
-              >
-                <Bot className="h-3.5 w-3.5" strokeWidth={2} />
-              </div>
-              <span className="flex min-w-0 items-center gap-1.5 text-[0.6875rem] font-medium text-slate-400">
-                <span className="truncate">{assignedAgent.name}</span>
+            <div
+              className="flex min-w-0 items-center gap-2.5"
+              title={`${assignedAgent.name} — ${assignedAgent.role}`}
+            >
+              {/* Agent identity chip — the agent's own gradient avatar with its
+                  initials (not a generic bot glyph). When the task is running,
+                  the avatar wears a pulsing status ring so the card reads as
+                  "live" at a glance, without a separate floating dot. */}
+              <div className="relative shrink-0">
+                <div
+                  className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br text-[10px] font-bold text-white ${
+                    assignedAgent.avatar || avatarColor(assignedAgent.name)
+                  }`}
+                >
+                  {initials(assignedAgent.name)}
+                </div>
                 {running && (
-                  <span className="kb-sync-dot h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                  <span
+                    className="kb-sync-dot absolute -inset-0.5 rounded-full ring-2 ring-blue-400/60"
+                    aria-hidden="true"
+                  />
                 )}
-              </span>
-            </>
+              </div>
+              <div className="flex min-w-0 flex-col leading-tight">
+                <span className="truncate text-[0.75rem] font-semibold text-slate-200">
+                  {assignedAgent.name}
+                </span>
+                <span className="truncate text-[0.625rem] font-medium text-slate-500">
+                  {assignedAgent.role}
+                </span>
+              </div>
+            </div>
           ) : task.assignee ? (
             <div
-              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ring-1 ring-white/10 ${avatarColor(task.assignee)}`}
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ring-1 ring-white/10 ${avatarColor(task.assignee)}`}
               title={task.assignee}
             >
               {initials(task.assignee)}

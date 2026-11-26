@@ -561,20 +561,45 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Running task — pulsing glow that matches the status color.
- * The accent is set inline as --kb-running-accent by the component.
+ * Running task — a distinct "live" state, not just a pulsing dot.
+ * The card wears a soft blue left accent bar, an elevated surface, and a
+ * gentle breathing glow that matches the status color. The accent is set
+ * inline as --kb-running-accent by the component.
  * ------------------------------------------------------------------ */
 @keyframes kb-running-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.3), 0 0 12px rgba(var(--kb-running-accent, 99, 102, 241), 0.15);
+    box-shadow:
+      0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.28),
+      0 0 16px rgba(var(--kb-running-accent, 99, 102, 241), 0.14),
+      0 12px 32px -16px rgba(0, 0, 0, 0.5);
   }
   50% {
-    box-shadow: 0 0 0 2px rgba(var(--kb-running-accent, 99, 102, 241), 0.5), 0 0 24px rgba(var(--kb-running-accent, 99, 102, 241), 0.3);
+    box-shadow:
+      0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.45),
+      0 0 28px rgba(var(--kb-running-accent, 99, 102, 241), 0.28),
+      0 12px 32px -16px rgba(0, 0, 0, 0.5);
   }
 }
 .kb-running {
-  animation: kb-running-pulse 2s ease-in-out infinite;
-  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.4);
+  position: relative;
+  animation: kb-running-pulse 2.4s ease-in-out infinite;
+  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.35);
+  background: rgba(22, 22, 27, 0.72);
+}
+/* Left accent bar — a quiet "live" signal that reads at a glance. */
+.kb-running::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 2.5px;
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--kb-running-accent, 99, 102, 241), 0.9),
+    rgba(var(--kb-running-accent, 99, 102, 241), 0.3)
+  );
 }
 
 /* ------------------------------------------------------------------ *

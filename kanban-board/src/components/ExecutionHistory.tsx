@@ -38,7 +38,7 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
     <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-white">Execution History</h2>
+          <h2 className="text-lg font-bold tracking-tight text-white">Execution History</h2>
           <p className="mt-0.5 text-xs text-slate-400">
             {active.length} active · {completed.length} completed
           </p>
@@ -57,10 +57,10 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
         <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{error}</div>
       )}
 
-      {/* Active runs */}
+      {/* Active runs — a timeline with a blue gradient line. */}
       <section>
-        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
-          <Loader2 className="h-4 w-4 animate-spin text-blue-400" /> Active Runs
+        <h3 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-blue-400" /> Active Runs
         </h3>
         {active.length === 0 ? (
           loading ? (
@@ -74,18 +74,19 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
             />
           )
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="relative flex flex-col gap-3 pl-5">
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-blue-500/50 via-white/10 to-transparent" />
             {active.map((run) => (
-              <RunRow key={run.id} run={run} profiles={profiles} active />
+              <TimelineNode key={run.id} run={run} profiles={profiles} active />
             ))}
           </div>
         )}
       </section>
 
-      {/* History */}
+      {/* Completed runs — a timeline with an emerald gradient line. */}
       <section>
-        <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-200">
-          <History className="h-4 w-4 text-slate-400" /> Completed Runs
+        <h3 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <History className="h-3.5 w-3.5 text-slate-400" /> Completed Runs
         </h3>
         {completed.length === 0 ? (
           loading ? (
@@ -97,9 +98,10 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
             <EmptyState label="No completed runs yet." />
           )
         ) : (
-          <div className="flex flex-col gap-2">
+          <div className="relative flex flex-col gap-3 pl-5">
+            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gradient-to-b from-emerald-500/40 via-white/10 to-transparent" />
             {completed.map((run) => (
-              <RunRow key={run.id} run={run} profiles={profiles} />
+              <TimelineNode key={run.id} run={run} profiles={profiles} />
             ))}
           </div>
         )}
@@ -142,7 +144,9 @@ function formatDateTime(ts: number): string {
   return `${day} ${month} ${year} ${hh}:${mm}`;
 }
 
-function RunRow({ run, profiles, active }: { run: OpenHandsExecution; profiles: Agent[]; active?: boolean }) {
+/** A single node on the execution timeline: a status dot on the line plus a
+    premium card. The dot color encodes the run's state at a glance. */
+function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; profiles: Agent[]; active?: boolean }) {
   const StatusIcon =
     run.status === "completed" ? CheckCircle2 : run.status === "failed" ? XCircle : Loader2;
   const statusColor =
@@ -151,6 +155,14 @@ function RunRow({ run, profiles, active }: { run: OpenHandsExecution; profiles: 
       : run.status === "failed"
         ? "text-rose-400"
         : "text-blue-400";
+  const dotColor =
+    run.status === "completed"
+      ? "bg-emerald-400"
+      : run.status === "failed"
+        ? "bg-rose-400"
+        : run.status === "queued"
+          ? "bg-amber-400"
+          : "bg-blue-400";
 
   // Resolve agent display name from the profile list.
   const agentName = run.agentId
@@ -165,39 +177,47 @@ function RunRow({ run, profiles, active }: { run: OpenHandsExecution; profiles: 
   const cost = run.costReported === false ? null : `$${run.cost.toFixed(4)}`;
 
   return (
-    <div
-      className={`kb-glass kb-fade-in flex items-center gap-3 rounded-2xl px-4 py-3 ${
-        active ? "ring-1 ring-blue-400/30" : ""
-      }`}
-    >
-      <StatusIcon
-        className={`h-4 w-4 shrink-0 ${statusColor} ${active ? "animate-spin" : ""}`}
-        strokeWidth={1.75}
+    <div className="relative">
+      {/* Status dot on the timeline */}
+      <span
+        className={`absolute -left-5 top-4 h-3.5 w-3.5 rounded-full ring-4 ring-[#0a0a0c] ${dotColor} ${
+          active ? "kb-sync-dot" : ""
+        }`}
       />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white">{run.title}</p>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
-          {statusBadge(run.status) && (
-            <Badge style={statusBadge(run.status)!} pulse={active} />
-          )}
-          {run.startedAt && (
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {formatDateTime(run.startedAt)}
-            </span>
-          )}
-          {duration && <span>Duration: {duration}</span>}
-          {agentName && (
-            <span className="flex items-center gap-1">
-              <Bot className="h-3 w-3 text-indigo-400" /> {agentName}
-            </span>
-          )}
-          {typeof run.retries === "number" && run.retries > 0 && <span>Retries: {run.retries}</span>}
-          {run.error && <span className="text-rose-400">Error: {run.error}</span>}
+      <div
+        className={`kb-glass-sm kb-fade-in flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors hover:bg-white/[0.07] ${
+          active ? "ring-1 ring-blue-400/30" : ""
+        }`}
+      >
+        <StatusIcon
+          className={`h-4 w-4 shrink-0 ${statusColor} ${active ? "animate-spin" : ""}`}
+          strokeWidth={1.75}
+        />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-white">{run.title}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400">
+            {statusBadge(run.status) && (
+              <Badge style={statusBadge(run.status)!} pulse={active} />
+            )}
+            {run.startedAt && (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {formatDateTime(run.startedAt)}
+              </span>
+            )}
+            {duration && <span>Duration: {duration}</span>}
+            {agentName && (
+              <span className="flex items-center gap-1">
+                <Bot className="h-3 w-3 text-indigo-400" /> {agentName}
+              </span>
+            )}
+            {typeof run.retries === "number" && run.retries > 0 && <span>Retries: {run.retries}</span>}
+            {run.error && <span className="text-rose-400">Error: {run.error}</span>}
+          </div>
         </div>
-      </div>
-      <div className="shrink-0 text-right text-xs">
-        {cost !== null && <p className="font-medium text-slate-300">{cost}</p>}
+        <div className="shrink-0 text-right text-xs">
+          {cost !== null && <p className="font-semibold text-slate-300">{cost}</p>}
+        </div>
       </div>
     </div>
   );
@@ -205,7 +225,7 @@ function RunRow({ run, profiles, active }: { run: OpenHandsExecution; profiles: 
 
 function EmptyState({ label }: { label: string }) {
   return (
-    <div className="kb-glass flex items-center justify-center rounded-2xl p-8 text-center">
+    <div className="kb-glass-sm flex items-center justify-center rounded-2xl p-8 text-center">
       <p className="text-xs text-slate-500">{label}</p>
     </div>
   );
