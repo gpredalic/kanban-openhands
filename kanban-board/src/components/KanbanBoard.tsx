@@ -108,7 +108,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
           capabilities: [],
           maxConcurrent: 1,
           status: "idle",
-          avatar: "from-cyan-500 to-indigo-500",
+          avatar: "bg-[#3a5a6b]",
         })));
       })
       .catch(() => {

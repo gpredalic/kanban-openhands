@@ -100,7 +100,7 @@ export const SEED_AGENTS: Agent[] = [
     capabilities: ["research", "summarize", "long-context"],
     maxConcurrent: 3,
     status: "idle",
-    avatar: "from-cyan-500 to-blue-500",
+    avatar: "bg-[#3a5a6b]",
   },
   {
     id: "agent-coder",
@@ -111,7 +111,7 @@ export const SEED_AGENTS: Agent[] = [
     capabilities: ["code", "reasoning", "tests"],
     maxConcurrent: 2,
     status: "idle",
-    avatar: "from-violet-500 to-purple-500",
+    avatar: "bg-[#4a3a6b]",
   },
   {
     id: "agent-reviewer",
@@ -122,7 +122,7 @@ export const SEED_AGENTS: Agent[] = [
     capabilities: ["review", "reasoning", "security"],
     maxConcurrent: 2,
     status: "idle",
-    avatar: "from-amber-500 to-orange-500",
+    avatar: "bg-[#6b5a3a]",
   },
   {
     id: "agent-writer",
@@ -133,7 +133,7 @@ export const SEED_AGENTS: Agent[] = [
     capabilities: ["writing", "summarize", "fast"],
     maxConcurrent: 4,
     status: "idle",
-    avatar: "from-emerald-500 to-teal-500",
+    avatar: "bg-[#3a6b5a]",
   },
   {
     id: "agent-ops",
@@ -144,7 +144,7 @@ export const SEED_AGENTS: Agent[] = [
     capabilities: ["ops", "fast", "code"],
     maxConcurrent: 3,
     status: "idle",
-    avatar: "from-pink-500 to-rose-500",
+    avatar: "bg-[#6b3a5a]",
   },
 ];
 

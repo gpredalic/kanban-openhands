@@ -318,7 +318,7 @@ test("F5: workflow routing shows current node, next node, and execution path", a
   const html = container.innerHTML;
   assert.match(html, /Now Working On/, "must show Now Working On");
   assert.match(html, /Up Next/, "must show Up Next");
-  assert.match(html, /Progress/, "must show Progress");
+  assert.match(html, /Workflow Structure/, "must show Workflow Structure");
 
   // The running task node must be the current node.
   assert.match(html, /Running task/, "current node must be the running task");

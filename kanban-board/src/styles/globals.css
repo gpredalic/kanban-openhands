@@ -2,23 +2,18 @@
 @tailwind utilities;
 
 /* ------------------------------------------------------------------ *
- * Kanban Board — premium SaaS design system
+ * Kanban Board — Apple Design System 3.0
  *
- * Modern dark theme inspired by Linear, Notion, Jira Cloud, Vercel and
- * shadcn/ui. Glassmorphism cards, soft gradients, premium shadows,
- * 16–20px radii, smooth micro-animations, clean typography, spacious
- * layout. Every rule is scoped to #kanban-extension-root so the bundle
- * never restyles the host application. Tailwind Preflight is disabled
- * globally (see tailwind.config.js); the scoped reset that follows
- * normalizes only the elements inside the extension.
+ * Premium dark theme. Depth comes from structure, not effects:
+ * a clear shadow hierarchy (resting → hover → elevated → overlay),
+ * a single accent, and editorial typography. No glow, no blur,
+ * no gradient wash. Every rule is scoped to #kanban-extension-root.
  * ------------------------------------------------------------------ */
 
 #kanban-extension-root {
   /* ------------------------------------------------------------------ *
-   * Apple Design System 2.0 — palette.
-   * A near-black canvas with soft neutral surfaces and a single refined
-   * accent (Apple system blue). Status colors are desaturated to read as
-   * quiet signals, not neon.
+   * Palette — near-black canvas, soft neutral surfaces, single accent.
+   * Status colors are desaturated to read as quiet signals.
    * ------------------------------------------------------------------ */
   --kb-bg-900: #0a0a0c;
   --kb-bg-800: #101014;
@@ -30,7 +25,7 @@
   --kb-status-progress: #0a84ff;
   --kb-status-review: #ff9f0a;
   --kb-status-done: #30d158;
-  /* Status-aware glow colors — the card's ambient glow matches its status. */
+  /* Status-aware accent colors — used for the running bar and column dots. */
   --kb-glow-todo: 142, 142, 147;
   --kb-glow-progress: 10, 132, 255;
   --kb-glow-review: 255, 159, 10;
@@ -39,29 +34,39 @@
   --kb-glow-blocked: 255, 69, 58;
   --kb-glow-neutral: 94, 92, 230;
   /* ------------------------------------------------------------------ *
-   * Soft neumorphism — surfaces are defined by a dual shadow (a faint
-   * light edge top-left, a deep dark edge bottom-right) rather than a hard
-   * border. This is what makes a panel read as "raised from the canvas".
+   * Shadow hierarchy — four clear elevation levels.
+   * Resting:  the card sits on the canvas.
+   * Hover:    a quiet lift, no glow.
+   * Elevated: the running / active state — slightly raised.
+   * Overlay:  the DragOverlay clone — highest, with a soft drop shadow.
    * ------------------------------------------------------------------ */
-  --kb-neu-raised:
+  --kb-shadow-resting:
     0 1px 2px rgba(0, 0, 0, 0.25),
-    0 10px 30px -16px rgba(0, 0, 0, 0.5);
-  --kb-neu-raised-sm:
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  --kb-neu-inset:
+    0 4px 12px -4px rgba(0, 0, 0, 0.3);
+  --kb-shadow-hover:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 8px 24px -8px rgba(0, 0, 0, 0.45);
+  --kb-shadow-elevated:
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    0 12px 32px -8px rgba(0, 0, 0, 0.5);
+  --kb-shadow-overlay:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 24px 48px -12px rgba(0, 0, 0, 0.6);
+  /* Inset — for wells, inputs, recessed areas. */
+  --kb-shadow-inset:
     inset 0 1px 3px rgba(0, 0, 0, 0.35);
-  --kb-neu-lift:
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.4) inset,
-    0 28px 56px -20px rgba(0, 0, 0, 0.8),
-    0 10px 24px -10px rgba(0, 0, 0, 0.55);
-  /* Legacy shadow tokens — kept for any direct references, now softer. */
-  --kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
-  --kb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
-  --kb-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45), 0 4px 8px rgba(0, 0, 0, 0.25);
-  --kb-shadow-glow: 0 0 0 1px rgba(var(--kb-glow-neutral), 0.25), 0 8px 24px rgba(var(--kb-glow-neutral), 0.18);
+  /* Legacy tokens — kept for any direct references. */
+  --kb-neu-raised: var(--kb-shadow-resting);
+  --kb-neu-raised-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --kb-neu-inset: var(--kb-shadow-inset);
+  --kb-neu-lift: var(--kb-shadow-elevated);
+  --kb-shadow-sm: var(--kb-shadow-resting);
+  --kb-shadow-md: var(--kb-shadow-hover);
+  --kb-shadow-lg: var(--kb-shadow-elevated);
+  --kb-shadow-glow: var(--kb-shadow-overlay);
   /* ------------------------------------------------------------------ *
-   * Editorial type scale — a deliberate ramp from display to meta.
+   * Editorial type scale — Nunito Bold for all headings, SemiBold for
+   * buttons, Regular for body. No exceptions.
    * ------------------------------------------------------------------ */
   --kb-text-display: 2.5rem;
   --kb-text-section: 1.375rem;
@@ -78,7 +83,7 @@
   --kb-radius-card: 20px;
   --kb-radius-button: 14px;
   --kb-radius-badge: 999px;
-  /* Self-contained height floor (does not depend on the host height chain). */
+  /* Self-contained height floor. */
   min-height: 100vh;
   margin: 0;
   background: var(--kb-bg-900);
@@ -171,17 +176,14 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Neumorphic surfaces. Soft, raised panels defined by a dual shadow
- * (faint light edge top-left, deep dark edge bottom-right) plus a hairline
- * border. A whisper of backdrop blur keeps the "glass" feel without the
- * blue tint. This is the primary surface language of the design system.
+ * Surfaces. Depth comes from the shadow hierarchy, not from blur or
+ * glow. A hairline border defines the edge; the shadow defines the
+ * elevation. No backdrop blur — the canvas is already dark enough.
  * ------------------------------------------------------------------ */
 .kb-glass {
   background: rgba(22, 22, 27, 0.6);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: var(--kb-neu-raised);
+  box-shadow: var(--kb-shadow-resting);
 }
 
 .kb-glass-sm {
@@ -194,20 +196,17 @@
 .kb-inset {
   background: rgba(10, 10, 12, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: var(--kb-neu-inset);
+  box-shadow: var(--kb-shadow-inset);
 }
 
 /* Accent gradient — a refined, restrained blue → indigo ramp. Used for
- * primary buttons and the active filter pill. Less saturated than the old
- * tri-color gradient so it reads as a single confident accent. */
+ * primary buttons and the active filter pill. */
 .kb-gradient {
   background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 100%);
 }
 
-/* Dot-grid surface — turns a flat panel into a design surface (Figma / n8n /
- * Linear style). A faint radial dot on a 26px grid, masked so it fades toward
- * the edges. Applied to the board and the secondary views so the whole product
- * shares the Workflow canvas's sense of depth. */
+/* Dot-grid surface — a faint radial dot on a 26px grid, masked so it fades
+ * toward the edges. Applied to the board and secondary views. */
 .kb-dot-grid {
   background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
   background-size: 26px 26px;
@@ -216,35 +215,31 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Task card — neumorphic surface with a soft hover lift.
+ * Task card — a quiet surface with a soft hover lift.
  *
  * No scale transform on hover: scaling the card makes it visually
  * overflow its column, which widens the board and triggers a
  * horizontal scrollbar. The hover feedback is carried entirely by the
- * border-color highlight and the glow shadow — box-shadow never affects
- * layout, so the card stays strictly within its bounds and the board
- * remains stable.
+ * shadow lift and a hairline border highlight — box-shadow never
+ * affects layout, so the card stays strictly within its bounds.
  * ------------------------------------------------------------------ */
 .kb-card {
   --kb-card-glow: var(--kb-glow-neutral);
+  box-shadow: var(--kb-shadow-resting);
   transition: box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
 }
 .kb-card:hover {
-  border-color: rgba(var(--kb-card-glow), 0.16);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 14px 36px -18px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(var(--kb-card-glow), 0.08);
+  border-color: rgba(var(--kb-card-glow), 0.14);
+  box-shadow: var(--kb-shadow-hover);
 }
 
-/* Button hover — a quiet lift with a soft accent halo. */
+/* Button hover — a quiet lift. No glow halo. */
 .kb-btn-glow {
-  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
 }
 .kb-btn-glow:hover {
   transform: translateY(-1px);
-  filter: brightness(1.06);
-  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.35), 0 10px 28px -8px rgba(10, 132, 255, 0.4);
+  box-shadow: var(--kb-shadow-hover);
 }
 
 /* Dashed add-task button — a soft accent wash on hover. */
@@ -282,13 +277,13 @@
   box-shadow: 0 4px 14px -6px rgba(10, 132, 255, 0.4);
 }
 
-/* Dragging card — the floating DragOverlay clone: lifted, glowing, slightly
+/* Dragging card — the floating DragOverlay clone: lifted, slightly
    rotated. It is rendered outside the column's overflow container, so it is
    never clipped and always sits above all UI. */
 .kb-dragging {
-  opacity: 0.92;
+  opacity: 0.95;
   transform: scale(1.04) rotate(1.5deg);
-  box-shadow: var(--kb-shadow-glow), 0 24px 48px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--kb-shadow-overlay);
   cursor: grabbing;
 }
 
@@ -587,8 +582,8 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Running task — a distinct "live" state carried by depth, not by glow.
- * The card sits slightly raised (a stronger elevation shadow) and wears a
+ * Running task — a distinct "live" state carried by elevation, not by
+ * glow. The card sits slightly raised (the elevated shadow) and wears a
  * quiet, solid accent bar on the left. No pulsing, no ambient glow: the
  * state reads as a premium elevation change, the way Apple and Linear
  * indicate an active item — structure, not effect.
@@ -596,12 +591,9 @@
  * ------------------------------------------------------------------ */
 .kb-running {
   position: relative;
-  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.28);
+  border-color: rgba(var(--kb-running-accent, 99, 102, 241), 0.22);
   background: rgba(24, 24, 30, 0.78);
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.3),
-    0 14px 36px -18px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(var(--kb-running-accent, 99, 102, 241), 0.12);
+  box-shadow: var(--kb-shadow-elevated);
 }
 /* Left accent bar — a quiet, solid "live" signal that reads at a glance. */
 .kb-running::before {

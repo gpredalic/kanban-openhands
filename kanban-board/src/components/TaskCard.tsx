@@ -53,13 +53,19 @@ const DELETE_PHASE_TEXT: Record<DeletePhase, string> = {
   fading: "Removing…",
 };
 
+/**
+ * Agent identity is deliberately quiet: a small, solid, desaturated dot with
+ * initials, and a muted name. The gradient avatars were too heavy — they
+ * competed with the title. Solid, low-saturation colors read as a calm
+ * secondary signal, the way Linear shows an assignee.
+ */
 const AVATAR_COLORS = [
-  "bg-gradient-to-br from-blue-500 to-indigo-600",
-  "bg-gradient-to-br from-violet-500 to-purple-600",
-  "bg-gradient-to-br from-pink-500 to-rose-600",
-  "bg-gradient-to-br from-emerald-500 to-teal-600",
-  "bg-gradient-to-br from-amber-500 to-orange-600",
-  "bg-gradient-to-br from-cyan-500 to-sky-600",
+  "bg-[#3a4a6b]",
+  "bg-[#4a3a6b]",
+  "bg-[#6b3a5a]",
+  "bg-[#3a6b5a]",
+  "bg-[#6b5a3a]",
+  "bg-[#3a5a6b]",
 ];
 
 function avatarColor(name: string): string {
@@ -402,11 +408,12 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
         </p>
       )}
 
-      {/* Progress — a quiet hairline, no label. The number lives in the footer. */}
+      {/* Progress — a quiet hairline, no label, no gradient. A solid, muted
+          fill reads as a calm signal. The number lives in the footer. */}
       {progress > 0 && (
         <div className="mb-3 h-1 overflow-hidden rounded-full bg-white/5">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#0A84FF] to-[#5E5CE6] transition-all duration-300"
+            className="h-full rounded-full bg-slate-500/70 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -424,28 +431,28 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
               title={`${assignedAgent.name} — ${assignedAgent.role}`}
             >
               <span
-                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[8px] font-bold text-white ${assignedAgent.avatar || avatarColor(assignedAgent.name)}`}
+                className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[7px] font-semibold text-white/90 ${assignedAgent.avatar || avatarColor(assignedAgent.name)}`}
               >
                 {initials(assignedAgent.name)}
               </span>
-              <span className="truncate text-[0.6875rem] font-medium text-slate-500">
+              <span className="truncate text-[0.6875rem] font-normal text-slate-600">
                 {assignedAgent.name}
               </span>
             </div>
           ) : task.assignee ? (
-            <div
-              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white ${avatarColor(task.assignee)}`}
+            <span
+              className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[7px] font-semibold text-white/90 ${avatarColor(task.assignee)}`}
               title={task.assignee}
             >
               {initials(task.assignee)}
-            </div>
+            </span>
           ) : null}
         </div>
 
         <div className="flex shrink-0 items-center gap-2">
           {task.waitingOn && task.waitingOn.length > 0 && (
             <span
-              className="flex items-center gap-1 text-[0.6875rem] font-medium text-rose-400"
+              className="flex items-center gap-1 text-[0.6875rem] font-normal text-rose-400/80"
               title={`Waiting on ${task.waitingOn.length} task(s)`}
             >
               <AlertTriangle className="h-3 w-3" />
@@ -453,18 +460,18 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
             </span>
           )}
           {progress > 0 && (
-            <span className="text-[0.6875rem] font-medium tabular-nums text-slate-500">
+            <span className="text-[0.6875rem] font-normal tabular-nums text-slate-600">
               {progress}%
             </span>
           )}
           {task.dueDate && (
             <span
-              className={`flex items-center gap-1 text-[0.6875rem] font-medium ${
+              className={`flex items-center gap-1 text-[0.6875rem] font-normal ${
                 due === "overdue"
-                  ? "text-rose-400"
+                  ? "text-rose-400/80"
                   : due === "soon"
-                    ? "text-amber-400"
-                    : "text-slate-500"
+                    ? "text-amber-400/80"
+                    : "text-slate-600"
               }`}
             >
               <Calendar className="h-3 w-3" />

@@ -224,7 +224,9 @@ test("full user-acceptance sweep: every button and interaction works", async () 
 
   // 11. HISTORY VIEW
   clickText(reload, "History");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Execution History") ?? false), "History view renders");
+  // The "Clear" button is unique to the History view (the nav tab also says
+  // "History", so asserting on it alone would pass even if the view failed).
+  assert.ok(await waitFor(() => reload.textContent?.includes("Clear") ?? false), "History view renders");
 
   // 12. ANALYTICS VIEW
   clickText(reload, "Analytics");

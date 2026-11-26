@@ -1,10 +1,11 @@
 /**
  * ExecutionHistory — the "History" view.
  *
- * Shows real executions from the live snapshot: active runs (with a pulsing
- * indicator) and completed runs (most recent first). Each run shows the task
- * title, status, start time, duration, agent display name, and cost — all
- * business information, no raw identifiers.
+ * A quiet, editorial timeline of real executions. Active runs pulse; completed
+ * runs are listed most-recent-first. Each entry shows the task title, status,
+ * start time, duration, agent name, and cost — all business information, no raw
+ * identifiers. The surface is spacious and calm, closer to Apple Activity or
+ * Notion Updates than a log viewer.
  */
 
 import { useState } from "react";
@@ -35,21 +36,22 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
     .sort((a, b) => (b.finishedAt ?? 0) - (a.finishedAt ?? 0));
 
   return (
-    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
+    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-10 p-8">
+      {/* Header — large, editorial. */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Execution History</h2>
-          <p className="mt-1 text-sm text-slate-400">
+          <h2 className="text-3xl font-bold tracking-tight text-white">History</h2>
+          <p className="mt-2 text-sm text-slate-500">
             {active.length} active · {completed.length} completed
           </p>
         </div>
         <button
           type="button"
           onClick={() => setConfirmReset(true)}
-          className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+          className="kb-glass-sm flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-400 transition-colors hover:text-white"
         >
-          <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
-          <span>Clear History</span>
+          <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} />
+          <span>Clear</span>
         </button>
       </div>
 
@@ -57,23 +59,21 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
         <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{error}</div>
       )}
 
-      {/* Active runs — a quiet timeline. */}
+      {/* Active runs — a spacious timeline. */}
       <section>
-        <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active</h3>
+        <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active</h3>
         {active.length === 0 ? (
           loading ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <SkeletonRow />
               <SkeletonRow />
             </div>
           ) : (
-            <EmptyState
-              label="No active runs — run a task from its detail view to see it here."
-            />
+            <EmptyState label="No active runs — run a task from its detail view to see it here." />
           )
         ) : (
-          <div className="relative flex flex-col gap-4 pl-5">
-            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-white/10" />
+          <div className="relative flex flex-col gap-5 pl-6">
+            <div className="absolute left-[7px] top-3 bottom-3 w-px bg-white/10" />
             {active.map((run) => (
               <TimelineNode key={run.id} run={run} profiles={profiles} active />
             ))}
@@ -81,12 +81,12 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
         )}
       </section>
 
-      {/* Completed runs — a quiet timeline. */}
+      {/* Completed runs — a spacious timeline. */}
       <section>
-        <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Completed</h3>
+        <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Completed</h3>
         {completed.length === 0 ? (
           loading ? (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <SkeletonRow />
               <SkeletonRow />
             </div>
@@ -94,8 +94,8 @@ export function ExecutionHistory({ openHandsState, profiles, onReset }: Executio
             <EmptyState label="No completed runs yet." />
           )
         ) : (
-          <div className="relative flex flex-col gap-4 pl-5">
-            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-white/10" />
+          <div className="relative flex flex-col gap-5 pl-6">
+            <div className="absolute left-[7px] top-3 bottom-3 w-px bg-white/10" />
             {completed.map((run) => (
               <TimelineNode key={run.id} run={run} profiles={profiles} />
             ))}
@@ -141,7 +141,7 @@ function formatDateTime(ts: number): string {
 }
 
 /** A single node on the execution timeline: a status dot on the line plus a
-    premium card. The dot color encodes the run's state at a glance. */
+    spacious card. The dot color encodes the run's state at a glance. */
 function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; profiles: Agent[]; active?: boolean }) {
   const StatusIcon =
     run.status === "completed" ? CheckCircle2 : run.status === "failed" ? XCircle : Loader2;
@@ -176,12 +176,12 @@ function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; prof
     <div className="relative">
       {/* Status dot on the timeline */}
       <span
-        className={`absolute -left-5 top-4 h-3.5 w-3.5 rounded-full ring-4 ring-[#0a0a0c] ${dotColor} ${
+        className={`absolute -left-6 top-5 h-3.5 w-3.5 rounded-full ring-4 ring-[#0a0a0c] ${dotColor} ${
           active ? "kb-sync-dot" : ""
         }`}
       />
       <div
-        className={`kb-glass-sm kb-fade-in flex items-center gap-3 rounded-2xl px-4 py-3 transition-colors hover:bg-white/[0.07] ${
+        className={`kb-glass-sm kb-fade-in flex items-center gap-4 rounded-2xl px-5 py-4 transition-colors hover:bg-white/[0.07] ${
           active ? "ring-1 ring-blue-400/30" : ""
         }`}
       >
@@ -191,7 +191,7 @@ function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; prof
         />
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-semibold text-white">{run.title}</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
             {statusBadge(run.status) && (
               <Badge style={statusBadge(run.status)!} pulse={active} />
             )}
@@ -202,7 +202,7 @@ function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; prof
           </div>
         </div>
         <div className="shrink-0 text-right text-xs">
-          {cost !== null && <p className="font-semibold text-slate-300">{cost}</p>}
+          {cost !== null && <p className="font-semibold text-slate-400">{cost}</p>}
         </div>
       </div>
     </div>
@@ -211,8 +211,8 @@ function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; prof
 
 function EmptyState({ label }: { label: string }) {
   return (
-    <div className="kb-glass-sm flex items-center justify-center rounded-2xl p-8 text-center">
-      <p className="text-xs text-slate-500">{label}</p>
+    <div className="kb-glass-sm flex items-center justify-center rounded-2xl p-10 text-center">
+      <p className="text-sm text-slate-500">{label}</p>
     </div>
   );
 }

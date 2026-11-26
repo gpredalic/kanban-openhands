@@ -391,12 +391,12 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
   };
 
   return (
-    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-6">
-      {/* Header row */}
+    <div ref={rootRef} className="kb-reveal relative z-10 flex flex-col gap-8 p-8">
+      {/* Header row — large, editorial. */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white">Agents</h2>
-          <p className="mt-0.5 text-xs text-slate-400">
+          <h2 className="text-3xl font-bold tracking-tight text-white">Agents</h2>
+          <p className="mt-2 text-sm text-slate-500">
             {profiles.length} agent profiles · full lifecycle management · updated live
           </p>
         </div>
@@ -404,7 +404,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
           <button
             type="button"
             onClick={() => void resync(true, "Synced")}
-            className="kb-glass-sm kb-btn-glow flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white"
+            className="kb-glass-sm flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-400 transition-colors hover:text-white"
           >
             <RefreshCw className="h-3.5 w-3.5" strokeWidth={2} />
             Sync
@@ -412,7 +412,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
           <button
             type="button"
             onClick={openCreate}
-            className="kb-gradient kb-btn-glow flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold text-white"
+            className="kb-gradient flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-white"
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
             New Agent
@@ -1045,10 +1045,13 @@ function AgentProfileCard({
   onDelete: () => void;
 }) {
   return (
-    <div className="kb-glass kb-fade-in group relative overflow-hidden rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_-12px_rgba(99,102,241,0.4)]">
+    <div className="kb-glass kb-fade-in group relative overflow-hidden rounded-2xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_1px_2px_rgba(0,0,0,0.3),0_8px_24px_-8px_rgba(0,0,0,0.45)]">
       <div className="flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-indigo-500 shadow-lg">
-          <Bot className="h-5 w-5 text-white" strokeWidth={1.75} />
+        {/* Agent identity — a quiet, solid, desaturated surface. The gradient
+            avatar was too heavy; a calm solid reads as a secondary signal,
+            the way Linear shows an assignee. */}
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#2b3a55] ring-1 ring-white/10">
+          <Bot className="h-5 w-5 text-indigo-200/90" strokeWidth={1.75} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
