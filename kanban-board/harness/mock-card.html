@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kanban Card Visual Proof</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0f172a; }
+  #mount { height: 100%; }
+</style>
+</head>
+<body>
+<div id="mount"></div>
+<script type="module">
+// Self-contained mock host: loads the REAL extension.js and feeds it demo
+// tasks covering every card state (running, completed, failed, queued,
+// blocked, due dates, progress, assignees, agents). No live server needed.
+const tasks = [
+  { id: "c1", title: "Refactor the payment reconciliation pipeline", status: "in_progress", assignee: null, projectId: "p1", waitingOn: null, tags: ["backend"], dueDate: null, priority: "high", description: "Split the monolithic reconciliation job into staged, idempotent workers with a dead-letter queue.", ai: { executionStatus: "running", progress: 62 } },
+  { id: "c2", title: "Ship the new onboarding checklist", status: "done", assignee: "Grace", projectId: "p1", waitingOn: null, tags: [], dueDate: null, priority: "medium", description: "Five-step checklist with progress persistence and a completion celebration.", ai: { executionStatus: "completed", progress: 100 } },
+  { id: "c3", title: "Fix the flaky WebSocket reconnect loop", status: "review", assignee: "Alan", projectId: "p2", waitingOn: ["c1"], tags: ["bug"], dueDate: "2026-11-26", priority: "critical", description: "Reconnects storm under backpressure; add jittered exponential backoff.", ai: { executionStatus: "failed", progress: 30 } },
+  { id: "c4", title: "Draft the Q4 architecture review deck", status: "todo", assignee: "Katherine", projectId: "p1", waitingOn: null, tags: ["docs"], dueDate: "2026-12-01", priority: "low", description: "Twelve slides covering the new orchestration model and rollout plan.", ai: { executionStatus: "queued", progress: 0 } },
+  { id: "c5", title: "Migrate the analytics store to the new schema", status: "in_progress", assignee: null, projectId: "p2", waitingOn: null, tags: ["data"], dueDate: null, priority: "high", description: "Backfill, dual-write, then cutover with a rollback switch.", ai: { executionStatus: "running", progress: 45 } },
+];
+
+const host = {
+  apiVersion: "1",
+  registerPage(id, render) {
+    const container = document.getElementById("mount");
+    render({ container, path: "/kanban-board" });
+    return () => { container.innerHTML = ""; };
+  },
+  agentServer: {
+    async request({ method, path }) {
+      if (method === "GET" && path.startsWith("/api/file/download")) return tasks;
+      if (method === "GET" && path.includes("/api/conversations")) return { conversations: [] };
+      if (method === "GET" && path.includes("/api/events")) return { events: [] };
+      if (method === "GET" && path.includes("/api/profiles")) return { profiles: [] };
+      if (method === "GET" && path.includes("/api/agent-profiles")) return { profiles: [] };
+      if (method === "GET" && path.includes("/api/settings")) return { secrets: [] };
+      return {};
+    },
+  },
+};
+
+const mod = await import("/extension.js");
+mod.activate(host);
+document.title = "mounted";
+</script>
+</body>
+</html>

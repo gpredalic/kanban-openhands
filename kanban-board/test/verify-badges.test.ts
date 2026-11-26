@@ -1,60 +1,51 @@
+/**
+ * verify-badges.test.ts — badge-system acceptance test.
+ *
+ * The badge system is the shared <Badge> component in src/lib/badges.tsx. It is
+ * the single source of truth for status and priority pills and is rendered by
+ * the detail modal, monitoring view, execution history, and create modal.
+ *
+ * The task card no longer renders badges (status is communicated by the column,
+ * priority lives in the detail modal), so this test renders the shared <Badge>
+ * component directly — the real source of truth — and verifies the pill
+ * pattern, dot centering, and Title Case labels for every status and priority
+ * value.
+ *
+ * Rendered with React.createElement (no JSX) because the headless test loader
+ * uses Node's native type-stripping, which does not transform JSX in .ts files.
+ */
+
+import "./setup";
 import { test } from "node:test";
 import assert from "node:assert";
-import "./setup";
-import { activate } from "../extension.js";
+import * as React from "react";
+import { createRoot } from "react-dom/client";
+import { flushSync } from "react-dom";
+import { Badge, STATUS_STYLES, PRIORITY_STYLES, statusBadge, priorityBadge } from "../src/lib/badges";
 
-type RenderFn = (ctx: { container: HTMLElement; path: string }) => void;
+test("Shared Badge component: Title Case, colored dot, flex-centered", async () => {
+  const container = document.createElement("div");
+  document.body.appendChild(container);
+  const root = createRoot(container);
 
-/** Demo tasks covering every status and priority value. */
-const tasks = [
-  { id: "t1", title: "Running task", status: "in_progress", assignee: null, projectId: "p1", waitingOn: null, tags: [], dueDate: null, priority: "high" },
-  { id: "t2", title: "Failed task", status: "todo", assignee: null, projectId: "p1", waitingOn: null, tags: [], dueDate: null, priority: "critical" },
-  { id: "t3", title: "Completed task", status: "done", assignee: null, projectId: "p1", waitingOn: null, tags: [], dueDate: null, priority: "low" },
-  { id: "t4", title: "Pending task", status: "review", assignee: null, projectId: "p1", waitingOn: null, tags: [], dueDate: null, priority: "medium" },
-];
+  // Render every status and every priority value through the shared <Badge>.
+  const statuses = Object.keys(STATUS_STYLES) as (keyof typeof STATUS_STYLES)[];
+  const priorities = Object.keys(PRIORITY_STYLES) as (keyof typeof PRIORITY_STYLES)[];
 
-function makeHost() {
-  let render: RenderFn | null = null;
-  const host = {
-    apiVersion: "1",
-    registerPage(id: string, fn: RenderFn) {
-      render = fn;
-      return () => { render = null; };
-    },
-    agentServer: {
-      request: async (opts: { method: string; path: string }) => {
-        if (opts.method === "GET" && opts.path.startsWith("/api/file/download")) return tasks;
-        return {};
-      },
-    },
-  };
-  return {
-    host,
-    trigger: () => {
-      const container = document.createElement("div");
-      document.body.appendChild(container);
-      render!({ container, path: "/kanban-board" });
-      return container;
-    },
-  };
-}
-
-async function waitFor(predicate: () => boolean, timeoutMs = 3000): Promise<boolean> {
-  const start = Date.now();
-  while (Date.now() - start < timeoutMs) {
-    if (predicate()) return true;
-    await new Promise((r) => setTimeout(r, 15));
-  }
-  return predicate();
-}
-
-test("Status + Priority badges: Title Case, colored dot, flex-centered", async () => {
-  const { host, trigger } = makeHost();
-  const cleanup = activate(host);
-  const container = trigger();
-
-  const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
-  assert.ok(loaded, "tasks must load and render");
+  flushSync(() => {
+    root.render(
+      React.createElement(
+        "div",
+        null,
+        ...statuses.map((s) =>
+          React.createElement(Badge, { key: s, style: statusBadge(s)!, pulse: s === "running" })
+        ),
+        ...priorities.map((p) =>
+          React.createElement(Badge, { key: p, style: priorityBadge(p) })
+        )
+      )
+    );
+  });
 
   // 1. The shared Badge pill pattern must be present in the DOM.
   const badgePills = container.querySelectorAll("span[class*='flex items-center gap-1.5 rounded-full px-2.5 py-0.5']");
@@ -83,6 +74,6 @@ test("Status + Priority badges: Title Case, colored dot, flex-centered", async (
   console.log(`Badge pills: ${badgePills.length}, all with centered dot: ${pillsWithDot}`);
   console.log(`Sample badge texts: ${badgeTexts.slice(0, 6).join(" | ")}`);
 
-  cleanup();
+  root.unmount();
   container.remove();
 });
