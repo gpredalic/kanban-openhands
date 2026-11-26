@@ -500,13 +500,13 @@ export function WorkflowView({
   }, [edges, nodeById]);
 
   const edgePaths = useMemo(() => {
-    const paths = new Map<string, string>();
+    const paths = new Map<string, ReturnType<typeof edgeGeometry>>();
     for (const edge of edges) {
       const from = nodeById.get(edge.from);
       const to = nodeById.get(edge.to);
       if (!from || !to) continue;
       const { index, count } = edgePorts.get(edge.id) ?? { index: 0, count: 1 };
-      paths.set(edge.id, edgeGeometry(from, to, index, count).d);
+      paths.set(edge.id, edgeGeometry(from, to, index, count));
     }
     return paths;
   }, [edges, nodeById, edgePorts]);
@@ -732,13 +732,49 @@ export function WorkflowView({
             onPointerLeave={onSvgPointerUp}
           >
             <defs>
-              <marker id="wf-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#818cf8" />
+              {/* Dot grid — turns the empty canvas into a design surface (Figma / n8n style). */}
+              <pattern id="wf-grid" width="26" height="26" patternUnits="userSpaceOnUse">
+                <circle cx="1.5" cy="1.5" r="1.5" fill="rgba(148,163,184,0.16)" />
+              </pattern>
+              {/* Soft drop shadow for node depth. */}
+              <filter id="wf-node-shadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="#020617" floodOpacity="0.55" />
+              </filter>
+              {/* Node surface gradient — a subtle top-light gives the card dimension. */}
+              <linearGradient id="wf-node-surface" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(30,41,59,0.98)" />
+                <stop offset="100%" stopColor="rgba(15,23,42,0.98)" />
+              </linearGradient>
+              <linearGradient id="wf-node-surface-active" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(16,185,129,0.22)" />
+                <stop offset="100%" stopColor="rgba(15,23,42,0.98)" />
+              </linearGradient>
+              <linearGradient id="wf-node-surface-selected" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(99,102,241,0.30)" />
+                <stop offset="100%" stopColor="rgba(15,23,42,0.98)" />
+              </linearGradient>
+              {/* Edge glow for the active routing path. */}
+              <filter id="wf-edge-glow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="3.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <marker id="wf-arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#a5b4fc" />
               </marker>
-              <marker id="wf-arrow-active" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <marker id="wf-arrow-active" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399" />
               </marker>
+              <marker id="wf-arrow-loop" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#e879f9" />
+              </marker>
             </defs>
+
+            {/* Canvas background — dot grid over a deep base. */}
+            <rect x={0} y={0} width={CANVAS_W} height={CANVAS_H} fill="#0a0f1e" />
+            <rect x={0} y={0} width={CANVAS_W} height={CANVAS_H} fill="url(#wf-grid)" />
 
             {/* Edges — active state comes from the engine's routing. */}
             {edges.map((edge) => {
@@ -748,18 +784,23 @@ export function WorkflowView({
               const isEngineActive = activeEdges.has(edge.id);
               const isSelected = edge.id === selectedEdgeId;
               const isLoop = loopEdgeSet.has(edge.id);
-              const stroke = isEngineActive ? "#34d399" : isSelected ? "#a5b4fc" : isLoop ? "#d946ef" : "#818cf8";
-              const pathD = edgePaths.get(edge.id);
-              if (!pathD) return null;
+              const stroke = isEngineActive ? "#34d399" : isSelected ? "#c7d2fe" : isLoop ? "#e879f9" : "#818cf8";
+              const geo = edgePaths.get(edge.id);
+              if (!geo) return null;
+              const label = edgeLabel(edge);
+              const labelW = label ? label.length * 6.2 + 16 : 0;
               return (
                 <g key={edge.id}>
                   <path
-                    d={pathD}
+                    d={geo.d}
                     fill="none"
                     stroke={stroke}
-                    strokeWidth={isEngineActive || isSelected ? 2.5 : 1.75}
-                    strokeDasharray={isLoop ? "7 5" : undefined}
-                    markerEnd={isEngineActive ? "url(#wf-arrow-active)" : "url(#wf-arrow)"}
+                    strokeWidth={isEngineActive || isSelected ? 3 : 2.25}
+                    strokeLinecap="round"
+                    strokeDasharray={isLoop ? "8 6" : undefined}
+                    markerEnd={isEngineActive ? "url(#wf-arrow-active)" : isLoop ? "url(#wf-arrow-loop)" : "url(#wf-arrow)"}
+                    filter={isEngineActive ? "url(#wf-edge-glow)" : undefined}
+                    opacity={isEngineActive || isSelected || isLoop ? 1 : 0.85}
                     className="cursor-pointer"
                     onPointerDown={(e) => {
                       e.stopPropagation();
@@ -767,15 +808,27 @@ export function WorkflowView({
                       setSelectedNodeId(null);
                     }}
                   />
-                  {edgeLabel(edge) && (
-                    <text
-                      x={(from.x + NODE_W + to.x) / 2}
-                      y={(from.y + to.y) / 2 + NODE_H / 2 - 6}
-                      textAnchor="middle"
-                      className={`text-[10px] ${isEngineActive ? "fill-emerald-300" : isLoop ? "fill-fuchsia-300" : "fill-slate-400"}`}
-                    >
-                      {edgeLabel(edge)}
-                    </text>
+                  {label && (
+                    <g transform={`translate(${geo.mid.x}, ${geo.mid.y})`}>
+                      <rect
+                        x={-labelW / 2}
+                        y={-11}
+                        width={labelW}
+                        height={22}
+                        rx={11}
+                        fill="rgba(10,15,30,0.92)"
+                        stroke={isEngineActive ? "rgba(52,211,153,0.5)" : isLoop ? "rgba(232,121,249,0.45)" : "rgba(129,140,248,0.35)"}
+                        strokeWidth={1}
+                      />
+                      <text
+                        x={0}
+                        y={4}
+                        textAnchor="middle"
+                        className={`text-[10px] font-semibold ${isEngineActive ? "fill-emerald-300" : isLoop ? "fill-fuchsia-300" : "fill-slate-300"}`}
+                      >
+                        {label}
+                      </text>
+                    </g>
                   )}
                 </g>
               );
@@ -817,23 +870,24 @@ export function WorkflowView({
                   onPointerDown={(e) => onNodePointerDown(e, node)}
                   onPointerUp={onNodeDragEnd}
                 >
-                  {/* Node body */}
+                  {/* Node body — gradient surface + drop shadow for depth. */}
                   <rect
                     width={NODE_W}
                     height={NODE_H}
                     rx={14}
-                    fill={isSelected ? "rgba(99,102,241,0.18)" : isEngineActive ? "rgba(52,211,153,0.12)" : "rgba(15,23,42,0.85)"}
-                    stroke={isSelected ? "#818cf8" : isEngineActive ? "#34d399" : "rgba(148,163,184,0.25)"}
-                    strokeWidth={isSelected || isEngineActive ? 2 : 1}
+                    fill={isSelected ? "url(#wf-node-surface-selected)" : isEngineActive ? "url(#wf-node-surface-active)" : "url(#wf-node-surface)"}
+                    stroke={isSelected ? "#a5b4fc" : isEngineActive ? "#34d399" : "rgba(148,163,184,0.35)"}
+                    strokeWidth={isSelected || isEngineActive ? 2 : 1.25}
+                    filter="url(#wf-node-shadow)"
                   />
                   {/* Accent bar */}
-                  <rect x={0} y={10} width={3} height={NODE_H - 20} rx={1.5} fill={meta.accent} />
+                  <rect x={0} y={10} width={3.5} height={NODE_H - 20} rx={1.75} fill={meta.accent} />
                   {/* Type icon + label */}
                   <foreignObject x={14} y={10} width={NODE_W - 50} height={NODE_H - 20}>
                     <div className="flex h-full flex-col justify-center gap-0.5">
                       <div className="flex items-center gap-1.5">
-                        <Icon className="h-3.5 w-3.5 text-slate-300" strokeWidth={2} />
-                        <span className="truncate text-xs font-semibold text-white">{node.label}</span>
+                        <Icon className="h-4 w-4" style={{ color: meta.accent }} strokeWidth={2} />
+                        <span className="truncate text-[13px] font-bold text-white">{node.label}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ring-1 ${meta.badge}`}>{meta.label}</span>

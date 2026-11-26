@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kanban Full-View Visual Proof</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b1020; }
+  #mount { height: 100%; }
+</style>
+</head>
+<body>
+<div id="mount"></div>
+<script type="module">
+// Comprehensive mock host: loads the REAL extension.js and feeds it rich,
+// realistic content for EVERY view — board tasks, OpenHands conversations
+// (executions + events), workflows (all node types, branch types, loops,
+// multi-way nodes), routing rules, and agent profiles. No live server needed.
+//
+// The file-download handler distinguishes board.json / workflows.json /
+// routing-rules.json by the `path` query param, exactly like the real server.
+
+const now = Date.now();
+const min = 60_000;
+
+/* ---------------- Board tasks (board.json) ---------------- */
+const tasks = [
+  { id: "t-research", title: "Research the reconciliation edge cases", status: "done", assignee: "Grace", projectId: "p1", waitingOn: null, tags: ["backend", "research"], dueDate: null, priority: "high", description: "Map every failure mode in the payment reconciliation pipeline before we refactor it.", agentPrompt: "Read the reconciliation service and enumerate every failure mode, including partial refunds and double-charges. Produce a structured list.", expectedOutput: "A markdown list of failure modes with severity.", successCriteria: "Every failure mode has a severity and a proposed mitigation.", agentId: "agent-research", profileId: "scout", conversationId: "conv-research", executionId: "conv-research" },
+  { id: "t-implement", title: "Implement the staged reconciliation workers", status: "in_progress", assignee: null, projectId: "p1", waitingOn: ["t-research"], tags: ["backend"], dueDate: "2026-11-28", priority: "critical", description: "Split the monolithic job into staged, idempotent workers with a dead-letter queue.", agentPrompt: "Implement the staged workers. Each stage must be idempotent and emit to the dead-letter queue on failure.", expectedOutput: "Working staged workers with tests.", successCriteria: "All stages pass; dead-letter queue captures failures.", agentId: "agent-coder", profileId: "forge", conversationId: "conv-implement", executionId: "conv-implement" },
+  { id: "t-review", title: "Review the reconciliation diff", status: "review", assignee: "Alan", projectId: "p1", waitingOn: ["t-implement"], tags: ["review"], dueDate: "2026-11-27", priority: "high", description: "Flag risks and enforce standards on the reconciliation refactor.", agentPrompt: "Review the diff for idempotency bugs and missing error handling.", expectedOutput: "A review with inline comments.", successCriteria: "No critical issues remain.", agentId: "agent-reviewer", profileId: "sentinel", conversationId: "conv-review", executionId: "conv-review" },
+  { id: "t-onboard", title: "Ship the new onboarding checklist", status: "done", assignee: "Grace", projectId: "p1", waitingOn: null, tags: [], dueDate: null, priority: "medium", description: "Five-step checklist with progress persistence and a completion celebration.", agentPrompt: "Build the onboarding checklist with persisted progress.", expectedOutput: "A working checklist.", successCriteria: "Progress persists across reloads.", agentId: "agent-writer", profileId: "quill", conversationId: "conv-onboard", executionId: "conv-onboard" },
+  { id: "t-websocket", title: "Fix the flaky WebSocket reconnect loop", status: "review", assignee: "Alan", projectId: "p2", waitingOn: ["t-implement"], tags: ["bug"], dueDate: "2026-11-26", priority: "critical", description: "Reconnects storm under backpressure; add jittered exponential backoff.", agentPrompt: "Add jittered exponential backoff to the reconnect loop.", expectedOutput: "A stable reconnect loop.", successCriteria: "No reconnect storm under load.", agentId: "agent-coder", profileId: "forge", conversationId: "conv-websocket", executionId: "conv-websocket" },
+  { id: "t-analytics", title: "Migrate the analytics store to the new schema", status: "in_progress", assignee: null, projectId: "p2", waitingOn: null, tags: ["data"], dueDate: null, priority: "high", description: "Backfill, dual-write, then cutover with a rollback switch.", agentPrompt: "Run the backfill and set up dual-write.", expectedOutput: "A migrated store.", successCriteria: "Dual-write is live and rollback works.", agentId: "agent-ops", profileId: "relay", conversationId: "conv-analytics", executionId: "conv-analytics" },
+  { id: "t-deck", title: "Draft the Q4 architecture review deck", status: "todo", assignee: "Katherine", projectId: "p1", waitingOn: null, tags: ["docs"], dueDate: "2026-12-01", priority: "low", description: "Twelve slides covering the new orchestration model and rollout plan.", agentPrompt: "Draft twelve slides on the orchestration model.", expectedOutput: "A 12-slide deck.", successCriteria: "Covers the rollout plan.", agentId: "agent-writer", profileId: "quill", conversationId: null, executionId: null },
+  { id: "t-deploy", title: "Deploy the reconciliation service to staging", status: "todo", assignee: null, projectId: "p2", waitingOn: ["t-review"], tags: ["ops"], dueDate: null, priority: "medium", description: "Deploy to staging and verify the dead-letter queue.", agentPrompt: "Deploy to staging and verify the dead-letter queue.", expectedOutput: "A deployed staging service.", successCriteria: "Dead-letter queue verified.", agentId: "agent-ops", profileId: "relay", conversationId: null, executionId: null },
+];
+
+/* ---------------- OpenHands conversations (executions) ---------------- */
+// Each conversation carries the tags the board reads (taskid, agentid, …),
+// an execution_status, and token/cost metrics. The snapshot is built from
+// /api/conversations/search; events come from /api/conversations/{id}/events.
+const conversations = [
+  {
+    id: "conv-research", title: "Research the reconciliation edge cases", execution_status: "completed",
+    created_at: now - 90 * min, updated_at: now - 60 * min, current_model_id: "gemini-2.5-pro", agent_profile_id: "scout",
+    tags: { taskid: "t-research", agentid: "agent-research", agentprofileid: "scout", boardstatus: "done", tasktitle: "Research the reconciliation edge cases", workflowid: "wf-feature", repository: "kanban-openhands" },
+    stats: { prompt_tokens: 42000, completion_tokens: 9800, cost: 0.0612 },
+  },
+  {
+    id: "conv-implement", title: "Implement the staged reconciliation workers", execution_status: "running",
+    created_at: now - 40 * min, updated_at: now - 2 * min, current_model_id: "claude-opus-4", agent_profile_id: "forge",
+    tags: { taskid: "t-implement", agentid: "agent-coder", agentprofileid: "forge", boardstatus: "in_progress", tasktitle: "Implement the staged reconciliation workers", workflowid: "wf-feature", repository: "kanban-openhands" },
+    stats: { prompt_tokens: 88000, completion_tokens: 21000, cost: 0.184 },
+  },
+  {
+    id: "conv-review", title: "Review the reconciliation diff", execution_status: "failed",
+    created_at: now - 25 * min, updated_at: now - 5 * min, current_model_id: "gpt-5", agent_profile_id: "sentinel",
+    error: "Diff too large to review in one pass; split the review into per-file chunks.",
+    tags: { taskid: "t-review", agentid: "agent-reviewer", agentprofileid: "sentinel", boardstatus: "review", tasktitle: "Review the reconciliation diff", workflowid: "wf-feature", repository: "kanban-openhands" },
+    stats: { prompt_tokens: 12000, completion_tokens: 300, cost: 0.014 },
+  },
+  {
+    id: "conv-onboard", title: "Ship the new onboarding checklist", execution_status: "completed",
+    created_at: now - 200 * min, updated_at: now - 150 * min, current_model_id: "mistral-large", agent_profile_id: "quill",
+    tags: { taskid: "t-onboard", agentid: "agent-writer", agentprofileid: "quill", boardstatus: "done", tasktitle: "Ship the new onboarding checklist", repository: "kanban-openhands" },
+    stats: { prompt_tokens: 30000, completion_tokens: 7000, cost: 0.031 },
+  },
+  {
+    id: "conv-websocket", title: "Fix the flaky WebSocket reconnect loop", execution_status: "failed",
+    created_at: now - 15 * min, updated_at: now - 3 * min, current_model_id: "claude-opus-4", agent_profile_id: "forge",
+    error: "Backoff jitter produced a reconnect storm under simulated backpressure.",
+    tags: { taskid: "t-websocket", agentid: "agent-coder", agentprofileid: "forge", boardstatus: "review", tasktitle: "Fix the flaky WebSocket reconnect loop", repository: "kanban-openhands" },
+    stats: { prompt_tokens: 22000, completion_tokens: 5000, cost: 0.052 },
+  },
+  {
+    id: "conv-analytics", title: "Migrate the analytics store to the new schema", execution_status: "running",
+    created_at: now - 30 * min, updated_at: now - 1 * min, current_model_id: "llama-4-70b", agent_profile_id: "relay",
+    tags: { taskid: "t-analytics", agentid: "agent-ops", agentprofileid: "relay", boardstatus: "in_progress", tasktitle: "Migrate the analytics store to the new schema", repository: "kanban-openhands" },
+    stats: { prompt_tokens: 51000, completion_tokens: 14000, cost: 0.041 },
+  },
+];
+
+// Per-conversation events (the "What the Agent Is Doing" feed).
+const eventsByConversation = {
+  "conv-implement": [
+    { id: "ev-imp-3", kind: "message", source: "agent", timestamp: now - 2 * min, llm_message: { content: "Wiring the dead-letter queue into the third stage now." } },
+    { id: "ev-imp-2", kind: "observation", source: "agent", timestamp: now - 9 * min, observation: { text: "Stage 2 idempotency test passed." } },
+    { id: "ev-imp-1", kind: "message", source: "user", timestamp: now - 40 * min, llm_message: { content: "Implement the staged workers." } },
+  ],
+  "conv-review": [
+    { id: "ev-rev-2", kind: "message", source: "agent", timestamp: now - 5 * min, llm_message: { content: "Diff too large to review in one pass; splitting into per-file chunks." } },
+    { id: "ev-rev-1", kind: "message", source: "user", timestamp: now - 25 * min, llm_message: { content: "Review the reconciliation diff." } },
+  ],
+  "conv-websocket": [
+    { id: "ev-ws-2", kind: "message", source: "agent", timestamp: now - 3 * min, llm_message: { content: "Backoff jitter produced a reconnect storm under simulated backpressure." } },
+    { id: "ev-ws-1", kind: "message", source: "user", timestamp: now - 15 * min, llm_message: { content: "Add jittered exponential backoff." } },
+  ],
+  "conv-analytics": [
+    { id: "ev-an-2", kind: "observation", source: "agent", timestamp: now - 1 * min, observation: { text: "Backfill 62% complete; dual-write enabled." } },
+    { id: "ev-an-1", kind: "message", source: "user", timestamp: now - 30 * min, llm_message: { content: "Run the backfill and set up dual-write." } },
+  ],
+  "conv-research": [
+    { id: "ev-re-2", kind: "message", source: "agent", timestamp: now - 60 * min, llm_message: { content: "Enumerated 14 failure modes with severity and mitigations." } },
+    { id: "ev-re-1", kind: "message", source: "user", timestamp: now - 90 * min, llm_message: { content: "Enumerate every failure mode." } },
+  ],
+  "conv-onboard": [
+    { id: "ev-ob-2", kind: "message", source: "agent", timestamp: now - 150 * min, llm_message: { content: "Checklist shipped with persisted progress." } },
+    { id: "ev-ob-1", kind: "message", source: "user", timestamp: now - 200 * min, llm_message: { content: "Build the onboarding checklist." } },
+  ],
+};
+
+/* ---------------- Workflows (workflows.json) ---------------- */
+// A rich workflow exercising every node type, every branch type, multi-way
+// nodes (outputPorts 3 and 4), and a bounded loop (A → B → C → A).
+const workflows = [
+  {
+    id: "wf-feature", name: "Feature Pipeline", description: "Research → implement → review → ship, with a bounded retry loop and a manual-approval gate.", status: "active",
+    nodes: [
+      { id: "start", type: "start", label: "Start", x: 60, y: 300 },
+      { id: "n-research", type: "task", label: "Research", x: 260, y: 300, taskId: "t-research", config: { expectedOutput: "Failure-mode list", description: "Map failure modes." } },
+      { id: "n-implement", type: "agent", label: "Implement", x: 480, y: 300, taskId: "t-implement", agentId: "agent-coder", profileId: "forge", config: { prompt: "Implement the staged workers.", memory: "session", context: "task", timeoutSeconds: 1800, retryPolicy: { maxAttempts: 3, backoff: "exponential", delaySeconds: 30 } } },
+      { id: "n-review", type: "approval", label: "Review", x: 700, y: 300, taskId: "t-review", config: { approver: "sentinel", slaHours: 24, escalationRules: [{ afterHours: 24, escalateTo: "team-lead", action: "notify" }, { afterHours: 48, escalateTo: "manager", action: "block" }] } },
+      { id: "n-ship", type: "task", label: "Ship", x: 920, y: 300, taskId: "t-deploy", config: { expectedOutput: "Deployed staging service" } },
+      { id: "end", type: "end", label: "End", x: 1120, y: 300 },
+    ],
+    edges: [
+      { id: "e-start", from: "start", to: "n-research", condition: "IF_SUCCESS" },
+      { id: "e-research", from: "n-research", to: "n-implement", name: "Research Complete", condition: "IF_SUCCESS" },
+      { id: "e-implement", from: "n-implement", to: "n-review", name: "Implementation Ready", condition: "IF_SUCCESS" },
+      { id: "e-review-ok", from: "n-review", to: "n-ship", name: "Approved", condition: "IF_APPROVED" },
+      { id: "e-review-no", from: "n-review", to: "n-implement", name: "Rejected", condition: "IF_REJECTED", loopLimit: 3 },
+      { id: "e-ship", from: "n-ship", to: "end", condition: "IF_SUCCESS" },
+    ],
+  },
+  {
+    id: "wf-branch", name: "Branching Router", description: "A 4-way condition node fans out to success / failure / timeout / manual-approval paths.", status: "active",
+    nodes: [
+      { id: "b-start", type: "start", label: "Start", x: 60, y: 300 },
+      { id: "b-work", type: "task", label: "Process", x: 260, y: 300, taskId: "t-analytics", config: { expectedOutput: "Processed batch" } },
+      { id: "b-cond", type: "condition", label: "Route", x: 480, y: 300, outputPorts: 4, config: { expression: "status == 'approved'", variables: [{ name: "status", description: "Task status" }] } },
+      { id: "b-true", type: "task", label: "Approved path", x: 720, y: 120, config: { expectedOutput: "Approved output" } },
+      { id: "b-false", type: "task", label: "Rejected path", x: 720, y: 260, config: { expectedOutput: "Rejected output" } },
+      { id: "b-timeout", type: "delay", label: "Timeout path", x: 720, y: 400, config: { durationSeconds: 300, schedule: "0 0 * * *" } },
+      { id: "b-approval", type: "approval", label: "Manual approval", x: 720, y: 540, config: { approver: "team-lead", slaHours: 12 } },
+      { id: "b-end", type: "end", label: "End", x: 960, y: 300 },
+    ],
+    edges: [
+      { id: "be-start", from: "b-start", to: "b-work", condition: "IF_SUCCESS" },
+      { id: "be-work", from: "b-work", to: "b-cond", condition: "IF_SUCCESS" },
+      { id: "be-true", from: "b-cond", to: "b-true", name: "True", condition: "IF_TRUE" },
+      { id: "be-false", from: "b-cond", to: "b-false", name: "False", condition: "IF_FALSE" },
+      { id: "be-timeout", from: "b-cond", to: "b-timeout", name: "Timeout", condition: "IF_TIMEOUT" },
+      { id: "be-approval", from: "b-cond", to: "b-approval", name: "Manual", condition: "IF_MANUAL_APPROVAL" },
+      { id: "be-true-end", from: "b-true", to: "b-end", condition: "IF_SUCCESS" },
+      { id: "be-false-end", from: "b-false", to: "b-end", condition: "IF_SUCCESS" },
+      { id: "be-timeout-end", from: "b-timeout", to: "b-end", condition: "IF_SUCCESS" },
+      { id: "be-approval-end", from: "b-approval", to: "b-end", condition: "IF_APPROVED" },
+    ],
+  },
+  {
+    id: "wf-loop", name: "Bounded Loop", description: "A → B → C → A with a loop limit of 3, plus a failure and a retry-exhausted branch.", status: "active",
+    nodes: [
+      { id: "l-start", type: "start", label: "Start", x: 60, y: 300 },
+      { id: "l-a", type: "task", label: "A — Extract", x: 260, y: 300, taskId: "t-analytics", config: { expectedOutput: "Extracted data" } },
+      { id: "l-b", type: "agent", label: "B — Transform", x: 480, y: 300, agentId: "agent-coder", profileId: "forge", config: { prompt: "Transform the extracted data.", memory: "persistent", context: "workflow" } },
+      { id: "l-c", type: "task", label: "C — Load", x: 700, y: 300, config: { expectedOutput: "Loaded data" } },
+      { id: "l-fail", type: "task", label: "Failure handler", x: 480, y: 520, config: { expectedOutput: "Failure report" } },
+      { id: "l-retry", type: "relay", label: "Retry relay", x: 260, y: 520, config: { routeTarget: "forge", retryStrategy: { maxAttempts: 2, backoff: "fixed", delaySeconds: 10 } } },
+      { id: "l-end", type: "end", label: "End", x: 920, y: 300 },
+    ],
+    edges: [
+      { id: "le-start", from: "l-start", to: "l-a", condition: "IF_SUCCESS" },
+      { id: "le-a", from: "l-a", to: "l-b", condition: "IF_SUCCESS" },
+      { id: "le-b", from: "l-b", to: "l-c", condition: "IF_SUCCESS" },
+      { id: "le-loop", from: "l-c", to: "l-a", name: "Loop back", condition: "IF_LOOP", loopLimit: 3 },
+      { id: "le-c-end", from: "l-c", to: "l-end", name: "Done", condition: "IF_SUCCESS", priority: 1 },
+      { id: "le-fail", from: "l-b", to: "l-fail", name: "Error", condition: "IF_FAILURE" },
+      { id: "le-retry", from: "l-fail", to: "l-retry", name: "Retries exhausted", condition: "IF_RETRY_EXHAUSTED" },
+      { id: "le-retry-a", from: "l-retry", to: "l-a", name: "Retry", condition: "IF_SUCCESS" },
+    ],
+  },
+];
+
+/* ---------------- Routing rules (routing-rules.json) ---------------- */
+const routingRules = [
+  { id: "rule-review", name: "Reviews go to Sentinel", priority: 10, condition: { type: "status", status: "review" }, target: { agentId: "agent-reviewer" } },
+  { id: "rule-code", name: "Code tasks go to Forge", priority: 20, condition: { type: "tag", tag: "backend" }, target: { agentId: "agent-coder" } },
+  { id: "rule-high", name: "High priority → GPT-5", priority: 30, condition: { type: "priority", priority: "high" }, target: { modelId: "gpt-5" } },
+  { id: "rule-default", name: "Default → Scout", priority: 100, condition: { type: "always" }, target: { agentId: "agent-research" } },
+];
+
+/* ---------------- Agent profiles ---------------- */
+const agentProfiles = {
+  active_agent_profile_id: "forge",
+  profiles: [
+    { id: "scout", name: "Scout", llm_profile_ref: "gemini-2.5-pro" },
+    { id: "forge", name: "Forge", llm_profile_ref: "claude-opus-4" },
+    { id: "sentinel", name: "Sentinel", llm_profile_ref: "gpt-5" },
+    { id: "quill", name: "Quill", llm_profile_ref: "mistral-large" },
+    { id: "relay", name: "Relay", llm_profile_ref: "llama-4-70b" },
+  ],
+};
+
+const llmProfiles = {
+  profiles: [
+    { id: "gpt-5", name: "GPT-5", provider: "openai" },
+    { id: "claude-opus-4", name: "Claude Opus 4", provider: "anthropic" },
+    { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro", provider: "google" },
+    { id: "mistral-large", name: "Mistral Large", provider: "mistral" },
+    { id: "llama-4-70b", name: "Llama 4 70B", provider: "meta" },
+  ],
+};
+
+/* ---------------- Mock host ---------------- */
+const host = {
+  apiVersion: "1",
+  registerPage(id, render) {
+    const container = document.getElementById("mount");
+    render({ container, path: "/kanban-board" });
+    return () => { container.innerHTML = ""; };
+  },
+  agentServer: {
+    async request({ method, path }) {
+      // File downloads: distinguish board.json / workflows.json / routing-rules.json.
+      if (method === "GET" && path.startsWith("/api/file/download")) {
+        const decoded = decodeURIComponent(path.split("path=")[1] ?? "");
+        if (decoded.endsWith("board.json")) return JSON.stringify(tasks);
+        if (decoded.endsWith("workflows.json")) return JSON.stringify(workflows);
+        if (decoded.endsWith("routing-rules.json")) return JSON.stringify(routingRules);
+        return "[]";
+      }
+      // OpenHands conversations (executions).
+      if (method === "GET" && path.startsWith("/api/conversations/search")) return { conversations };
+      // Per-conversation events.
+      const evMatch = path.match(/\/api\/conversations\/([^/]+)\/events\/search/);
+      if (method === "GET" && evMatch) return { events: eventsByConversation[decodeURIComponent(evMatch[1])] ?? [] };
+      // Agent profiles.
+      if (method === "GET" && path === "/api/agent-profiles") return agentProfiles;
+      // LLM profiles.
+      if (method === "GET" && path === "/api/profiles") return llmProfiles;
+      // Secrets.
+      if (method === "GET" && path.includes("/api/settings")) return { secrets: [] };
+      return {};
+    },
+  },
+};
+
+const mod = await import("/extension.js");
+mod.activate(host);
+document.title = "mounted";
+</script>
+</body>
+</html>
