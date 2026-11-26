@@ -8,14 +8,12 @@
 
 import { useDroppable } from "@dnd-kit/core";
 import type { Column, Task, TaskStatus, DeletePhase } from "../types/task";
-import type { Agent } from "../types/ai";
 import { TaskCard } from "./TaskCard";
 import { EmptyState } from "./EmptyState";
 
 interface KanbanColumnProps {
   column: Column;
   activeTaskId: string | null;
-  agents?: Agent[];
   /** Task ids currently being deleted — shows a "Deleting…" overlay on those cards. */
   deletingTaskIds?: Set<string>;
   /** The current delete phase per task id — drives the phase-specific overlay text. */
@@ -38,7 +36,7 @@ const STATUS_DOT: Record<TaskStatus, string> = {
   done: "bg-emerald-400",
 };
 
-export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
+export function KanbanColumn({ column, activeTaskId, deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
 
   return (
@@ -72,7 +70,6 @@ export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskId
             <TaskCard
               key={task.id}
               task={task}
-              agents={agents}
               isDragging={activeTaskId === task.id}
               deleting={deletingTaskIds?.has(task.id) ?? false}
               deletePhase={deletePhases?.get(task.id)}

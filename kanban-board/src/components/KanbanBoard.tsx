@@ -319,7 +319,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                     <KanbanColumn
                       key={col.status}
                       column={col}
-                      agents={assignmentAgents}
                       activeTaskId={activeTaskId}
                       deletingTaskIds={state.uiState.deletingTaskIds}
                       deletePhases={state.uiState.deletePhases}
@@ -348,7 +347,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                         return (
                           <TaskCard
                             task={activeTask}
-                            agents={assignmentAgents}
                             isDragging
                             isOverlay
                           />

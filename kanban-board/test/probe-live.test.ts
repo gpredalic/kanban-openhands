@@ -241,10 +241,11 @@ test("4. assigned profile is shown on the task card and in the task detail", asy
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Card and detail task") ?? false));
 
-  // Card: the assigned agent name ("Forge") must render on the card.
+  // Card: the assigned agent name ("Forge") must NOT render on the card —
+  // agent identity is hidden from the board and surfaces only in the detail.
   const card = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((c) => c.textContent?.includes("Card and detail task"));
   assert.ok(card, "task card must render");
-  assert.ok(card?.textContent?.includes("Forge"), `card must show the assigned profile name "Forge"; got ${JSON.stringify(card?.textContent?.slice(0, 200))}`);
+  assert.ok(!card?.textContent?.includes("Forge"), `card must NOT show the assigned profile name "Forge"; got ${JSON.stringify(card?.textContent?.slice(0, 200))}`);
 
   // Detail: open the card's edit modal via the ellipsis CardMenu and assert
   // the "Assigned agent:" line.
@@ -287,14 +288,12 @@ test("5. agent assignment survives a page reload", async () => {
   const reloaded = fixture.getTasks().find((t) => t.title === "Reload survival task");
   assert.equal(reloaded?.agentId, "profile-scout", `agentId must survive reload, got ${JSON.stringify(reloaded?.agentId)}`);
 
-  // The reloaded card must still show the assigned profile name ("Scout").
-  // The agent name renders once the async profile fetch resolves, so poll for it.
-  const cardShown = await waitFor(() =>
-    [...reload.querySelectorAll<HTMLElement>(".kb-card")]
-      .find((c) => c.textContent?.includes("Reload survival task"))
-      ?.textContent?.includes("Scout") ?? false,
-  );
-  assert.ok(cardShown, `reloaded card must still show the assigned profile name "Scout"; got ${JSON.stringify([...reload.querySelectorAll<HTMLElement>(".kb-card")].find((c) => c.textContent?.includes("Reload survival task"))?.textContent?.slice(0, 200))}`);
+  // The reloaded card must NOT show the assigned profile name ("Scout") —
+  // agent identity is hidden from the board card. The assignment itself is
+  // already verified above via the persisted agentId.
+  const reloadedCard = [...reload.querySelectorAll<HTMLElement>(".kb-card")].find((c) => c.textContent?.includes("Reload survival task"));
+  assert.ok(reloadedCard, "reloaded task card must render");
+  assert.ok(!reloadedCard?.textContent?.includes("Scout"), `reloaded card must NOT show the assigned profile name "Scout"; got ${JSON.stringify(reloadedCard?.textContent?.slice(0, 200))}`);
 
   reloadCleanup();
   reload.remove();

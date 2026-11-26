@@ -24,12 +24,11 @@ import { CSS } from "@dnd-kit/utilities";
 import { memo, useState, useRef, useEffect, useCallback, type CSSProperties } from "react";
 import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, MoreHorizontal } from "lucide-react";
 import type { Task, DeletePhase } from "../types/task";
-import type { Agent, EnrichedTask } from "../types/ai";
+import type { EnrichedTask } from "../types/ai";
 import { dueState } from "../lib/date";
 
 interface TaskCardProps {
   task: Task;
-  agents?: Agent[];
   isDragging: boolean;
   /** True when this card is the DragOverlay clone (rendered outside the column). */
   isOverlay?: boolean;
@@ -54,35 +53,12 @@ const DELETE_PHASE_TEXT: Record<DeletePhase, string> = {
 };
 
 /**
- * Agent identity is deliberately quiet: a small, solid, desaturated dot with
- * initials, and a muted name. The gradient avatars were too heavy — they
- * competed with the title. Solid, low-saturation colors read as a calm
- * secondary signal, the way Linear shows an assignee.
+ * Agent identity is deliberately hidden from the board card. The card shows
+ * only the task title and essential status (progress, blocked, due date).
+ * Agent, owner, description, and full activity history surface when the task
+ * is opened in the detail modal — the way Linear keeps the board quiet and the
+ * detail view rich.
  */
-const AVATAR_COLORS = [
-  "bg-[#3a4a6b]",
-  "bg-[#4a3a6b]",
-  "bg-[#6b3a5a]",
-  "bg-[#3a6b5a]",
-  "bg-[#6b5a3a]",
-  "bg-[#3a5a6b]",
-];
-
-function avatarColor(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) | 0;
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-}
-
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((w) => w[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 function formatDue(iso: string): string {
   const d = new Date(iso + "T00:00:00");
@@ -189,7 +165,7 @@ function CardMenu({
   );
 }
 
-function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
+function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
   // Disable dragging while a delete is in flight or has failed — the card is
   // locked to its column during the transaction.
   const locked = deleting || Boolean(deleteError);
@@ -218,7 +194,6 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
 
   const due = task.dueDate ? dueState(task.dueDate, task.status) : "none";
   const progress = task.progress ?? 0;
-  const assignedAgent = task.agentId ? agents.find((agent) => agent.id === task.agentId) : undefined;
   const executionStatus = (task as EnrichedTask).ai?.executionStatus;
   // A task is "running" (and therefore edit-locked) when it is actively
   // executing or waiting to start. OpenHands reports `executing`/`started`
@@ -419,36 +394,12 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
         </div>
       )}
 
-      {/* Footer — one quiet row. Identity on the left, due / blocked / progress
-          on the right. Edit + delete reveal on hover so the resting card stays
-          clean; they remain in the DOM (opacity, not display) so they stay
-          clickable and discoverable. */}
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          {assignedAgent ? (
-            <div
-              className="flex min-w-0 items-center gap-1.5"
-              title={`${assignedAgent.name} — ${assignedAgent.role}`}
-            >
-              <span
-                className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[7px] font-semibold text-white/90 ${assignedAgent.avatar || avatarColor(assignedAgent.name)}`}
-              >
-                {initials(assignedAgent.name)}
-              </span>
-              <span className="truncate text-[0.6875rem] font-normal text-slate-600">
-                {assignedAgent.name}
-              </span>
-            </div>
-          ) : task.assignee ? (
-            <span
-              className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full text-[7px] font-semibold text-white/90 ${avatarColor(task.assignee)}`}
-              title={task.assignee}
-            >
-              {initials(task.assignee)}
-            </span>
-          ) : null}
-        </div>
-
+      {/* Footer — one quiet row of status signals: blocked, progress, due date.
+          Identity (agent / owner) is intentionally absent from the card; it
+          surfaces in the detail modal. Edit + delete reveal on hover so the
+          resting card stays clean; they remain in the DOM (opacity, not
+          display) so they stay clickable and discoverable. */}
+      <div className="mt-3 flex items-center justify-end gap-2">
         <div className="flex shrink-0 items-center gap-2">
           {task.waitingOn && task.waitingOn.length > 0 && (
             <span
