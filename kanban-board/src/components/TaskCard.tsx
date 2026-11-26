@@ -71,6 +71,11 @@ function formatDue(iso: string): string {
  * and Delete. Replaces the two always-hover-revealed icon buttons with the
  * Apple-style pattern: one quiet affordance, a menu that appears on demand.
  *
+ * The ellipsis itself is invisible at rest (opacity-0) and reveals only on
+ * click (or keyboard focus via group-focus-within). It stays in the DOM and
+ * clickable, so the resting card reads as a clean editorial surface while the
+ * action remains discoverable and testable.
+ *
  * The popover closes on outside click, Escape, or after an action is chosen.
  * It renders inside the card (which is not overflow-hidden), so it is never
  * clipped by the column's overflow container.
@@ -120,7 +125,7 @@ function CardMenu({
           setOpen((v) => !v);
         }}
         onPointerDown={(e) => e.stopPropagation()}
-        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
+        className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-opacity duration-150 group-focus-within:opacity-100 hover:bg-white/10 hover:text-slate-200 ${open ? "opacity-100" : "opacity-0"}`}
       >
         <MoreHorizontal className="h-4 w-4" />
       </button>
@@ -298,7 +303,7 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
         if (moved > 5 || wasDrag) return;
         onEdit?.(task);
       }}
-      className={`kb-glass kb-card kb-fade-in group relative cursor-grab rounded-[16px] p-5 active:cursor-grabbing ${
+      className={`kb-glass kb-card kb-fade-in group relative flex min-h-[132px] cursor-grab flex-col rounded-[16px] p-5 active:cursor-grabbing ${
         isOverlay ? "kb-dragging kb-drag-overlay" : isDragging ? "kb-drag-placeholder" : ""
       } ${deleting ? "opacity-60" : ""} ${deleteError ? "kb-delete-failed" : ""} ${deletePhase === "fading" ? "kb-delete-fading" : ""} ${running ? "kb-running" : ""} ${animClass}`}
     >
@@ -396,10 +401,10 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
 
       {/* Footer — one quiet row of status signals: blocked, progress, due date.
           Identity (agent / owner) is intentionally absent from the card; it
-          surfaces in the detail modal. Edit + delete reveal on hover so the
-          resting card stays clean; they remain in the DOM (opacity, not
-          display) so they stay clickable and discoverable. */}
-      <div className="mt-3 flex items-center justify-end gap-2">
+          surfaces in the detail modal. The ellipsis menu is invisible at rest
+          and reveals on click (or keyboard focus), so the resting card stays a
+          clean editorial surface while the action remains discoverable. */}
+      <div className="mt-auto flex items-center justify-end gap-2 pt-3">
         <div className="flex shrink-0 items-center gap-2">
           {task.waitingOn && task.waitingOn.length > 0 && (
             <span
