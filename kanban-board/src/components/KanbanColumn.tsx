@@ -28,24 +28,17 @@ interface KanbanColumnProps {
   onCancelDelete?: (taskId: string) => void;
 }
 
-const STATUS_COLORS: Record<TaskStatus, string> = {
-  todo: "bg-slate-400",
-  in_progress: "bg-blue-500",
-  review: "bg-amber-500",
-  done: "bg-emerald-500",
-};
-
-/* Status-aware dot glow — the dot's ambient glow matches its status color. */
-const STATUS_GLOW: Record<TaskStatus, string> = {
-  todo: "rgba(142, 142, 147, 0.5)",
-  in_progress: "rgba(10, 132, 255, 0.5)",
-  review: "rgba(255, 159, 10, 0.5)",
-  done: "rgba(48, 209, 88, 0.5)",
+/* Status-aware gradient accent — the column header's left bar gives each
+ * column a branded, Apple-like identity instead of a bare dot. */
+const STATUS_ACCENT: Record<TaskStatus, string> = {
+  todo: "from-slate-400 to-slate-500",
+  in_progress: "from-blue-400 to-indigo-500",
+  review: "from-amber-400 to-orange-500",
+  done: "from-emerald-400 to-teal-500",
 };
 
 export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
-  const dot = STATUS_COLORS[column.status];
 
   return (
     <div
@@ -55,15 +48,17 @@ export function KanbanColumn({ column, activeTaskId, agents = [], deletingTaskId
         isOver ? "kb-drop-target" : ""
       }`}
     >
-      {/* Column header */}
+      {/* Column header — a gradient status bar on the left, the lane title,
+          and a count badge. The gradient bar gives each column a branded,
+          Apple-like identity instead of a bare dot. */}
       <div className="mb-4 flex items-center justify-between px-1">
         <div className="flex items-center gap-2.5">
-          <span className={`h-2 w-2 rounded-full ${dot}`} style={{ boxShadow: `0 0 8px ${STATUS_GLOW[column.status]}` }} />
-          <h3 className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-slate-400">
+          <span className={`h-4 w-1 rounded-full bg-gradient-to-b ${STATUS_ACCENT[column.status]}`} />
+          <h3 className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-slate-300">
             {column.title}
           </h3>
         </div>
-        <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/[0.04] px-2 text-xs font-semibold tabular-nums text-slate-500 ring-1 ring-white/[0.06]">
+        <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/[0.05] px-2 text-xs font-semibold tabular-nums text-slate-400 ring-1 ring-white/[0.08]">
           {column.tasks.length}
         </span>
       </div>

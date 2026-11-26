@@ -204,6 +204,17 @@
   background: linear-gradient(135deg, var(--kb-accent-blue) 0%, var(--kb-accent-indigo) 100%);
 }
 
+/* Dot-grid surface — turns a flat panel into a design surface (Figma / n8n /
+ * Linear style). A faint radial dot on a 26px grid, masked so it fades toward
+ * the edges. Applied to the board and the secondary views so the whole product
+ * shares the Workflow canvas's sense of depth. */
+.kb-dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 0%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 90% 80% at 50% 0%, #000 55%, transparent 100%);
+}
+
 /* ------------------------------------------------------------------ *
  * Task card — neumorphic surface with a soft hover lift.
  *

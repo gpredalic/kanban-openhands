@@ -307,7 +307,13 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
               <StatsCards stats={stats} />
 
               <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-                <div ref={boardRef} className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div ref={boardRef} className="relative z-10">
+                  {/* Dot-grid surface — gives the board the same design-surface
+                      depth as the Workflow canvas, so the columns read as
+                      floating panels over a real workspace rather than flat
+                      glass on a flat floor. */}
+                  <div className="kb-dot-grid pointer-events-none absolute inset-0 -z-10 rounded-[24px]" aria-hidden="true" />
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                   {enrichedColumns.map((col) => (
                     <KanbanColumn
                       key={col.status}
@@ -323,6 +329,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                       onCancelDelete={handleCancelDelete}
                     />
                   ))}
+                  </div>
                 </div>
                 {/* DragOverlay: renders the dragged card as a floating clone that
                     follows the pointer. It is portaled outside the column's
