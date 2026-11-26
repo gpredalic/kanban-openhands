@@ -194,26 +194,42 @@ test("F3: delete button disabled for running and queued tasks", async () => {
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Running task: delete button must be disabled.
+  // Running task: the CardMenu (ellipsis) button is present and enabled,
+  // but the Delete task menu item inside the popover is disabled.
   const runningCard = taskCardByTitle(container, "Running task");
   assert.ok(runningCard, "Running task card must exist");
-  const runningDelete = runningCard!.querySelector('button[title="Stop the task before deleting it."]');
-  assert.ok(runningDelete, "Running task must have a disabled delete button with the stop-first title");
-  assert.ok(runningDelete!.hasAttribute("disabled"), "Running task delete button must be disabled");
+  const runningMenu = runningCard!.querySelector('button[aria-label="Card actions"]');
+  assert.ok(runningMenu, "Running task must have a CardMenu (ellipsis) button");
+  assert.ok(!runningMenu!.hasAttribute("disabled"), "CardMenu button must be enabled (Edit is still available)");
+  runningMenu!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...runningCard!.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
+  const runningDelete = [...runningCard!.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
+  assert.ok(runningDelete, "Delete task menu item must exist in the popover");
+  assert.ok(runningDelete.hasAttribute("disabled"), "Delete task must be disabled for a running task");
 
-  // Queued task: delete button must be disabled.
+  // Queued task: same — CardMenu enabled, Delete disabled.
   const queuedCard = taskCardByTitle(container, "Queued task");
   assert.ok(queuedCard, "Queued task card must exist");
-  const queuedDelete = queuedCard!.querySelector('button[title="Stop the task before deleting it."]');
-  assert.ok(queuedDelete, "Queued task must have a disabled delete button with the stop-first title");
-  assert.ok(queuedDelete!.hasAttribute("disabled"), "Queued task delete button must be disabled");
+  const queuedMenu = queuedCard!.querySelector('button[aria-label="Card actions"]');
+  assert.ok(queuedMenu, "Queued task must have a CardMenu (ellipsis) button");
+  assert.ok(!queuedMenu!.hasAttribute("disabled"), "CardMenu button must be enabled for a queued task");
+  queuedMenu!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...queuedCard!.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
+  const queuedDelete = [...queuedCard!.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
+  assert.ok(queuedDelete, "Delete task menu item must exist in the popover");
+  assert.ok(queuedDelete.hasAttribute("disabled"), "Delete task must be disabled for a queued task");
 
-  // Failed task: delete button must be enabled (not active).
+  // Failed task: CardMenu enabled, Delete enabled.
   const failedCard = taskCardByTitle(container, "Failed task");
   assert.ok(failedCard, "Failed task card must exist");
-  const failedDelete = failedCard!.querySelector('button[title="Delete task"]');
-  assert.ok(failedDelete, "Failed task must have an enabled delete button");
-  assert.ok(!failedDelete!.hasAttribute("disabled"), "Failed task delete button must be enabled");
+  const failedMenu = failedCard!.querySelector('button[aria-label="Card actions"]');
+  assert.ok(failedMenu, "Failed task must have a CardMenu (ellipsis) button");
+  assert.ok(!failedMenu!.hasAttribute("disabled"), "Failed task CardMenu must be enabled");
+  failedMenu!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...failedCard!.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
+  const failedDelete = [...failedCard!.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
+  assert.ok(failedDelete, "Delete task menu item must exist in the popover");
+  assert.ok(!failedDelete.hasAttribute("disabled"), "Delete task must be enabled for a failed task");
 
   cleanup();
   container.remove();

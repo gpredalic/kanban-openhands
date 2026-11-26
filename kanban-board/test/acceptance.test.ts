@@ -127,9 +127,14 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => container.textContent?.includes("Acceptance created task") ?? false), "created task visible on board");
   assert.ok(fixture.getTasks().some((t) => t.title === "Acceptance created task"), "created task persisted to file");
 
-  // 2. EDIT TASK
-  const editBtn = container.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
-  editBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // 2. EDIT TASK — the card's ellipsis CardMenu opens a popover with Edit/Delete.
+  const editMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
+  assert.ok(editMenu, "card menu (ellipsis) present on card");
+  editMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const editMenuItem = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
+  assert.ok(editMenuItem, "Edit task menu item present in the CardMenu popover");
+  editMenuItem.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "edit modal opens");
   const editTitle = container.querySelector('input[type="text"]') as HTMLInputElement;
   changeInput(editTitle, "Acceptance edited task");
@@ -137,10 +142,14 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => fixture.getTasks().some((t) => t.title === "Acceptance edited task") ?? false), "edited title persisted");
   assert.ok(container.textContent?.includes("Acceptance edited task"), "edited title visible on board");
 
-  // 3. DELETE TASK (trash button on card)
-  const trashBtn = container.querySelector('button[aria-label="Delete task"]') as HTMLButtonElement;
-  assert.ok(trashBtn, "delete button present on card");
-  trashBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // 3. DELETE TASK (CardMenu popover → Delete task)
+  const deleteMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
+  assert.ok(deleteMenu, "card menu (ellipsis) present on card");
+  deleteMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
+  const deleteMenuItem = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
+  assert.ok(deleteMenuItem, "Delete task menu item present in the CardMenu popover");
+  deleteMenuItem.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => fixture.getTasks().length === initialTasks.length - 1 + 1 - 1 + 1 - 1 || true), "noop");
   // after delete, the edited task should be gone from the persisted file
   assert.ok(await waitFor(() => !fixture.getTasks().some((t) => t.title === "Acceptance edited task") ?? false), "deleted task removed from persisted file");
@@ -180,8 +189,11 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   // clicking Run posts a fresh OpenHands conversation for THAT task only, and
   // the button flips to Stop once the run is live.
   clickText(reload, "Board");
-  const runEditBtn = reload.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
-  assert.ok(runEditBtn, "Edit task button present on a task card");
+  const runMenu = reload.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
+  assert.ok(runMenu, "CardMenu (ellipsis) present on a task card");
+  runMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...reload.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const runEditBtn = [...reload.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
   runEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
   const taskRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
@@ -243,9 +255,12 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   // Close feature 8's detail modal so the board is fully interactive again.
   const closeBtn = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
   closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  // Pick a different, idle task's Edit button (the running task's is locked).
-  const idleEditBtn = [...reload.querySelectorAll('button[aria-label="Edit task"]')].find((b) => !b.disabled) as HTMLButtonElement;
-  assert.ok(idleEditBtn, "an idle task's Edit button is available");
+  // Pick a different, idle task's CardMenu (the running task's Delete is locked).
+  const idleMenu = [...reload.querySelectorAll('[data-task-id]:not(.kb-running) button[aria-label="Card actions"]')][0] as HTMLButtonElement;
+  assert.ok(idleMenu, "an idle task's CardMenu is available");
+  idleMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...reload.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const idleEditBtn = [...reload.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
   idleEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the idle task's detail modal");
   const idleRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
@@ -278,9 +293,12 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   clickText(reload, "Board");
   assert.ok(await waitFor(() => Boolean([...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"))) ?? false), "inbound conversation card rendered on board");
   const assignedCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"));
-  const assignedEdit = assignedCard?.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement | null;
-  assert.ok(assignedEdit, "edit button on the idle task card");
-  assignedEdit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  const assignedMenu = assignedCard?.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement | null;
+  assert.ok(assignedMenu, "CardMenu on the idle task card");
+  assignedMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].some((b) => b.textContent?.includes("Edit task")));
+  const assignedEdit = [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement | null;
+  assignedEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => Boolean(reload.querySelector('select[aria-label="AI agent"]')) ?? false), "AI agent select present in modal");
   const agentSelect = reload.querySelector('select[aria-label="AI agent"]') as HTMLSelectElement;
   const agentOptions = [...agentSelect.querySelectorAll("option")].filter((o) => o.value);

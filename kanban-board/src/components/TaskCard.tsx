@@ -96,13 +96,14 @@ function formatDue(iso: string): string {
 function CardMenu({
   onEdit,
   onDelete,
-  disabled,
-  disabledReason,
+  deleteDisabled,
+  deleteDisabledReason,
 }: {
   onEdit: () => void;
   onDelete: () => void;
-  disabled?: boolean;
-  disabledReason?: string;
+  /** True when the task is running/queued — Delete is locked, Edit stays available. */
+  deleteDisabled?: boolean;
+  deleteDisabledReason?: string;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -129,16 +130,15 @@ function CardMenu({
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        aria-label={disabledReason ?? "Card actions"}
+        aria-label="Card actions"
         aria-haspopup="menu"
         aria-expanded={open}
-        disabled={disabled}
         onClick={(e) => {
           e.stopPropagation();
           setOpen((v) => !v);
         }}
         onPointerDown={(e) => e.stopPropagation()}
-        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/10 hover:text-slate-200"
       >
         <MoreHorizontal className="h-4 w-4" />
       </button>
@@ -164,13 +164,15 @@ function CardMenu({
           <button
             type="button"
             role="menuitem"
+            disabled={deleteDisabled}
+            title={deleteDisabledReason}
             onClick={(e) => {
               e.stopPropagation();
               close();
               onDelete();
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] font-medium text-rose-400 transition-colors hover:bg-rose-500/10"
+            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] font-medium text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:bg-transparent"
           >
             <Trash2 className="h-3.5 w-3.5" />
             Delete task
@@ -472,8 +474,8 @@ function TaskCardInner({ task, agents = [], isDragging, isOverlay = false, delet
           )}
           {(onEdit || onDelete) && (
             <CardMenu
-              disabled={running}
-              disabledReason={running ? "Task is running — actions locked" : undefined}
+              deleteDisabled={running}
+              deleteDisabledReason={running ? "Task is running — delete locked" : undefined}
               onEdit={() => onEdit?.(task)}
               onDelete={() => onDelete?.(task.id)}
             />

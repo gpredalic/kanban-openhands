@@ -82,11 +82,14 @@ test("detail modal renders Title Case priority badges with a centered dot in the
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Open the detail modal by clicking the Edit button on the first card. The
-  // button is hover-revealed (opacity-0 at rest) but remains in the DOM and
-  // clickable, so a programmatic click opens the modal.
-  const edit = container.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
-  assert.ok(edit, "Edit button exists on the card");
+  // Open the detail modal via the card's ellipsis CardMenu: click the menu
+  // button to open the popover, then click the "Edit task" menu item.
+  const menu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
+  assert.ok(menu, "CardMenu (ellipsis) button exists on the card");
+  menu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const edit = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
+  assert.ok(edit, "Edit task menu item exists in the CardMenu popover");
   edit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 
   // The modal must open and render the priority selector.

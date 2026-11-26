@@ -246,9 +246,14 @@ test("4. assigned profile is shown on the task card and in the task detail", asy
   assert.ok(card, "task card must render");
   assert.ok(card?.textContent?.includes("Forge"), `card must show the assigned profile name "Forge"; got ${JSON.stringify(card?.textContent?.slice(0, 200))}`);
 
-  // Detail: open the card's edit modal and assert the "Assigned agent:" line.
-  const edit = card?.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement | null;
-  assert.ok(edit, "edit button must exist on the card");
+  // Detail: open the card's edit modal via the ellipsis CardMenu and assert
+  // the "Assigned agent:" line.
+  const menu = card?.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement | null;
+  assert.ok(menu, "CardMenu (ellipsis) button must exist on the card");
+  menu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...(card?.querySelectorAll('[role="menuitem"]') ?? [])].some((b) => b.textContent?.includes("Edit task")));
+  const edit = [...(card?.querySelectorAll('[role="menuitem"]') ?? [])].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement | null;
+  assert.ok(edit, "Edit task menu item must exist in the CardMenu popover");
   edit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => container.textContent?.includes("Assigned agent: Forge") ?? false), "detail modal must show 'Assigned agent: Forge'");
 

@@ -133,7 +133,11 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     agentCardVisible: container.textContent?.includes("Forge"),
   };
   const assignedCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task"));
-  const assignedEdit = assignedCard?.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement | null;
+  // The card's ellipsis CardMenu opens a popover with Edit/Delete.
+  const assignedMenu = assignedCard?.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement | null;
+  assignedMenu?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].some((b) => b.textContent?.includes("Edit task")));
+  const assignedEdit = [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement | null;
   assignedEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await waitFor(() => container.textContent?.includes("Assigned agent: Forge") ?? false);
   evidence.assignment = {
@@ -160,7 +164,10 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     callCount: fixture.calls.length,
   };
 
-  const edit = container.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
+  const editMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
+  editMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const edit = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
   edit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false));
   await sleep(20);
@@ -170,7 +177,10 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   await waitFor(() => fixture.getTasks().some((t) => t.title === "Edited audit task"));
   evidence.edit = { visible: container.textContent?.includes("Edited audit task"), persisted: fixture.getTasks().some((t) => t.title === "Edited audit task") };
 
-  const deleteEdit = [...container.querySelectorAll('button[aria-label="Edit task"]')][1] as HTMLButtonElement;
+  const deleteMenu = [...container.querySelectorAll('button[aria-label="Card actions"]')][1] as HTMLButtonElement;
+  deleteMenu?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const deleteEdit = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
   deleteEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false));
   const deleteButton = [...container.querySelectorAll("button")].find((button) => button.textContent?.includes("Delete"));
@@ -211,15 +221,18 @@ test("user acceptance audit exercises the real extension bundle", async () => {
 
   clickText(container, "Board");
   // Wait for React to re-render the board view after the view switch. The
-  // Edit task button is still on the card, so it is a reliable board-rendered
-  // signal.
-  assert.ok(await waitFor(() => container.querySelectorAll('button[aria-label="Edit task"]').length > 0, 2000), "board view renders with task cards after view switch");
+  // CardMenu (ellipsis) button is still on the card, so it is a reliable
+  // board-rendered signal.
+  assert.ok(await waitFor(() => container.querySelectorAll('button[aria-label="Card actions"]').length > 0, 2000), "board view renders with task cards after view switch");
   // Execution is task-centric: the header no longer carries a global Run AI /
   // Stop AI toggle. The Run / Stop / Retry actions live in the task detail
   // modal (moved off the card). Opening a task's detail modal and clicking Run
   // posts a fresh OpenHands conversation for THAT task only, and the button
   // flips to Stop AI once the run is live.
-  const auditEditBtn = container.querySelector('button[aria-label="Edit task"]') as HTMLButtonElement;
+  const auditMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
+  auditMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
+  const auditEditBtn = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
   auditEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   assert.ok(await waitFor(() => Boolean(container.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
   const taskRunBtn = container.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
