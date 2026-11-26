@@ -22,7 +22,7 @@ import { useFlipAnimation } from "../hooks/useFlipAnimation";
 import { useAiState } from "../lib/ai-store";
 import { applyAiOverlay, SEED_AGENTS } from "../lib/ai-overlay";
 import { computeStats } from "../lib/board-state";
-import type { Host, Task, BoardFilter, TaskPriority } from "../types/task";
+import type { Host, Task, TaskPriority } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import { commandExecution, fetchAgentProfiles, useOpenHandsState } from "../lib/openhands";
 import { resolveRouting } from "../lib/ai-engine";
@@ -60,34 +60,6 @@ function ViewFallback() {
 
 interface KanbanBoardProps {
   host: Host;
-}
-
-function matchesFilter(task: Task, filter: BoardFilter, search: string): boolean {
-  // Free-text search: match against title, description, assignee, and tags.
-  const query = search.trim().toLowerCase();
-  if (query) {
-    const haystack = [
-      task.title,
-      task.description ?? "",
-      task.assignee ?? "",
-      ...(task.tags ?? []),
-    ]
-      .join(" ")
-      .toLowerCase();
-    if (!haystack.includes(query)) return false;
-  }
-  switch (filter) {
-    case "all":
-      return true;
-    case "active":
-      return task.status !== "done";
-    case "assigned":
-      return task.assignee !== null && task.assignee !== "";
-    case "completed":
-      return task.status === "done";
-    default:
-      return true;
-  }
 }
 
 export function KanbanBoard({ host }: KanbanBoardProps) {
@@ -191,16 +163,13 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     aiStore.setTasks(enrichedTasks);
   }, [aiStore, enrichedTasks]);
 
-  const filteredColumns = useMemo(() => {
+  const enrichedColumns = useMemo(() => {
     const enrichedById = new Map(enrichedTasks.map((t) => [t.id, t]));
-    const search = state.uiState.search;
     return state.columns.map((col) => ({
       ...col,
-      tasks: col.tasks
-        .filter((t) => matchesFilter(t, state.uiState.filter, search))
-        .map((t) => enrichedById.get(t.id) ?? t),
+      tasks: col.tasks.map((t) => enrichedById.get(t.id) ?? t),
     }));
-  }, [state.columns, state.uiState.filter, state.uiState.search, enrichedTasks]);
+  }, [state.columns, enrichedTasks]);
 
   const handleCreate = (title: string, status: Task["status"], assignee?: string | null, agentId?: string | null, agentPrompt?: string, expectedOutput?: string, successCriteria?: string, priority?: TaskPriority) => {
     void controller.create(title, status, assignee, undefined, agentId, agentPrompt, expectedOutput, successCriteria, priority);
@@ -311,13 +280,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
 
   return (
     <div className="kb-app flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
-      <Header
-        onCreate={() => setShowCreateModal(true)}
-        search={state.uiState.search}
-        onSearch={(query) => controller.setUiState({ search: query })}
-        filter={state.uiState.filter}
-        onFilter={(f) => controller.setUiState({ filter: f })}
-      />
+      <Header onCreate={() => setShowCreateModal(true)} />
 
       <ViewSwitcher view={view} onView={handleViewChange} />
 
@@ -345,7 +308,7 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
 
               <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
                 <div ref={boardRef} className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  {filteredColumns.map((col) => (
+                  {enrichedColumns.map((col) => (
                     <KanbanColumn
                       key={col.status}
                       column={col}
