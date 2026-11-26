@@ -9,7 +9,6 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { Header } from "./Header";
 import { StatsCards } from "./StatsCards";
-import { FilterBar } from "./FilterBar";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskCard } from "./TaskCard";
 import { ViewSwitcher } from "./ViewSwitcher";
@@ -63,7 +62,20 @@ interface KanbanBoardProps {
   host: Host;
 }
 
-function matchesFilter(task: Task, filter: BoardFilter): boolean {
+function matchesFilter(task: Task, filter: BoardFilter, search: string): boolean {
+  // Free-text search: match against title, description, assignee, and tags.
+  const query = search.trim().toLowerCase();
+  if (query) {
+    const haystack = [
+      task.title,
+      task.description ?? "",
+      task.assignee ?? "",
+      ...(task.tags ?? []),
+    ]
+      .join(" ")
+      .toLowerCase();
+    if (!haystack.includes(query)) return false;
+  }
   switch (filter) {
     case "all":
       return true;
@@ -181,13 +193,14 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
 
   const filteredColumns = useMemo(() => {
     const enrichedById = new Map(enrichedTasks.map((t) => [t.id, t]));
+    const search = state.uiState.search;
     return state.columns.map((col) => ({
       ...col,
       tasks: col.tasks
-        .filter((t) => matchesFilter(t, state.uiState.filter))
+        .filter((t) => matchesFilter(t, state.uiState.filter, search))
         .map((t) => enrichedById.get(t.id) ?? t),
     }));
-  }, [state.columns, state.uiState.filter, enrichedTasks]);
+  }, [state.columns, state.uiState.filter, state.uiState.search, enrichedTasks]);
 
   const handleCreate = (title: string, status: Task["status"], assignee?: string | null, agentId?: string | null, agentPrompt?: string, expectedOutput?: string, successCriteria?: string, priority?: TaskPriority) => {
     void controller.create(title, status, assignee, undefined, agentId, agentPrompt, expectedOutput, successCriteria, priority);
@@ -298,7 +311,13 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
 
   return (
     <div className="kb-app flex flex-col gap-6 p-4 sm:p-6 lg:p-8">
-      <Header onCreate={() => setShowCreateModal(true)} syncing={state.uiState.syncing} />
+      <Header
+        onCreate={() => setShowCreateModal(true)}
+        search={state.uiState.search}
+        onSearch={(query) => controller.setUiState({ search: query })}
+        filter={state.uiState.filter}
+        onFilter={(f) => controller.setUiState({ filter: f })}
+      />
 
       <ViewSwitcher view={view} onView={handleViewChange} />
 
@@ -323,11 +342,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
           ) : (
             <>
               <StatsCards stats={stats} />
-
-              <FilterBar
-                filter={state.uiState.filter}
-                onFilter={(f) => controller.setUiState({ filter: f })}
-              />
 
               <DndContext sensors={sensors} onDragStart={onDragStart} onDragEnd={onDragEnd}>
                 <div ref={boardRef} className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">

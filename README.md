@@ -20,6 +20,10 @@ holds credentials.
 - **Task CRUD** — create, edit, delete, and move tasks. Every mutation persists
   to `board.json` on the agent server.
 - **Search & filter** — real client-side filtering of the loaded task list.
+  The board header is focused on the work: a search field, a single Filter
+  control (a dropdown of All / Active / Assigned / Completed), and the Create
+  Task button. The operational chrome (sync indicator, profile avatar) was
+  removed from the header; the four filter pills collapsed into the dropdown.
 - **Status & priority badges** — every status (`pending`, `queued`, `running`,
   `completed`, `failed`, `cancelled`) and priority (`low`, `medium`, `high`,
   `critical`) renders as a colored dot + Title Case label, vertically centered

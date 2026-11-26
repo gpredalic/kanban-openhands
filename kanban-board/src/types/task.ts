@@ -98,6 +98,8 @@ export type DeletePhase = "deleting" | "removing_conversation" | "syncing" | "fa
 /** Ephemeral UI state — lives only in the browser, never persisted. */
 export interface BoardUiState {
   filter: BoardFilter;
+  /** Free-text search query. Empty string means "no search". */
+  search: string;
   lastLoadedAt: number;
   /** True while a board load/sync round-trip is in flight. */
   syncing: boolean;

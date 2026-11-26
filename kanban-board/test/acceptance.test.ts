@@ -164,9 +164,9 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => reload.textContent?.includes("Acceptance created task") ?? false), "created task survives reload");
   assert.ok(fixture.getTasks().find((t) => t.title === "Acceptance created task")?.status === "in_progress", "moved status survives reload");
 
-  // 6. SEARCH — board search was removed; the header no longer carries a search
-  // box and the board no longer filters by free-text query.
-  assert.ok(reload.querySelector('input[aria-label="Search tasks"]') === null, "board search input is gone");
+  // 6. SEARCH — the board header carries a search field again. The user
+  // re-added search as a focused control alongside the single Filter control.
+  assert.ok(reload.querySelector('input[aria-label="Search tasks"]') !== null, "board search input is present");
 
   // 7. NOTIFICATIONS — the notification icon and its panel were removed from
   // the header; no notification button or surface may remain.
