@@ -6,6 +6,7 @@
  */
 
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import { Header } from "./Header";
 import { StatsCards } from "./StatsCards";
@@ -331,28 +332,32 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                   ))}
                   </div>
                 </div>
-                {/* DragOverlay: renders the dragged card as a floating clone that
-                    follows the pointer. It is portaled outside the column's
-                    overflow container, so the card is never clipped and always
-                    stays above all UI (z-index 9999). The original card in the
-                    column becomes an invisible placeholder (opacity 0), so
-                    there is no ghost duplicate. */}
-                <DragOverlay dropAnimation={null}>
-                  {activeTaskId ? (
-                    (() => {
-                      const activeTask = enrichedTasks.find((t) => t.id === activeTaskId);
-                      if (!activeTask) return null;
-                      return (
-                        <TaskCard
-                          task={activeTask}
-                          agents={assignmentAgents}
-                          isDragging
-                          isOverlay
-                        />
-                      );
-                    })()
-                  ) : null}
-                </DragOverlay>
+                {/* DragOverlay: rendered via a portal to document.body so the
+                    dragged card escapes the board's stacking context (the
+                    `relative z-10` wrapper) and is never clipped by column
+                    overflow. z-index 9999 is now relative to the root stacking
+                    context, so the card always stays above all UI. The original
+                    card in the column becomes an invisible placeholder
+                    (opacity 0), so there is no ghost duplicate. */}
+                {createPortal(
+                  <DragOverlay dropAnimation={null}>
+                    {activeTaskId ? (
+                      (() => {
+                        const activeTask = enrichedTasks.find((t) => t.id === activeTaskId);
+                        if (!activeTask) return null;
+                        return (
+                          <TaskCard
+                            task={activeTask}
+                            agents={assignmentAgents}
+                            isDragging
+                            isOverlay
+                          />
+                        );
+                      })()
+                    ) : null}
+                  </DragOverlay>,
+                  document.body,
+                )}
               </DndContext>
             </>
           )}
