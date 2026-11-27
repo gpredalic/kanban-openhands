@@ -44,7 +44,7 @@ export function Header({ onCreate }: HeaderProps) {
             </p>
             <h1
               ref={titleRef}
-              className="kb-reveal mt-2 text-[2.5rem] font-bold leading-[1.05] tracking-[-0.025em] text-slate-50"
+              className="kb-reveal kb-type-display mt-2 text-slate-50"
             >
               Kanban Board
             </h1>

@@ -179,7 +179,7 @@ function TimelineNode({ run, profiles, active }: { run: OpenHandsExecution; prof
           strokeWidth={1.75}
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-lg font-bold text-white">{run.title}</p>
+          <p className="kb-type-card truncate text-white">{run.title}</p>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
             {statusBadge(run.status) && (
               <Badge style={statusBadge(run.status)!} pulse={active} />

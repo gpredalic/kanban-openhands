@@ -1055,7 +1055,7 @@ function AgentProfileCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
-            <p className="truncate text-sm font-semibold text-white">{profile.name}</p>
+            <p className="truncate text-sm font-bold text-white">{profile.name}</p>
             {profile.active && (
               <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 ring-1 ring-emerald-400/25">
                 active
