@@ -52,7 +52,17 @@ export function SkeletonColumn() {
   );
 }
 
-/** A skeleton row — mimics the shape of a run/execution row. */
+/** A skeleton stat card — mimics the shape of a StatsCards item. */
+export function SkeletonStat() {
+  return (
+    <div className="kb-glass rounded-2xl p-4">
+      <SkeletonBar className="mb-2 h-3 w-16" />
+      <SkeletonBar className="h-6 w-12" />
+    </div>
+  );
+}
+
+/** A skeleton row — mimics a list/timeline row (History, Analytics). */
 export function SkeletonRow() {
   return (
     <div className="kb-glass flex items-center gap-3 rounded-2xl px-4 py-3">
@@ -65,16 +75,6 @@ export function SkeletonRow() {
         <SkeletonBar className="mb-1 h-3 w-24" />
         <SkeletonBar className="h-3 w-16" />
       </div>
-    </div>
-  );
-}
-
-/** A skeleton stat card — mimics the shape of a StatsCards item. */
-export function SkeletonStat() {
-  return (
-    <div className="kb-glass rounded-2xl p-4">
-      <SkeletonBar className="mb-2 h-3 w-16" />
-      <SkeletonBar className="h-6 w-12" />
     </div>
   );
 }

@@ -435,6 +435,15 @@ export function TaskDetailModal({
                     <p className="whitespace-pre-wrap kb-type-body leading-relaxed text-rose-200/80">{exec.error}</p>
                   </div>
                 )}
+                {/* Once the task is no longer running, "what the agent is doing"
+                    has little value — fold it into the summary as a quiet line
+                    rather than a prominent section. Stays in the DOM for the
+                    test contract. */}
+                {!exec.isRunning && (
+                  <p className="mt-4 kb-type-meta text-slate-600">
+                    What the Agent Is Doing: {exec.latestMessage !== "—" ? exec.latestMessage : "idle"}
+                  </p>
+                )}
               </div>
             </section>
           )}
@@ -454,47 +463,84 @@ export function TaskDetailModal({
             </section>
           )}
 
+          {/* Live activity is only prominent while the task is running. Once it
+              finishes, the quiet one-liner lives inside Agent Summary above, so
+              the primary content (Final Result / Summary / Original Prompt) is
+              not interrupted by a low-value section. */}
+          {exec.execution && exec.isRunning && (
+            <section className="mb-10">
+              <h4 className="mb-4 flex items-center gap-2.5 kb-type-section text-white">
+                <Bot className="h-5 w-5 text-blue-400" strokeWidth={1.75} />
+                What the Agent Is Doing
+              </h4>
+              <div className="rounded-2xl bg-white/[0.03] p-7 ring-1 ring-white/5">
+                <p className="kb-type-card leading-snug tracking-tight text-white">
+                  {exec.currentStep}
+                </p>
+                <div className="mt-5 flex items-center gap-3">
+                  <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+                    <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
+                  </div>
+                  <span className="kb-type-meta text-slate-500">Agent is working…</span>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* ════════════════════════════════════════════════════════════
-              WHAT THE AGENT IS DOING — live while running, a quiet
-              one-liner once done. De-emphasized for completed tasks.
+              EXECUTION TIMELINE — a visible, standalone section. The
+              step-by-step record of the run. Secondary content: it sits
+              after the primary outcome sections but before the collapsed
+              configuration and debug metadata.
               ════════════════════════════════════════════════════════════ */}
           {exec.execution && (
             <section className="mb-10">
-              {exec.isRunning ? (
-                <>
-                  <h4 className="mb-4 flex items-center gap-2.5 kb-type-section text-white">
-                    <Bot className="h-5 w-5 text-blue-400" strokeWidth={1.75} />
-                    What the Agent Is Doing
-                  </h4>
-                  <div className="rounded-2xl bg-white/[0.03] p-7 ring-1 ring-white/5">
-                    <p className="kb-type-card leading-snug tracking-tight text-white">
-                      {exec.currentStep}
-                    </p>
-                    <div className="mt-5 flex items-center gap-3">
-                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
-                        <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
-                      </div>
-                      <span className="kb-type-meta text-slate-500">Agent is working…</span>
-                    </div>
-                  </div>
-                </>
+              <h4 className="mb-4 flex items-center gap-2.5 kb-type-section text-white">
+                <History className="h-5 w-5 text-slate-400" strokeWidth={1.75} />
+                Execution Timeline
+              </h4>
+              {exec.events.length === 0 && !exec.execution ? (
+                <p className="kb-type-body text-slate-500">No activity recorded yet.</p>
               ) : (
-                <div className="flex items-center gap-3 rounded-xl bg-white/[0.02] px-5 py-3 ring-1 ring-white/5">
-                  <Bot className="h-4 w-4 shrink-0 text-slate-500" strokeWidth={1.75} />
-                  <span className="kb-type-meta text-slate-500">
-                    What the Agent Is Doing: {exec.latestMessage !== "—" ? exec.latestMessage : "idle"}
-                  </span>
-                  <span className="ml-auto kb-type-meta text-slate-600">
-                    Progress {exec.progress}%
-                  </span>
+                <div className="kb-scroll relative flex max-h-80 flex-col gap-0 overflow-y-auto pl-5">
+                  {/* Timeline line */}
+                  <div className="absolute left-[5px] top-1 bottom-1 w-px bg-white/10" />
+                  {exec.execution && (
+                    <div className="relative flex items-start gap-3 py-2.5">
+                      <span className="absolute -left-5 mt-1 h-2.5 w-2.5 rounded-full bg-blue-400 ring-4 ring-blue-400/20" />
+                      <div className="min-w-0">
+                        <p className="kb-type-body font-semibold text-white">Execution started</p>
+                        {exec.execution.startedAt && (
+                          <p className="mt-1 kb-type-meta text-slate-500">
+                            {new Date(exec.execution.startedAt).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {exec.events.map((event) => (
+                    <div key={event.id} className="relative flex items-start gap-3 py-2.5">
+                      <span className="absolute -left-5 mt-1 h-2 w-2 rounded-full bg-slate-600" />
+                      <div className="min-w-0">
+                        <p className="kb-type-body text-slate-300">{event.title}</p>
+                        {event.detail && (
+                          <p className="mt-1 kb-type-meta text-slate-500">{event.detail}</p>
+                        )}
+                        <p className="mt-1 kb-type-meta text-slate-600">
+                          {new Date(event.at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </section>
           )}
 
           {/* ════════════════════════════════════════════════════════════
-              ADVANCED DETAILS — collapsed by default. Execution timeline
-              + debug metadata. Content stays in the DOM via `hidden`.
+              ADVANCED DETAILS — collapsed by default. Debug metadata only
+              (the execution timeline now lives in its own visible section
+              above). Content stays in the DOM via `hidden`.
               ════════════════════════════════════════════════════════════ */}
           <div className="mb-8 rounded-xl bg-white/[0.02] ring-1 ring-white/5">
             <button
@@ -567,48 +613,6 @@ export function TaskDetailModal({
                   </div>
                 </div>
               )}
-
-              {/* History — a timeline, not a list of rows. */}
-              <div>
-                <h5 className="mb-3 flex items-center gap-1.5 kb-type-meta text-slate-500">
-                  <History className="h-3 w-3" /> History
-                </h5>
-                {exec.events.length === 0 && !exec.execution ? (
-                  <p className="kb-type-meta text-slate-600">No activity recorded yet.</p>
-                ) : (
-                  <div className="kb-scroll relative flex max-h-64 flex-col gap-0 overflow-y-auto pl-5">
-                    {/* Timeline line */}
-                    <div className="absolute left-[5px] top-1 bottom-1 w-px bg-white/10" />
-                    {exec.execution && (
-                      <div className="relative flex items-start gap-3 py-2.5">
-                        <span className="absolute -left-5 mt-1 h-2.5 w-2.5 rounded-full bg-blue-400 ring-4 ring-blue-400/20" />
-                        <div className="min-w-0">
-                          <p className="kb-type-body font-semibold text-white">Execution started</p>
-                          {exec.execution.startedAt && (
-                            <p className="mt-1 kb-type-meta text-slate-500">
-                              {new Date(exec.execution.startedAt).toLocaleString()}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {exec.events.map((event) => (
-                      <div key={event.id} className="relative flex items-start gap-3 py-2.5">
-                        <span className="absolute -left-5 mt-1 h-2 w-2 rounded-full bg-slate-600" />
-                        <div className="min-w-0">
-                          <p className="kb-type-body text-slate-300">{event.title}</p>
-                          {event.detail && (
-                            <p className="mt-1 kb-type-meta text-slate-500">{event.detail}</p>
-                          )}
-                          <p className="mt-1 kb-type-meta text-slate-600">
-                            {new Date(event.at).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 

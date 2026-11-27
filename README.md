@@ -35,7 +35,7 @@ holds credentials.
   conversations appear on the board; board actions create/update conversations.
 - **AI orchestration** — Run AI, multi-agent relay, agent assignment, and
   routing rules (see the audit notes for what is fully wired vs. partial).
-- **Views** — Board, Command Center, Workflow, Agents, History, Analytics.
+- **Views** — Board, Workflow, Activity, Agents, History, Analytics.
 - **Column-move animation** — when a task's status changes and the card moves
   between columns, the card lifts (scale 1.02 + accent glow), glides across the
   board, and settles into its destination column (scale back to 1, shadow
@@ -179,7 +179,7 @@ but six are **partially working** and keep it short of the enterprise bar:
 | Create / Edit / Delete / Move Task | WORKS |
 | Persistence after refresh | WORKS |
 | Search | WORKS |
-| Command Center, Workflow, Agents views | WORKS |
+| Activity, Workflow, Agents views | WORKS |
 | OpenHands → Board and Board → OpenHands sync | WORKS |
 | Multi-agent relay | WORKS |
 | **Notifications** | PARTIALLY — local in-memory panel only; no durable feed, read state, or deep links |
