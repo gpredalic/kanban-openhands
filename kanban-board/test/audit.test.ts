@@ -134,16 +134,21 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   };
   const assignedCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task"));
   // The card is a pure editorial surface — clicking it opens the Task Detail
-  // Inspector, which carries the "Assigned agent:" line. No CardMenu ellipsis
-  // exists on the card anymore.
+  // Inspector, which is now a minimal surface (only the "Edit Task" eyebrow and
+  // the close button). No "Assigned agent:" line, no AI agent select, no Save
+  // button. No CardMenu ellipsis exists on the card anymore.
   assignedCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   assignedCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
-  await waitFor(() => container.textContent?.includes("Assigned agent: Forge") ?? false);
+  await waitFor(() => container.textContent?.includes("Edit Task") ?? false);
   evidence.assignment = {
     cardAgentVisible: Boolean(assignedCard?.textContent?.includes("Forge")),
     detailAgentVisible: container.textContent?.includes("Assigned agent: Forge"),
+    inspectorMinimal: !container.textContent?.includes("Assigned agent:") && !container.querySelector('select[aria-label="AI agent"]'),
   };
-  clickText(container, "Save");
+  // Close the inspector.
+  const closeBtn = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => !container.textContent?.includes("Edit Task") ?? false);
 
   // Task creation has a single entry point: the header's "Create Task" button.
   // The column-local "Add Task" cards are gone — no column may offer its own
@@ -164,31 +169,44 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   };
 
   // The card is a pure editorial surface — clicking it opens the Task Detail
-  // Inspector (Edit Task modal), which carries Edit and Delete. No CardMenu
-  // ellipsis exists on the card anymore.
+  // Inspector (Edit Task modal), which is now a minimal surface (only the
+  // "Edit Task" eyebrow and the close button). No Edit form, no Delete button,
+  // no Confirm Delete. No CardMenu ellipsis exists on the card anymore.
   const editCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task"));
   editCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   editCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false));
   await sleep(20);
-  const editTitle = container.querySelector('input[type="text"]') as HTMLInputElement;
-  changeInput(editTitle, "Edited audit task");
-  clickText(container, "Save");
-  await waitFor(() => fixture.getTasks().some((t) => t.title === "Edited audit task"));
-  evidence.edit = { visible: container.textContent?.includes("Edited audit task"), persisted: fixture.getTasks().some((t) => t.title === "Edited audit task") };
+  const inspectorButtons = [...container.querySelectorAll("button")].map((b) => b.textContent?.trim());
+  evidence.edit = {
+    inspectorOpens: container.textContent?.includes("Edit Task"),
+    noSaveButton: !inspectorButtons.includes("Save"),
+    noDeleteButton: !inspectorButtons.includes("Delete"),
+    noConfirmDelete: !inspectorButtons.includes("Confirm Delete"),
+    noTitleInput: container.querySelector('input[type="text"]') === null,
+  };
+  // Close the inspector.
+  const closeBtnEdit = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtnEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => !container.textContent?.includes("Edit Task") ?? false);
 
-  // Re-open the detail inspector by clicking the card again, then delete.
-  const deleteCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Edited audit task"));
+  // Re-open the detail inspector by clicking the card again. The inspector is
+  // minimal — no Delete button, no Confirm Delete.
+  const deleteCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task"));
   deleteCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   deleteCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false));
   const deleteButton = [...container.querySelectorAll("button")].find((button) => button.textContent?.includes("Delete"));
-  assert.ok(deleteButton, "delete action exists");
-  deleteButton.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => container.textContent?.includes("Confirm Delete") ?? false));
-  clickText(container, "Confirm Delete");
-  await sleep(50);
-  evidence.delete = { persistedCount: fixture.getTasks().length, remainingTitles: fixture.getTasks().map((task) => task.title) };
+  evidence.delete = {
+    deleteButtonPresent: Boolean(deleteButton),
+    confirmDeletePresent: container.textContent?.includes("Confirm Delete"),
+    persistedCount: fixture.getTasks().length,
+    remainingTitles: fixture.getTasks().map((task) => task.title),
+  };
+  // Close the inspector.
+  const closeBtnDelete = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtnDelete?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => !container.textContent?.includes("Edit Task") ?? false);
 
   const dragCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task")) as HTMLElement;
   const inProgressColumn = [...container.querySelectorAll("h3")].find((heading) => heading.textContent === "In Progress")?.parentElement?.parentElement as HTMLElement;
@@ -223,25 +241,26 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   // task card (.kb-card) is a reliable board-rendered signal.
   assert.ok(await waitFor(() => container.querySelectorAll(".kb-card").length > 0, 2000), "board view renders with task cards after view switch");
   // Execution is task-centric: the header no longer carries a global Run AI /
-  // Stop AI toggle. The Run / Stop / Retry actions live in the task detail
-  // modal (moved off the card). Opening a task's detail modal and clicking Run
-  // posts a fresh OpenHands conversation for THAT task only, and the button
-  // flips to Stop AI once the run is live. The card is a pure editorial
+  // Stop AI toggle, and the task detail inspector no longer carries Run / Stop
+  // / Retry actions either. The inspector is a minimal surface: only the
+  // "Edit Task" eyebrow and the close button. The card is a pure editorial
   // surface — clicking it opens the Task Detail Inspector. No CardMenu
   // ellipsis exists on the card anymore.
   const auditCard = container.querySelector(".kb-card") as HTMLElement | null;
   auditCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   auditCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
-  assert.ok(await waitFor(() => Boolean(container.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
-  const taskRunBtn = container.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
-  taskRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await sleep(100);
+  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false, 2000), "Task Detail Inspector opens on card click");
   evidence.runAi = {
-    perTaskRunButtonPresent: Boolean(taskRunBtn),
+    inspectorOpens: container.textContent?.includes("Edit Task"),
+    perTaskRunButtonPresent: Boolean(container.querySelector('button[aria-label="Run this task"]')),
     stopButtonAppears: Boolean(container.querySelector('button[aria-label="Stop this task"]')),
     commandPosts: fixture.calls.filter((call) => call.method === "POST" && call.path === "/api/conversations").length,
     visibleExecution: container.textContent?.includes("execution"),
   };
+  // Close the inspector.
+  const closeBtnRun = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtnRun?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  await waitFor(() => !container.textContent?.includes("Edit Task") ?? false);
   clickText(container, "Analytics");
   await sleep(50);
   const resetMetricsBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Clear Analytics"));

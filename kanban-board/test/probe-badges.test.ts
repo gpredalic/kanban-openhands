@@ -75,44 +75,39 @@ async function waitFor(predicate: () => boolean, timeoutMs = 2000): Promise<bool
   return predicate();
 }
 
-test("detail modal renders Title Case priority badges with a centered dot in the real DOM", async () => {
+test("inspector is minimal — no Priority section or priority badges", async () => {
   const { host, trigger } = makeHost();
   const cleanup = activate(host);
   const container = trigger();
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Open the detail modal by clicking the card body. The card is a pure
+  // Open the detail inspector by clicking the card body. The card is a pure
   // editorial surface — the CardMenu ellipsis is gone. A genuine click
   // (pointerdown + pointerup with no movement) opens the Task Detail
-  // Inspector, which carries Edit and Delete. This mirrors the proven
-  // click-card flow in probe-delete-flow.test.ts.
+  // Inspector, which is now a minimal surface (only the "Edit Task" eyebrow
+  // and the close button). No Priority section, no priority badges.
   const card = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((c) => c.textContent?.includes("Running task")) as HTMLElement;
   assert.ok(card, "task card exists on the board");
   card.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   card.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
 
-  // The modal must open and render the priority selector.
-  const opened = await waitFor(() => container.innerHTML.includes("Priority"));
-  assert.ok(opened, "detail modal opens and shows the Priority section");
+  // The inspector must open and show the "Edit Task" eyebrow.
+  const opened = await waitFor(() => container.innerHTML.includes("Edit Task"));
+  assert.ok(opened, "detail inspector opens and shows the Edit Task eyebrow");
 
   const html = container.innerHTML;
 
-  // Title Case priority labels — the exact strings the user sees.
-  assert.match(html, />Low</, "priority badge must show Title Case 'Low'");
-  assert.match(html, />Medium</, "priority badge must show Title Case 'Medium'");
-  assert.match(html, />High</, "priority badge must show Title Case 'High'");
-  assert.match(html, />Critical</, "priority badge must show Title Case 'Critical'");
+  // The minimal inspector must NOT show a Priority section or priority badges.
+  assert.ok(!html.includes("Priority"), "minimal inspector must NOT show the Priority section");
+  assert.doesNotMatch(html, />Low</, "no Title Case 'Low' priority badge");
+  assert.doesNotMatch(html, />Medium</, "no Title Case 'Medium' priority badge");
+  assert.doesNotMatch(html, />High</, "no Title Case 'High' priority badge");
+  assert.doesNotMatch(html, />Critical</, "no Title Case 'Critical' priority badge");
 
-  // The colored dot span must be present (one per priority level).
+  // No priority dot spans.
   const dots = container.querySelectorAll("span.h-2.w-2.shrink-0.rounded-full");
-  assert.ok(dots.length >= 4, `expected >=4 priority dots, found ${dots.length}`);
-
-  // No lowercase priority label may leak into a badge.
-  assert.doesNotMatch(html, />low</, "no lowercase 'low' label");
-  assert.doesNotMatch(html, />medium</, "no lowercase 'medium' label");
-  assert.doesNotMatch(html, />high</, "no lowercase 'high' label");
-  assert.doesNotMatch(html, />critical</, "no lowercase 'critical' label");
+  assert.ok(dots.length === 0, `expected 0 priority dots in the minimal inspector, found ${dots.length}`);
 
   cleanup();
   container.remove();

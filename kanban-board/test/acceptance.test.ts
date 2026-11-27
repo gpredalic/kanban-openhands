@@ -127,36 +127,37 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => container.textContent?.includes("Acceptance created task") ?? false), "created task visible on board");
   assert.ok(fixture.getTasks().some((t) => t.title === "Acceptance created task"), "created task persisted to file");
 
-  // 2. EDIT TASK — clicking the card opens the Task Detail Inspector directly.
+  // 2. INSPECTOR — clicking the card opens the Task Detail Inspector directly.
   // The card is a pure editorial surface at rest: no ellipsis, no menu.
-  // Edit a pre-existing task (not the one we just created) so the created task
-  // stays available for the drag + persistence steps below.
-  const editCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Design the onboarding flow")) as HTMLElement;
-  assert.ok(editCard, "task card found on board");
-  editCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
-  editCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+  // The inspector is now a minimal surface: only the "Edit Task" eyebrow and
+  // the close button. No Save, Delete, Run, Stop, AI agent select, Priority,
+  // Task Goal, Agent Prompt, Expected Output, Success Criteria, or Assigned
+  // agent controls remain.
+  const inspectCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Design the onboarding flow")) as HTMLElement;
+  assert.ok(inspectCard, "task card found on board");
+  inspectCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  inspectCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens on card click");
-  const editTitle = container.querySelector('input[type="text"]') as HTMLInputElement;
-  changeInput(editTitle, "Acceptance edited task");
-  clickText(container, "Save");
-  assert.ok(await waitFor(() => fixture.getTasks().some((t) => t.title === "Acceptance edited task") ?? false), "edited title persisted");
-  assert.ok(container.textContent?.includes("Acceptance edited task"), "edited title visible on board");
-
-  // 3. DELETE TASK — open the Inspector again, click Delete, then Confirm Delete.
-  const deleteCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Acceptance edited task")) as HTMLElement;
-  assert.ok(deleteCard, "edited task card found on board");
-  deleteCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
-  deleteCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
-  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens for delete");
-  clickText(container, "Delete");
-  // React 18 batches the setConfirmDelete(true) update; the "Confirm Delete"
-  // button only appears after React flushes the re-render. A real user sees the
-  // button appear before clicking it, so wait for it rather than clicking
-  // synchronously (which would query the DOM before the flush).
-  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete"))), "Confirm Delete button appears after Delete");
-  clickText(container, "Confirm Delete");
-  // after delete, the edited task should be gone from the persisted file
-  assert.ok(await waitFor(() => !fixture.getTasks().some((t) => t.title === "Acceptance edited task") ?? false), "deleted task removed from persisted file");
+  // The inspector is minimal: no Save, Delete, Run, Stop, or Retry buttons.
+  const inspectorButtons = [...container.querySelectorAll("button")].map((b) => b.textContent?.trim());
+  assert.ok(!inspectorButtons.includes("Save"), "no Save button in the minimal inspector");
+  assert.ok(!inspectorButtons.includes("Delete"), "no Delete button in the minimal inspector");
+  assert.ok(!inspectorButtons.includes("Confirm Delete"), "no Confirm Delete button in the minimal inspector");
+  assert.ok(!container.querySelector('button[aria-label="Run this task"]'), "no Run button in the minimal inspector");
+  assert.ok(!container.querySelector('button[aria-label="Stop this task"]'), "no Stop button in the minimal inspector");
+  // No AI agent select, Priority, Task Goal, Agent Prompt, Expected Output,
+  // Success Criteria, or Assigned agent controls.
+  assert.ok(!container.querySelector('select[aria-label="AI agent"]'), "no AI agent select in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Task Goal"), "no Task Goal section in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Agent Prompt"), "no Agent Prompt section in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Expected Output"), "no Expected Output section in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Success Criteria"), "no Success Criteria section in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Assigned agent:"), "no Assigned agent line in the minimal inspector");
+  // Close the inspector.
+  const closeBtn = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  assert.ok(closeBtn, "close button present in the minimal inspector");
+  closeBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => !container.textContent?.includes("Edit Task") ?? false), "inspector closes on close button click");
 
   // 4. MOVE TASK between columns (drag)
   const dragCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Acceptance created task")) as HTMLElement;
@@ -187,25 +188,23 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(reload.querySelector('button[aria-label="Notifications"]') === null, "notification button is gone");
   assert.ok(reload.querySelector('[aria-label="Notification surface"]') === null, "notification surface is gone");
 
-  // 8. RUN AI — execution is now task-centric: the header no longer carries a
-  // global Run AI / Stop AI toggle. The Run / Stop / Retry actions live in the
-  // task detail modal (moved off the card). Opening a task's detail modal and
-  // clicking Run posts a fresh OpenHands conversation for THAT task only, and
-  // the button flips to Stop once the run is live.
+  // 8. INSPECTOR IS MINIMAL — the header no longer carries a global Run AI /
+  // Stop AI toggle, and the task detail inspector no longer carries Run / Stop
+  // / Retry actions either. The inspector is a minimal surface: only the
+  // "Edit Task" eyebrow and the close button. Opening a task's inspector must
+  // NOT expose a Run or Stop button.
   clickText(reload, "Board");
-  // The card is a pure editorial surface at rest — no ellipsis, no menu.
-  // Clicking the card opens the Task Detail Inspector directly, which carries
-  // the Run / Stop / Retry actions.
   const runCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")][0] as HTMLElement;
   assert.ok(runCard, "a task card is present on the board");
   runCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   runCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => reload.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens on card click");
-  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
-  const taskRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
-  taskRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Stop this task"]')) ?? false), "Run AI flips the task to Stop AI once running");
-  assert.ok(fixture.calls.some((c) => c.method === "POST" && c.path === "/api/conversations"), "Run AI posts a conversation to OpenHands");
+  assert.ok(!reload.querySelector('button[aria-label="Run this task"]'), "no Run button in the minimal inspector");
+  assert.ok(!reload.querySelector('button[aria-label="Stop this task"]'), "no Stop button in the minimal inspector");
+  // Close the inspector.
+  const closeBtn8 = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn8?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => !reload.textContent?.includes("Edit Task") ?? false), "inspector closes");
 
   // 9. WORKFLOW BUILDER — the Workflow view is a pure node-graph builder.
   // The relay is a first-class workflow node type in the palette.
@@ -231,34 +230,22 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   // Poll interval is now 2s; the inbound conversation must appear well under the old 10s.
   assert.ok(await waitFor(() => reload.textContent?.includes("OpenHands inbound conversation") ?? false, 4000), "inbound OpenHands conversation reflected on board (fast poll)");
 
-  // 14. Board -> OpenHands sync (board task creates conversation) — task-centric.
-  // There is no global orchestration toggle anymore. The Run / Stop / Retry
-  // actions live in the task detail modal. Feature 8 already started one task
-  // (its card is now locked / kb-running). Starting a SECOND task must post its
-  // own conversation without being blocked by the first task's live run — proving
-  // execution is task-scoped, not global.
+  // 14. INSPECTOR IS MINIMAL FOR AN IDLE TASK — the task detail inspector no
+  // longer carries Run / Stop / Retry actions. Opening an idle task's inspector
+  // must NOT expose a Run button. The card is a pure editorial surface —
+  // clicking it opens the Inspector.
   clickText(reload, "Board");
-  // Feature 8's task is still running — its card carries the kb-running class.
-  assert.ok(await waitFor(() => reload.querySelector('[data-task-id].kb-running') !== null, 2000), "feature 8's task is still running (kb-running card present)");
-  // Close feature 8's detail modal so the board is fully interactive again.
-  const closeBtn = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
-  closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  // Pick a different, idle task's card (the running task's Delete is locked).
-  // The card is a pure editorial surface — clicking it opens the Inspector.
-  const idleCard = [...reload.querySelectorAll<HTMLElement>('[data-task-id]:not(.kb-running)')][0] as HTMLElement;
+  const idleCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")][0] as HTMLElement;
   assert.ok(idleCard, "an idle task card is available");
   idleCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   idleCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => reload.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens for the idle task");
-  assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the idle task's detail modal");
-  const idleRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
-  const isExecCall = (c: { method: string; path: string }) =>
-    c.method === "POST" && (c.path === "/api/conversations" || /\/api\/conversations\/[^/]+\/run$/.test(c.path));
-  const beforeRuns = fixture.calls.filter(isExecCall).length;
-  idleRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true })); // start a second task
-  await sleep(150);
-  const afterRuns = fixture.calls.filter(isExecCall).length;
-  assert.ok(afterRuns > beforeRuns, "second task's Run AI posts its own execution (task-centric, not blocked by the first)");
+  assert.ok(!reload.querySelector('button[aria-label="Run this task"]'), "no Run button in the idle task's minimal inspector");
+  assert.ok(!reload.querySelector('button[aria-label="Stop this task"]'), "no Stop button in the idle task's minimal inspector");
+  // Close the inspector.
+  const closeBtn14 = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn14?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => !reload.textContent?.includes("Edit Task") ?? false), "inspector closes");
 
   // 16. MULTI-AGENT RELAY — the relay is now a first-class workflow node type
   // (not a separate panel with a seed textarea). The orchestration panel
@@ -272,12 +259,10 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   await sleep(50);
   assert.ok(reload.textContent?.includes("Relay") ?? false, "relay node added to the canvas");
 
-  // 17. AGENT ASSIGNMENT — open the modal via card click, pick an agent from
-  // the select, confirm it shows. The card is a pure editorial surface: no
-  // ellipsis, no menu. Clicking the card body opens the Task Detail Inspector
-  // directly, which carries the AI agent select.
-  // Use an IDLE card (the inbound conversation card) — the created task is
-  // still running from the Run AI steps above.
+  // 17. INSPECTOR IS MINIMAL — the task detail inspector no longer carries an
+  // AI agent select, an "Assigned agent:" line, or a Save button. The card is a
+  // pure editorial surface: no ellipsis, no menu. Clicking the card body opens
+  // the Task Detail Inspector directly, which is now a minimal surface.
   clickText(reload, "Board");
   assert.ok(await waitFor(() => Boolean([...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"))) ?? false), "inbound conversation card rendered on board");
   const assignedCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation")) as HTMLElement;
@@ -285,17 +270,19 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assignedCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   assignedCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => reload.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens on card click");
-  assert.ok(await waitFor(() => Boolean(reload.querySelector('select[aria-label="AI agent"]')) ?? false), "AI agent select present in modal");
-  const agentSelect = reload.querySelector('select[aria-label="AI agent"]') as HTMLSelectElement;
-  const agentOptions = [...agentSelect.querySelectorAll("option")].filter((o) => o.value);
-  assert.ok(agentOptions.length > 0, "at least one assignable agent option");
-  agentSelect.value = agentOptions[0].value;
-  agentSelect.dispatchEvent(new window.Event("change", { bubbles: true }));
-  assert.ok(await waitFor(() => reload.textContent?.includes("Assigned agent:") ?? false), "agent assignment confirmation visible in detail modal");
-  clickText(reload, "Save");
+  assert.ok(!reload.querySelector('select[aria-label="AI agent"]'), "no AI agent select in the minimal inspector");
+  assert.ok(!reload.textContent?.includes("Assigned agent:"), "no Assigned agent line in the minimal inspector");
+  const inspectorButtons17 = [...reload.querySelectorAll("button")].map((b) => b.textContent?.trim());
+  assert.ok(!inspectorButtons17.includes("Save"), "no Save button in the minimal inspector");
+  // Close the inspector.
+  const closeBtn17 = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn17?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => !reload.textContent?.includes("Edit Task") ?? false), "inspector closes");
 
-  // 18. AI ROUTING (Run AI routes to a conversation)
-  assert.ok(fixture.calls.some((c) => c.method === "POST" && c.path === "/api/conversations"), "AI routing posts to OpenHands conversations");
+  // 18. INBOUND SYNC — the inbound OpenHands conversation (feature 11) was
+  // posted to /api/conversations by the mock host, proving the board reflects
+  // inbound OpenHands activity.
+  assert.ok(fixture.calls.some((c) => c.method === "POST" && c.path === "/api/conversations"), "inbound OpenHands conversation posted to /api/conversations");
 
   reloadCleanup();
   reload.remove();

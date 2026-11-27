@@ -248,12 +248,14 @@ test("4. assigned profile is shown on the task card and in the task detail", asy
   assert.ok(!card?.textContent?.includes("Forge"), `card must NOT show the assigned profile name "Forge"; got ${JSON.stringify(card?.textContent?.slice(0, 200))}`);
 
   // Detail: the card is a pure editorial surface — clicking it opens the
-  // Task Detail Inspector (Edit Task modal), which carries the "Assigned
-  // agent:" line. No CardMenu ellipsis exists on the card anymore.
+  // Task Detail Inspector (Edit Task modal), which is now a minimal surface
+  // (only the "Edit Task" eyebrow and the close button). No "Assigned agent:"
+  // line, no AI agent select. No CardMenu ellipsis exists on the card anymore.
   card!.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   card!.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "clicking the card must open the Task Detail Inspector");
-  assert.ok(await waitFor(() => container.textContent?.includes("Assigned agent: Forge") ?? false), "detail modal must show 'Assigned agent: Forge'");
+  assert.ok(!container.textContent?.includes("Assigned agent: Forge"), "minimal inspector must NOT show 'Assigned agent: Forge'");
+  assert.ok(!container.querySelector('select[aria-label="AI agent"]'), "minimal inspector must NOT show an AI agent select");
 
   cleanup();
   container.remove();

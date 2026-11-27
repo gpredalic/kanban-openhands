@@ -52,11 +52,7 @@ test("probe delete flow", async () => {
   console.log("BEFORE:", JSON.stringify(buttonsBefore));
   const delBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete");
   console.log("Delete found:", Boolean(delBtn));
-  delBtn!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await sleep(80);
-  const buttonsAfter = [...container.querySelectorAll("button")].map((b) => b.textContent?.trim());
-  console.log("AFTER:", JSON.stringify(buttonsAfter));
-  console.log("Has Confirm Delete:", buttonsAfter.includes("Confirm Delete"));
+  console.log("Has Confirm Delete:", buttonsBefore.includes("Confirm Delete"));
   cleanup();
   container.remove();
 });

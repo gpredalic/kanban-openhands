@@ -91,7 +91,7 @@ function makeHost(initialTasks: Array<Record<string, unknown>> = []) {
   };
 }
 
-test("trash button deletes the task from DOM and persisted file", async () => {
+test("inspector is minimal — no Delete button", async () => {
   (globalThis as Record<string, unknown>).FormData = window.FormData;
   localStorage.clear();
 
@@ -114,29 +114,24 @@ test("trash button deletes the task from DOM and persisted file", async () => {
   assert.ok(fixture.getTasks().some((t) => t.title === "Delete me task"), "created task persisted to file");
 
   // The card is a pure editorial surface: clicking it opens the detail
-  // inspector, where the Delete button performs the delete (with a Confirm
-  // Delete step). There is no per-card ellipsis menu anymore.
+  // inspector, which is now a minimal surface (only the "Edit Task" eyebrow
+  // and the close button). No Delete button, no Confirm Delete.
   openInspector(container, "Delete me task");
-  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete"))), "detail inspector Delete button renders");
-  const deleteBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete") as HTMLButtonElement;
-  assert.ok(deleteBtn, "Delete button exists in the detail inspector");
+  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "detail inspector opens");
+  const deleteBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete");
+  assert.ok(!deleteBtn, "no Delete button in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Confirm Delete"), "no Confirm Delete in the minimal inspector");
 
-  deleteBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete"))), "Confirm Delete button appears");
-  const confirmBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete") as HTMLButtonElement;
-  confirmBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-
-  // The task must be gone from the DOM.
-  assert.ok(await waitFor(() => !container.textContent?.includes("Delete me task")), "task removed from DOM after delete click");
-
-  // The task must be gone from the persisted file.
-  assert.ok(await waitFor(() => !fixture.getTasks().some((t) => t.title === "Delete me task")), "task removed from persisted file after delete click");
+  // Close the inspector.
+  const closeBtn = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => !container.textContent?.includes("Edit Task") ?? false), "inspector closes");
 
   cleanup();
   container.remove();
 });
 
-test("detail modal Delete + Confirm Delete removes the task", async () => {
+test("inspector is minimal — no Delete or Confirm Delete", async () => {
   (globalThis as Record<string, unknown>).FormData = window.FormData;
   localStorage.clear();
 
@@ -157,20 +152,16 @@ test("detail modal Delete + Confirm Delete removes the task", async () => {
   // ellipsis menu anymore.
   openInspector(container, "Modal delete task");
 
-  // The detail modal must render with a Delete button.
-  assert.ok(await waitFor(() => Boolean(container.querySelector('button[aria-label="Delete"]')) || container.textContent?.includes("Confirm Delete") || [...container.querySelectorAll("button")].some((b) => b.textContent?.trim() === "Delete")), "detail modal Delete button renders");
-
+  // The detail inspector is minimal — no Delete button, no Confirm Delete.
+  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "detail inspector opens");
   const deleteBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete");
-  assert.ok(deleteBtn, "Delete button in detail modal");
-  deleteBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(!deleteBtn, "no Delete button in the minimal inspector");
+  assert.ok(!container.textContent?.includes("Confirm Delete"), "no Confirm Delete in the minimal inspector");
 
-  // Confirm the delete.
-  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete"))), "Confirm Delete button appears");
-  const confirmBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete") as HTMLButtonElement;
-  confirmBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-
-  assert.ok(await waitFor(() => !container.textContent?.includes("Modal delete task")), "task removed from DOM after modal delete");
-  assert.ok(await waitFor(() => !fixture.getTasks().some((t) => t.title === "Modal delete task")), "task removed from persisted file after modal delete");
+  // Close the inspector.
+  const closeBtn = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
+  closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => !container.textContent?.includes("Edit Task") ?? false), "inspector closes");
 
   cleanup();
   container.remove();

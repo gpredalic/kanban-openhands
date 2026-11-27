@@ -8,8 +8,8 @@
  *
  *   F1  Status strictly controls column placement
  *   F2  No sliding/swipe actions (only scale hover)
- *   F3  Delete disabled for active (running/queued) tasks
- *   F4  Task execution details visible in the detail modal
+ *   F3  Inspector is minimal (no Delete button for any task status)
+ *   F4  Inspector is minimal (no Task Goal section)
  *   F5  (removed — the workflow routing readout lived in the Activity view,
  *       which was removed along with Agents and History)
  *   F6  Skeleton loading on initial load
@@ -186,9 +186,9 @@ test("F2: no sliding/swipe actions, no scale transform on hover", async () => {
 });
 
 /* ------------------------------------------------------------------ *
- * F3 — Delete disabled for active (running/queued) tasks.
+ * F3 — Inspector is minimal (no Delete button for any task status).
  * ------------------------------------------------------------------ */
-test("F3: delete button disabled for running and queued tasks", async () => {
+test("F3: inspector is minimal — no Delete button for any task status", async () => {
   const { host, trigger } = makeHost();
   const cleanup = activate(host);
   const container = trigger();
@@ -196,8 +196,9 @@ test("F3: delete button disabled for running and queued tasks", async () => {
   assert.ok(loaded, "tasks must load and render");
 
   // The card is a pure editorial surface — clicking it opens the Task Detail
-  // Inspector, whose Delete button is disabled for running/queued tasks and
-  // enabled for a failed task. No CardMenu ellipsis exists on the card.
+  // Inspector, which is now a minimal surface (only the "Edit Task" eyebrow
+  // and the close button). No Delete button for any task status. No CardMenu
+  // ellipsis exists on the card.
   const openInspector = (card: HTMLElement) => {
     card.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
     card.dispatchEvent(new window.Event("pointerup", { bubbles: true }));
@@ -209,54 +210,51 @@ test("F3: delete button disabled for running and queued tasks", async () => {
   const findDeleteButton = () =>
     [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete") as HTMLButtonElement | undefined;
 
-  // Running task: Delete disabled.
+  // Running task: no Delete button.
   const runningCard = taskCardByTitle(container, "Running task");
   assert.ok(runningCard, "Running task card must exist");
   openInspector(runningCard!);
   assert.ok(await waitFor(() => container.innerHTML.includes("Edit Task") ?? false), "clicking the running card must open the inspector");
   const runningDelete = findDeleteButton();
-  assert.ok(runningDelete, "Delete button must exist in the inspector");
-  assert.ok(runningDelete!.hasAttribute("disabled"), "Delete must be disabled for a running task");
+  assert.ok(!runningDelete, "no Delete button in the minimal inspector for a running task");
   closeInspector();
   await waitFor(() => !container.innerHTML.includes("Edit Task"));
 
-  // Queued task: Delete disabled.
+  // Queued task: no Delete button.
   const queuedCard = taskCardByTitle(container, "Queued task");
   assert.ok(queuedCard, "Queued task card must exist");
   openInspector(queuedCard!);
   assert.ok(await waitFor(() => container.innerHTML.includes("Edit Task") ?? false), "clicking the queued card must open the inspector");
   const queuedDelete = findDeleteButton();
-  assert.ok(queuedDelete, "Delete button must exist in the inspector");
-  assert.ok(queuedDelete!.hasAttribute("disabled"), "Delete must be disabled for a queued task");
+  assert.ok(!queuedDelete, "no Delete button in the minimal inspector for a queued task");
   closeInspector();
   await waitFor(() => !container.innerHTML.includes("Edit Task"));
 
-  // Failed task: Delete enabled.
+  // Failed task: no Delete button.
   const failedCard = taskCardByTitle(container, "Failed task");
   assert.ok(failedCard, "Failed task card must exist");
   openInspector(failedCard!);
   assert.ok(await waitFor(() => container.innerHTML.includes("Edit Task") ?? false), "clicking the failed card must open the inspector");
   const failedDelete = findDeleteButton();
-  assert.ok(failedDelete, "Delete button must exist in the inspector");
-  assert.ok(!failedDelete!.hasAttribute("disabled"), "Delete must be enabled for a failed task");
+  assert.ok(!failedDelete, "no Delete button in the minimal inspector for a failed task");
 
   cleanup();
   container.remove();
 });
 
 /* ------------------------------------------------------------------ *
- * F4 — Task execution details visible in the detail modal.
+ * F4 — Inspector is minimal (no Task Goal section).
  * ------------------------------------------------------------------ */
-test("F4: task execution details visible in the detail modal", async () => {
+test("F4: inspector is minimal — no Task Goal section", async () => {
   const { host, trigger } = makeHost();
   const cleanup = activate(host);
   const container = trigger();
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Click the Running task card to open the detail modal. The card opens the
-  // modal on onPointerUp (not onClick): dnd-kit's pointerdown handler calls
-  // preventDefault, which suppresses the click event. So we dispatch a
+  // Click the Running task card to open the detail inspector. The card opens
+  // the inspector on onPointerUp (not onClick): dnd-kit's pointerdown handler
+  // calls preventDefault, which suppresses the click event. So we dispatch a
   // pointerdown (to record the position) followed by a pointerup. happy-dom
   // has no PointerEvent constructor, so we use plain Events — clientX/clientY
   // are undefined, making Math.hypot(NaN, NaN) = NaN, and NaN > 5 is false,
@@ -266,15 +264,15 @@ test("F4: task execution details visible in the detail modal", async () => {
   runningCard!.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
   runningCard!.dispatchEvent(new window.Event("pointerup", { bubbles: true }));
 
-  const modalShown = await waitFor(() => container.innerHTML.includes("Task Goal"));
-  assert.ok(modalShown, "detail modal must show the Task Goal section");
+  const modalShown = await waitFor(() => container.innerHTML.includes("Edit Task"));
+  assert.ok(modalShown, "detail inspector opens on card click");
 
   const html = container.innerHTML;
-  assert.match(html, /What the Agent Is Doing/, "must show What the Agent Is Doing");
-  assert.match(html, /Agent Summary/, "must show Agent Summary");
-  assert.match(html, /Progress/, "must show Progress");
-  assert.match(html, /Original Prompt/, "must show Original Prompt");
-  assert.match(html, /Advanced Details/, "must show the Advanced Details collapsed section");
+  assert.ok(!html.includes("Task Goal"), "minimal inspector must NOT show the Task Goal section");
+  assert.ok(!html.includes("What the Agent Is Doing"), "minimal inspector must NOT show What the Agent Is Doing");
+  assert.ok(!html.includes("Agent Summary"), "minimal inspector must NOT show Agent Summary");
+  assert.ok(!html.includes("Original Prompt"), "minimal inspector must NOT show Original Prompt");
+  assert.ok(!html.includes("Advanced Details"), "minimal inspector must NOT show the Advanced Details collapsed section");
 
   cleanup();
   container.remove();
