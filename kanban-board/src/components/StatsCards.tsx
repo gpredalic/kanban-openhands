@@ -41,7 +41,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
           <p className={`text-3xl font-bold tabular-nums tracking-tight ${m.valueCls}`}>
             {m.value}
           </p>
-          <p className="text-[0.6875rem] font-medium uppercase tracking-[0.16em] text-slate-500">
+          <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
             {m.label}
           </p>
         </div>

@@ -395,7 +395,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
       {/* Header row — large, editorial. */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white">Agents</h2>
+          <h2 className="kb-type-display text-white">Agents</h2>
           <p className="mt-2 text-sm text-slate-500">
             {profiles.length} agent profiles · full lifecycle management · updated live
           </p>
@@ -447,7 +447,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
       {formOpen && (
         <div className="kb-glass kb-fade-in rounded-2xl p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-bold text-white">
               {editingName ? `Edit Agent — ${editingName}` : "New Agent"}
             </h3>
             <button
@@ -469,7 +469,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
               {/* Identity + model binding */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Agent Name
                   </span>
                   <input
@@ -487,7 +487,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
                   )}
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     LLM Profile
                   </span>
                   <select
@@ -504,7 +504,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
                   </select>
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Agent Class
                   </span>
                   <input
@@ -516,7 +516,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Tool Concurrency Limit
                   </span>
                   <input
@@ -532,7 +532,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
               {/* Persona + system message suffix */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Persona
                   </span>
                   <textarea
@@ -544,7 +544,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
                   />
                 </label>
                 <label className="flex flex-col gap-1.5">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     System Message Suffix
                   </span>
                   <textarea
@@ -560,7 +560,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
               {/* Tools */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Tools
                   </span>
                   <label className="flex cursor-pointer items-center gap-2 text-[11px] text-slate-400">
@@ -605,7 +605,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
 
               {/* MCP servers */}
               <div className="flex flex-col gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                   MCP Servers
                 </span>
                 <div className="flex items-center gap-3">
@@ -632,7 +632,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
 
               {/* Secrets */}
               <div className="flex flex-col gap-2">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                   Secrets
                 </span>
                 <div className="flex items-center gap-3">
@@ -676,7 +676,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
               {/* Skills */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Public Skills
                   </span>
                   <select
@@ -699,7 +699,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
                   )}
                 </div>
                 <label className="flex flex-col gap-2">
-                  <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                     Disabled Skills
                   </span>
                   <input
@@ -778,7 +778,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
           <div className="kb-glass kb-fade-in w-full max-w-sm rounded-2xl p-5">
             <div className="mb-3 flex items-center gap-2">
               <Trash2 className="h-4 w-4 text-rose-400" />
-              <h3 className="text-sm font-semibold text-white">Delete Agent</h3>
+              <h3 className="text-sm font-bold text-white">Delete Agent</h3>
             </div>
             <p className="text-xs text-slate-400">
               Delete agent <span className="font-semibold text-slate-200">{deletingName}</span>? This cannot be undone.
@@ -810,7 +810,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
           <div className="kb-glass kb-fade-in w-full max-w-sm rounded-2xl p-5">
             <div className="mb-3 flex items-center gap-2">
               <Pencil className="h-4 w-4 text-indigo-400" />
-              <h3 className="text-sm font-semibold text-white">Rename Agent</h3>
+              <h3 className="text-sm font-bold text-white">Rename Agent</h3>
             </div>
             <p className="mb-3 text-xs text-slate-400">
               Rename agent <span className="font-semibold text-slate-200">{renamingName}</span>.
@@ -853,7 +853,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Wrench className="h-4 w-4 text-indigo-400" />
-              <h3 className="text-sm font-semibold text-white">
+              <h3 className="text-sm font-bold text-white">
                 Materialize Diagnostics — {diagnostics.name}
               </h3>
             </div>
@@ -886,7 +886,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
             {/* Agent kind + LLM resolution */}
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div className="flex items-center justify-between rounded-xl bg-slate-900/40 px-3 py-2">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                   Agent Kind
                 </span>
                 <span className="text-xs font-semibold text-slate-200">
@@ -894,7 +894,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
                 </span>
               </div>
               <div className="flex items-center justify-between rounded-xl bg-slate-900/40 px-3 py-2">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                   LLM Profile
                 </span>
                 <span className="text-xs font-semibold text-slate-200">
@@ -928,7 +928,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
             {/* Errors */}
             {diagnostics.report.errors.length > 0 && (
               <div className="rounded-xl bg-rose-500/10 px-3 py-2 ring-1 ring-rose-400/20">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-rose-400">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-rose-400">
                   Errors ({diagnostics.report.errors.length})
                 </span>
                 <ul className="mt-1 flex flex-col gap-0.5">
@@ -944,7 +944,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
             {/* Unusable tools */}
             {diagnostics.report.unusableTools.length > 0 && (
               <div className="rounded-xl bg-amber-500/10 px-3 py-2 ring-1 ring-amber-400/20">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-amber-400">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-400">
                   Unusable Tools ({diagnostics.report.unusableTools.length})
                 </span>
                 <div className="mt-1.5 flex flex-wrap gap-1">
@@ -963,7 +963,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
             {/* Dangling MCP refs */}
             {diagnostics.report.danglingMcpServerRefs.length > 0 && (
               <div className="rounded-xl bg-amber-500/10 px-3 py-2 ring-1 ring-amber-400/20">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-amber-400">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-400">
                   Dangling MCP Server Refs ({diagnostics.report.danglingMcpServerRefs.length})
                 </span>
                 <div className="mt-1.5 flex flex-wrap gap-1">
@@ -981,7 +981,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
 
             {/* Resolved skills */}
             <div className="rounded-xl bg-slate-900/40 px-3 py-2">
-              <span className="text-[11px] font-medium uppercase tracking-wide text-slate-500">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                 Resolved Skills ({diagnostics.report.resolvedSkills.length})
               </span>
               <div className="mt-1.5 flex flex-wrap gap-1">
@@ -1003,7 +1003,7 @@ export function AgentRoster({ host, openHandsState }: AgentRosterProps) {
             {/* Dangling meta profile ref */}
             {diagnostics.report.danglingMetaProfileRef && (
               <div className="rounded-xl bg-amber-500/10 px-3 py-2 ring-1 ring-amber-400/20">
-                <span className="text-[11px] font-medium uppercase tracking-wide text-amber-400">
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-400">
                   Dangling Meta Profile Ref
                 </span>
                 <p className="mt-1 text-[11px] text-amber-200">
@@ -1022,7 +1022,7 @@ function SectionTitle({ icon: Icon, label }: { icon: typeof Bot; label: string }
   return (
     <div className="mb-3 flex items-center gap-2">
       <Icon className="h-4 w-4 text-indigo-400" strokeWidth={1.75} />
-      <h3 className="text-sm font-semibold tracking-tight text-slate-200">{label}</h3>
+      <h3 className="text-sm font-bold tracking-tight text-slate-200">{label}</h3>
     </div>
   );
 }

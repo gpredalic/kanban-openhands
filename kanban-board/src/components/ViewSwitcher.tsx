@@ -38,7 +38,7 @@ export function ViewSwitcher({ view, onView }: ViewSwitcherProps) {
             type="button"
             onClick={() => onView(v.id)}
             aria-pressed={active}
-            className={`kb-pill flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-medium ${
+            className={`kb-pill flex items-center gap-2 rounded-xl px-3.5 py-2 text-sm font-bold ${
               active ? "kb-pill--active" : "text-slate-400 hover:text-white"
             }`}
           >

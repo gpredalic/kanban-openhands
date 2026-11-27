@@ -198,7 +198,7 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
         if (moved > 5 || wasDrag) return;
         onEdit?.(task);
       }}
-      className={`kb-glass kb-card kb-fade-in group relative flex min-h-[132px] cursor-grab flex-col rounded-[16px] p-5 active:cursor-grabbing ${
+      className={`kb-glass kb-card kb-fade-in group relative flex min-h-[140px] cursor-grab flex-col rounded-[18px] p-6 active:cursor-grabbing ${
         isOverlay ? "kb-dragging kb-drag-overlay" : isDragging ? "kb-drag-placeholder" : ""
       } ${deleting ? "opacity-60" : ""} ${deleteError ? "kb-delete-failed" : ""} ${deletePhase === "fading" ? "kb-delete-fading" : ""} ${running ? "kb-running" : ""} ${animClass}`}
     >
@@ -272,13 +272,13 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
       ) : null}
       {/* Title — the editorial hero. Nunito Bold anchors the card; everything
           else is quiet metadata that supports it. */}
-      <h4 className="mb-2 text-[0.9375rem] font-bold leading-snug tracking-[-0.01em] text-slate-50 line-clamp-2">
+      <h4 className="kb-type-card mb-3 text-slate-50 line-clamp-2">
         {task.title}
       </h4>
 
-      {/* Description */}
+      {/* Description — quiet body text, one muted line. */}
       {task.description && (
-        <p className="mb-3 text-[0.8125rem] font-normal leading-relaxed text-slate-500 line-clamp-2">
+        <p className="kb-type-body mb-4 text-slate-500 line-clamp-2">
           {task.description}
         </p>
       )}
@@ -286,7 +286,7 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
       {/* Progress — a quiet hairline, no label, no gradient. A solid, muted
           fill reads as a calm signal. The number lives in the footer. */}
       {progress > 0 && (
-        <div className="mb-3 h-1 overflow-hidden rounded-full bg-white/5">
+        <div className="mb-4 h-1 overflow-hidden rounded-full bg-white/5">
           <div
             className="h-full rounded-full bg-slate-500/70 transition-all duration-300"
             style={{ width: `${progress}%` }}

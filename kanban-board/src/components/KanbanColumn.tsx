@@ -51,7 +51,7 @@ export function KanbanColumn({ column, activeTaskId, deletingTaskIds, deletePhas
       <div className="mb-4 flex items-center justify-between px-1">
         <div className="flex items-center gap-2">
           <span className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT[column.status]}`} />
-          <h3 className="text-[0.8125rem] font-semibold uppercase tracking-[0.14em] text-slate-300">
+          <h3 className="text-[0.8125rem] font-bold uppercase tracking-[0.14em] text-slate-300">
             {column.title}
           </h3>
         </div>

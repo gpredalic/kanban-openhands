@@ -940,7 +940,7 @@ export function WorkflowView({
             {selectedNode && (
               <>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-white">Node</h3>
+                  <h3 className="text-sm font-bold text-white">Node</h3>
                   <span className={`rounded-full px-2 py-0.5 text-[9px] font-semibold ring-1 ${NODE_META[selectedNode.type].badge}`}>
                     {NODE_META[selectedNode.type].label}
                   </span>
@@ -1045,7 +1045,7 @@ export function WorkflowView({
             {selectedEdge && (
               <>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold text-white">Connection</h3>
+                  <h3 className="text-sm font-bold text-white">Connection</h3>
                   <GitBranch className="h-4 w-4 text-indigo-300" strokeWidth={2} />
                 </div>
                 <label className="flex flex-col gap-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">

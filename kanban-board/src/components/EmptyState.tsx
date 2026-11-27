@@ -11,12 +11,15 @@ interface EmptyStateProps {
 
 export function EmptyState({ columnTitle }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-2.5 rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-8 text-center">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
-        <Inbox className="h-5 w-5 text-slate-500" strokeWidth={1.5} />
+    <div className="kb-glass-sm flex min-h-[140px] flex-col items-center justify-center gap-3 rounded-[18px] p-6 text-center">
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/[0.04] ring-1 ring-white/[0.06]">
+        <Inbox className="h-4 w-4 text-slate-500" strokeWidth={1.5} />
       </div>
-      <p className="text-xs font-medium text-slate-500">
+      <p className="kb-type-body text-slate-500">
         No tasks in {columnTitle}
+      </p>
+      <p className="kb-type-meta text-slate-600">
+        Drag a card here to move it
       </p>
     </div>
   );

@@ -44,7 +44,7 @@ export function ConfirmResetModal({
             <RotateCcw className="h-5 w-5" strokeWidth={2} />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold text-white">{question}</h3>
+            <h3 className="text-sm font-bold text-white">{question}</h3>
             <p className="mt-1 text-xs leading-relaxed text-slate-400">{detail}</p>
           </div>
           <button

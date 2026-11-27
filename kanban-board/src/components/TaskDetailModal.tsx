@@ -214,7 +214,7 @@ export function TaskDetailModal({
             <div className="flex flex-col gap-3">
               {/* Task Goal */}
               <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
                   <Target className="h-3.5 w-3.5" /> Task Goal
                 </h4>
                 <p className="text-xs leading-relaxed text-slate-300">
@@ -225,7 +225,7 @@ export function TaskDetailModal({
               {/* Progress */}
               <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
                 <div className="mb-2 flex items-center justify-between">
-                  <h4 className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                  <h4 className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
                     <Gauge className="h-3.5 w-3.5" /> Progress
                   </h4>
                   {exec.statusStyle && <Badge style={exec.statusStyle} pulse={exec.isRunning} />}
@@ -261,7 +261,7 @@ export function TaskDetailModal({
 
               {/* What the Agent Is Doing */}
               <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
                   <Bot className="h-3.5 w-3.5" /> What the Agent Is Doing
                 </h4>
                 <p className="text-xs leading-relaxed text-slate-300">
@@ -271,7 +271,7 @@ export function TaskDetailModal({
 
               {/* Agent Summary */}
               <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
                   <MessageSquare className="h-3.5 w-3.5" /> Agent Summary
                 </h4>
                 <p className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-slate-300">
@@ -282,7 +282,7 @@ export function TaskDetailModal({
               {/* Final Result */}
               {exec.execution.status === "completed" && (
                 <div className="rounded-xl bg-emerald-500/[0.06] p-3.5 ring-1 ring-emerald-500/15">
-                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-emerald-400">
                     <ListChecks className="h-3.5 w-3.5" /> Final Result
                   </h4>
                   <p className="text-xs leading-relaxed text-emerald-200/80">
@@ -294,7 +294,7 @@ export function TaskDetailModal({
               {/* Issues Encountered */}
               {exec.error && (
                 <div className="rounded-xl bg-rose-500/[0.06] p-3.5 ring-1 ring-rose-500/15">
-                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-rose-400">
+                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-rose-400">
                     <AlertCircle className="h-3.5 w-3.5" /> Issues Encountered
                   </h4>
                   <p className="whitespace-pre-wrap text-xs leading-relaxed text-rose-200/80">{exec.error}</p>
@@ -303,7 +303,7 @@ export function TaskDetailModal({
 
               {/* Original Prompt */}
               <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
                   <FileText className="h-3.5 w-3.5" /> Original Prompt
                 </h4>
                 <p className="line-clamp-3 whitespace-pre-wrap text-xs leading-relaxed text-slate-400">
@@ -495,7 +495,7 @@ export function TaskDetailModal({
               className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"
               aria-expanded={showAdvanced}
             >
-              <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-400">
+              <span className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
                 <ScrollText className="h-3.5 w-3.5" /> Advanced Details
               </span>
               {showAdvanced ? (
@@ -509,7 +509,7 @@ export function TaskDetailModal({
                 {/* Execution metadata */}
                 {(task.conversationId || task.executionId || task.profileId || exec.execution) && (
                   <div>
-                    <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                    <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
                       <Terminal className="h-3 w-3" /> Execution Metadata
                     </h5>
                     <div className="flex flex-col gap-1 text-[11px]">
@@ -563,7 +563,7 @@ export function TaskDetailModal({
 
                 {/* History */}
                 <div>
-                  <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-slate-500">
+                  <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
                     <History className="h-3 w-3" /> History
                   </h5>
                   {exec.events.length === 0 && !exec.execution ? (

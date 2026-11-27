@@ -104,56 +104,56 @@ export function MonitoringView({
       {/* Hero — what is happening, shown large. The node name is the focal
           point. No gradient wash, no redundant labels. */}
       {workflow && workflow.nodes.length > 0 && (
-        <div className="kb-glass relative overflow-hidden rounded-3xl p-10">
+        <div className="kb-glass relative overflow-hidden rounded-3xl p-12">
           <div className="relative">
-            <p className="mb-8 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Current Activity</p>
-            <div className="flex flex-wrap items-end justify-between gap-8">
+            <p className="mb-10 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Current Activity</p>
+            <div className="flex flex-wrap items-end justify-between gap-10">
               <div className="min-w-0">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Now Working On</p>
+                <p className="mb-4 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Now Working On</p>
                 {currentNode ? (
-                  <div className="flex items-center gap-4">
-                    <span className={`h-3 w-3 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
-                    <span className="truncate text-4xl font-bold tracking-tight text-white">{currentNode.label}</span>
+                  <div className="flex items-center gap-5">
+                    <span className={`h-3.5 w-3.5 shrink-0 rounded-full ${currentNode.type === "start" ? "bg-emerald-400" : currentNode.type === "end" ? "bg-slate-400" : "bg-blue-400"}`} />
+                    <span className="truncate text-5xl font-bold tracking-tight text-white">{currentNode.label}</span>
                     {(() => {
                       const s = nodeExecState(currentNode, openHandsState);
                       return statusBadge(s) ? <Badge style={statusBadge(s)!} pulse={s === "running"} /> : null;
                     })()}
                   </div>
                 ) : (
-                  <p className="text-4xl font-bold tracking-tight text-slate-600">Nothing in progress</p>
+                  <p className="text-5xl font-bold tracking-tight text-slate-600">Nothing in progress</p>
                 )}
               </div>
               {/* Up Next — a quiet secondary callout. */}
               <div className="shrink-0">
-                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Up Next</p>
+                <p className="mb-4 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Up Next</p>
                 {nextNode ? (
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-amber-400" />
-                    <span className="text-base font-semibold text-slate-200">{nextNode.label}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amber-400" />
+                    <span className="text-xl font-bold text-slate-200">{nextNode.label}</span>
                   </div>
                 ) : (
-                  <p className="text-base text-slate-500">Nothing queued</p>
+                  <p className="text-xl text-slate-500">Nothing queued</p>
                 )}
               </div>
             </div>
 
             {/* Progress — a visual stepper of the full execution path. */}
-            <div className="mt-10">
-              <p className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Workflow Structure</p>
+            <div className="mt-14">
+              <p className="mb-6 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Workflow Structure</p>
               {path.length > 0 ? (
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-3">
                   {path.map((n, i) => (
-                    <span key={n.id} className="flex items-center gap-2">
-                      <span className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium ring-1 ${i === path.length - 1 ? "bg-blue-500/20 text-blue-200 ring-blue-400/40" : "bg-white/5 text-slate-400 ring-white/10"}`}>
-                        <span className={`h-1.5 w-1.5 rounded-full ${i === path.length - 1 ? "bg-blue-400" : "bg-slate-600"}`} />
+                    <span key={n.id} className="flex items-center gap-3">
+                      <span className={`flex items-center gap-2.5 rounded-full px-5 py-2 text-base font-semibold ring-1 ${i === path.length - 1 ? "bg-blue-500/20 text-blue-200 ring-blue-400/40" : "bg-white/5 text-slate-400 ring-white/10"}`}>
+                        <span className={`h-2 w-2 rounded-full ${i === path.length - 1 ? "bg-blue-400" : "bg-slate-600"}`} />
                         {n.label}
                       </span>
-                      {i < path.length - 1 && <span className="text-slate-600">→</span>}
+                      {i < path.length - 1 && <span className="text-lg text-slate-600">→</span>}
                     </span>
                   ))}
                 </div>
               ) : (
-                <p className="text-base text-slate-500">No progress yet</p>
+                <p className="text-xl text-slate-500">No progress yet</p>
               )}
             </div>
           </div>
@@ -178,9 +178,9 @@ export function MonitoringView({
       {/* Active work — a quiet list of what's running, queued, or failed.
           Outcome-focused: the task title is the hero, the agent is quiet. */}
       <div className="kb-glass rounded-3xl">
-        <div className="flex flex-col gap-5 p-7">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active Work</p>
-          {openHandsState.error && <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-xs text-rose-300">{openHandsState.error}</div>}
+        <div className="flex flex-col gap-6 p-10">
+          <p className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Active Work</p>
+          {openHandsState.error && <div className="rounded-xl bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{openHandsState.error}</div>}
 
           {openHandsState.loading && executions.length === 0 ? (
             <>
@@ -188,26 +188,26 @@ export function MonitoringView({
               <SkeletonRow />
             </>
           ) : executions.length === 0 ? (
-            <p className="rounded-xl bg-white/5 px-4 py-6 text-center text-sm text-slate-500">No active work yet.</p>
+            <p className="rounded-xl bg-white/5 px-4 py-8 text-center text-base text-slate-500">No active work yet.</p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {executions.map((run) => {
                 const agentName = run.agentId ? agentNames.get(run.agentId) ?? null : null;
                 return (
-                  <div key={run.id} className="kb-glass-sm flex items-center gap-4 rounded-2xl px-5 py-4 transition-colors hover:bg-white/[0.07]">
+                  <div key={run.id} className="kb-glass-sm flex items-center gap-5 rounded-2xl px-6 py-5 transition-colors hover:bg-white/[0.07]">
                     {statusBadge(run.status) && (
                       <Badge style={statusBadge(run.status)!} pulse={run.status === "running" || run.status === "queued"} />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-base font-semibold text-white">{run.title}</p>
+                      <p className="truncate text-lg font-bold text-white">{run.title}</p>
                       {agentName && (
-                        <p className="mt-0.5 text-xs text-slate-500">{agentName}</p>
+                        <p className="mt-1 text-sm text-slate-500">{agentName}</p>
                       )}
                     </div>
-                    <div className="flex gap-1">
-                      {run.status === "running" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Stop" onClick={() => onCommand("stop", run.id)}><Square className="h-3.5 w-3.5" /></button>}
-                      {run.status === "failed" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Retry" onClick={() => onCommand("retry", run.id)}><RotateCcw className="h-3.5 w-3.5" /></button>}
-                      {run.status === "queued" && <button className="kb-glass-sm rounded-lg p-2 text-slate-300" title="Start" onClick={() => onCommand("start", run.id)}><Play className="h-3.5 w-3.5" /></button>}
+                    <div className="flex gap-1.5">
+                      {run.status === "running" && <button className="kb-glass-sm rounded-lg p-2.5 text-slate-300" title="Stop" onClick={() => onCommand("stop", run.id)}><Square className="h-4 w-4" /></button>}
+                      {run.status === "failed" && <button className="kb-glass-sm rounded-lg p-2.5 text-slate-300" title="Retry" onClick={() => onCommand("retry", run.id)}><RotateCcw className="h-4 w-4" /></button>}
+                      {run.status === "queued" && <button className="kb-glass-sm rounded-lg p-2.5 text-slate-300" title="Start" onClick={() => onCommand("start", run.id)}><Play className="h-4 w-4" /></button>}
                     </div>
                   </div>
                 );
