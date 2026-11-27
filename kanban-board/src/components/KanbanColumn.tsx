@@ -21,7 +21,6 @@ interface KanbanColumnProps {
   /** A delete failure reason per task id — shows the "Deletion Failed" state. */
   deleteErrors?: Map<string, string>;
   onEdit?: (task: Task) => void;
-  onDelete?: (taskId: string) => void;
   onRetryDelete?: (taskId: string) => void;
   onCancelDelete?: (taskId: string) => void;
 }
@@ -36,7 +35,7 @@ const STATUS_DOT: Record<TaskStatus, string> = {
   done: "bg-emerald-400",
 };
 
-export function KanbanColumn({ column, activeTaskId, deletingTaskIds, deletePhases, deleteErrors, onEdit, onDelete, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
+export function KanbanColumn({ column, activeTaskId, deletingTaskIds, deletePhases, deleteErrors, onEdit, onRetryDelete, onCancelDelete }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: column.status });
 
   return (
@@ -75,7 +74,6 @@ export function KanbanColumn({ column, activeTaskId, deletingTaskIds, deletePhas
               deletePhase={deletePhases?.get(task.id)}
               deleteError={deleteErrors?.get(task.id)}
               onEdit={onEdit}
-              onDelete={onDelete}
               onRetryDelete={onRetryDelete}
               onCancelDelete={onCancelDelete}
             />

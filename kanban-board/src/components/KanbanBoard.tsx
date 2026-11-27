@@ -324,7 +324,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                       deletePhases={state.uiState.deletePhases}
                       deleteErrors={state.uiState.deleteErrors}
                       onEdit={setEditingTask}
-                      onDelete={handleDelete}
                       onRetryDelete={handleRetryDelete}
                       onCancelDelete={handleCancelDelete}
                     />

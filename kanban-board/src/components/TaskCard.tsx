@@ -21,8 +21,8 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { memo, useState, useRef, useEffect, useCallback, type CSSProperties } from "react";
-import { Calendar, AlertTriangle, Pencil, Trash2, RotateCcw, XCircle, MoreHorizontal } from "lucide-react";
+import { memo, useState, useRef, useEffect, type CSSProperties } from "react";
+import { Calendar, AlertTriangle, RotateCcw, XCircle } from "lucide-react";
 import type { Task, DeletePhase } from "../types/task";
 import type { EnrichedTask } from "../types/ai";
 import { dueState } from "../lib/date";
@@ -39,7 +39,6 @@ interface TaskCardProps {
   /** Present when a delete failed — shows the "Deletion Failed" state. */
   deleteError?: string;
   onEdit?: (task: Task) => void;
-  onDelete?: (taskId: string) => void;
   onRetryDelete?: (taskId: string) => void;
   onCancelDelete?: (taskId: string) => void;
 }
@@ -66,111 +65,7 @@ function formatDue(iso: string): string {
   return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-/**
- * CardMenu — a single ellipsis ("…") that opens a clean popover with Edit
- * and Delete. Replaces the two always-hover-revealed icon buttons with the
- * Apple-style pattern: one quiet affordance, a menu that appears on demand.
- *
- * The ellipsis itself is invisible at rest (opacity-0) and reveals only on
- * click (or keyboard focus via group-focus-within). It stays in the DOM and
- * clickable, so the resting card reads as a clean editorial surface while the
- * action remains discoverable and testable.
- *
- * The popover closes on outside click, Escape, or after an action is chosen.
- * It renders inside the card (which is not overflow-hidden), so it is never
- * clipped by the column's overflow container.
- */
-function CardMenu({
-  onEdit,
-  onDelete,
-  deleteDisabled,
-  deleteDisabledReason,
-}: {
-  onEdit: () => void;
-  onDelete: () => void;
-  /** True when the task is running/queued — Delete is locked, Edit stays available. */
-  deleteDisabled?: boolean;
-  deleteDisabledReason?: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  const close = useCallback(() => setOpen(false), []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) close();
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, close]);
-
-  return (
-    <div ref={rootRef} className="relative">
-      <button
-        type="button"
-        aria-label="Card actions"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen((v) => !v);
-        }}
-        onPointerDown={(e) => e.stopPropagation()}
-        className={`flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-opacity duration-150 group-focus-within:opacity-100 hover:bg-white/10 hover:text-slate-200 ${open ? "opacity-100" : "opacity-0"}`}
-      >
-        <MoreHorizontal className="h-4 w-4" />
-      </button>
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 top-8 z-50 w-40 overflow-hidden rounded-xl border border-white/[0.08] bg-[#1c1c1e] py-1 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6)]"
-        >
-          <button
-            type="button"
-            role="menuitem"
-            onClick={(e) => {
-              e.stopPropagation();
-              close();
-              onEdit();
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] font-medium text-slate-200 transition-colors hover:bg-white/[0.06]"
-          >
-            <Pencil className="h-3.5 w-3.5 text-slate-400" />
-            Edit task
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            disabled={deleteDisabled}
-            title={deleteDisabledReason}
-            onClick={(e) => {
-              e.stopPropagation();
-              close();
-              onDelete();
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="flex w-full items-center gap-2.5 px-3 py-2 text-left text-[0.8125rem] font-medium text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:text-slate-600 disabled:hover:bg-transparent"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-            Delete task
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, deletePhase, deleteError, onEdit, onDelete, onRetryDelete, onCancelDelete }: TaskCardProps) {
+function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, deletePhase, deleteError, onEdit, onRetryDelete, onCancelDelete }: TaskCardProps) {
   // Disable dragging while a delete is in flight or has failed — the card is
   // locked to its column during the transaction.
   const locked = deleting || Boolean(deleteError);
@@ -401,9 +296,9 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
 
       {/* Footer — one quiet row of status signals: blocked, progress, due date.
           Identity (agent / owner) is intentionally absent from the card; it
-          surfaces in the detail modal. The ellipsis menu is invisible at rest
-          and reveals on click (or keyboard focus), so the resting card stays a
-          clean editorial surface while the action remains discoverable. */}
+          surfaces in the detail modal. The card is a pure editorial surface at
+          rest — no menu, no icon buttons. Clicking the card opens the Task
+          Detail Inspector, which carries Edit and Delete. */}
       <div className="mt-auto flex items-center justify-end gap-2 pt-3">
         <div className="flex shrink-0 items-center gap-2">
           {task.waitingOn && task.waitingOn.length > 0 && (
@@ -433,14 +328,6 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
               <Calendar className="h-3 w-3" />
               {formatDue(task.dueDate)}
             </span>
-          )}
-          {(onEdit || onDelete) && (
-            <CardMenu
-              deleteDisabled={running}
-              deleteDisabledReason={running ? "Task is running — delete locked" : undefined}
-              onEdit={() => onEdit?.(task)}
-              onDelete={() => onDelete?.(task.id)}
-            />
           )}
         </div>
       </div>

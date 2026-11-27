@@ -38,6 +38,16 @@ function changeInput(input: HTMLInputElement | HTMLTextAreaElement, value: strin
   input.dispatchEvent(new window.Event("change", { bubbles: true }));
 }
 
+// The card is a pure editorial surface: a genuine click (pointerdown +
+// pointerup with no drag) opens the detail inspector, where Save / Delete /
+// Confirm Delete / Run all live. There is no per-card ellipsis menu anymore.
+function openInspector(container: HTMLElement, title: string) {
+  const card = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((c) => c.textContent?.includes(title));
+  assert.ok(card, `task card for "${title}" exists in the DOM`);
+  card.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  card.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+}
+
 function makeHost(initialTasks: Array<Record<string, unknown>> = []) {
   let tasks = initialTasks.map((task) => ({ ...task }));
   const calls: Array<{ method: string; path: string; body?: unknown }> = [];
@@ -103,17 +113,18 @@ test("trash button deletes the task from DOM and persisted file", async () => {
   assert.ok(await waitFor(() => container.textContent?.includes("Delete me task")), "created task renders");
   assert.ok(fixture.getTasks().some((t) => t.title === "Delete me task"), "created task persisted to file");
 
-  // The card's ellipsis CardMenu must be present in the DOM so it is clickable.
-  // Clicking it opens the popover; the "Delete task" menu item performs the delete.
-  const menu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  assert.ok(menu, "CardMenu (ellipsis) button exists on the card");
-  assert.ok(menu.isConnected, "CardMenu button is in the DOM and clickable");
-  menu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
-  const deleteItem = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
-  assert.ok(deleteItem, "Delete task menu item exists in the CardMenu popover");
+  // The card is a pure editorial surface: clicking it opens the detail
+  // inspector, where the Delete button performs the delete (with a Confirm
+  // Delete step). There is no per-card ellipsis menu anymore.
+  openInspector(container, "Delete me task");
+  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete"))), "detail inspector Delete button renders");
+  const deleteBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete") as HTMLButtonElement;
+  assert.ok(deleteBtn, "Delete button exists in the detail inspector");
 
-  deleteItem.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  deleteBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete"))), "Confirm Delete button appears");
+  const confirmBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete") as HTMLButtonElement;
+  confirmBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
 
   // The task must be gone from the DOM.
   assert.ok(await waitFor(() => !container.textContent?.includes("Delete me task")), "task removed from DOM after delete click");
@@ -141,15 +152,10 @@ test("detail modal Delete + Confirm Delete removes the task", async () => {
   clickText(container, "Create");
   assert.ok(await waitFor(() => container.textContent?.includes("Modal delete task")), "created task renders");
 
-  // Open the detail modal via the card's ellipsis CardMenu: click the menu
-  // button to open the popover, then click the "Edit task" menu item.
-  const menuBtn = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  assert.ok(menuBtn, "CardMenu (ellipsis) button exists on the card");
-  menuBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const editBtn = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  assert.ok(editBtn, "Edit task menu item exists in the CardMenu popover");
-  editBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // Open the detail inspector by clicking the card (pointerdown + pointerup,
+  // no drag). The card is a pure editorial surface — there is no per-card
+  // ellipsis menu anymore.
+  openInspector(container, "Modal delete task");
 
   // The detail modal must render with a Delete button.
   assert.ok(await waitFor(() => Boolean(container.querySelector('button[aria-label="Delete"]')) || container.textContent?.includes("Confirm Delete") || [...container.querySelectorAll("button")].some((b) => b.textContent?.trim() === "Delete")), "detail modal Delete button renders");

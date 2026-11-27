@@ -194,42 +194,50 @@ test("F3: delete button disabled for running and queued tasks", async () => {
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Running task: the CardMenu (ellipsis) button is present and enabled,
-  // but the Delete task menu item inside the popover is disabled.
+  // The card is a pure editorial surface — clicking it opens the Task Detail
+  // Inspector, whose Delete button is disabled for running/queued tasks and
+  // enabled for a failed task. No CardMenu ellipsis exists on the card.
+  const openInspector = (card: HTMLElement) => {
+    card.dispatchEvent(new window.Event("pointerdown", { bubbles: true }));
+    card.dispatchEvent(new window.Event("pointerup", { bubbles: true }));
+  };
+  const closeInspector = () => {
+    const close = container.querySelector('button[aria-label="Close"]') as HTMLButtonElement | null;
+    close?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  };
+  const findDeleteButton = () =>
+    [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Delete") as HTMLButtonElement | undefined;
+
+  // Running task: Delete disabled.
   const runningCard = taskCardByTitle(container, "Running task");
   assert.ok(runningCard, "Running task card must exist");
-  const runningMenu = runningCard!.querySelector('button[aria-label="Card actions"]');
-  assert.ok(runningMenu, "Running task must have a CardMenu (ellipsis) button");
-  assert.ok(!runningMenu!.hasAttribute("disabled"), "CardMenu button must be enabled (Edit is still available)");
-  runningMenu!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...runningCard!.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
-  const runningDelete = [...runningCard!.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
-  assert.ok(runningDelete, "Delete task menu item must exist in the popover");
-  assert.ok(runningDelete.hasAttribute("disabled"), "Delete task must be disabled for a running task");
+  openInspector(runningCard!);
+  assert.ok(await waitFor(() => container.innerHTML.includes("Edit Task") ?? false), "clicking the running card must open the inspector");
+  const runningDelete = findDeleteButton();
+  assert.ok(runningDelete, "Delete button must exist in the inspector");
+  assert.ok(runningDelete!.hasAttribute("disabled"), "Delete must be disabled for a running task");
+  closeInspector();
+  await waitFor(() => !container.innerHTML.includes("Edit Task"));
 
-  // Queued task: same — CardMenu enabled, Delete disabled.
+  // Queued task: Delete disabled.
   const queuedCard = taskCardByTitle(container, "Queued task");
   assert.ok(queuedCard, "Queued task card must exist");
-  const queuedMenu = queuedCard!.querySelector('button[aria-label="Card actions"]');
-  assert.ok(queuedMenu, "Queued task must have a CardMenu (ellipsis) button");
-  assert.ok(!queuedMenu!.hasAttribute("disabled"), "CardMenu button must be enabled for a queued task");
-  queuedMenu!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...queuedCard!.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
-  const queuedDelete = [...queuedCard!.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
-  assert.ok(queuedDelete, "Delete task menu item must exist in the popover");
-  assert.ok(queuedDelete.hasAttribute("disabled"), "Delete task must be disabled for a queued task");
+  openInspector(queuedCard!);
+  assert.ok(await waitFor(() => container.innerHTML.includes("Edit Task") ?? false), "clicking the queued card must open the inspector");
+  const queuedDelete = findDeleteButton();
+  assert.ok(queuedDelete, "Delete button must exist in the inspector");
+  assert.ok(queuedDelete!.hasAttribute("disabled"), "Delete must be disabled for a queued task");
+  closeInspector();
+  await waitFor(() => !container.innerHTML.includes("Edit Task"));
 
-  // Failed task: CardMenu enabled, Delete enabled.
+  // Failed task: Delete enabled.
   const failedCard = taskCardByTitle(container, "Failed task");
   assert.ok(failedCard, "Failed task card must exist");
-  const failedMenu = failedCard!.querySelector('button[aria-label="Card actions"]');
-  assert.ok(failedMenu, "Failed task must have a CardMenu (ellipsis) button");
-  assert.ok(!failedMenu!.hasAttribute("disabled"), "Failed task CardMenu must be enabled");
-  failedMenu!.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...failedCard!.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
-  const failedDelete = [...failedCard!.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
-  assert.ok(failedDelete, "Delete task menu item must exist in the popover");
-  assert.ok(!failedDelete.hasAttribute("disabled"), "Delete task must be enabled for a failed task");
+  openInspector(failedCard!);
+  assert.ok(await waitFor(() => container.innerHTML.includes("Edit Task") ?? false), "clicking the failed card must open the inspector");
+  const failedDelete = findDeleteButton();
+  assert.ok(failedDelete, "Delete button must exist in the inspector");
+  assert.ok(!failedDelete!.hasAttribute("disabled"), "Delete must be enabled for a failed task");
 
   cleanup();
   container.remove();

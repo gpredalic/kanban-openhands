@@ -133,12 +133,11 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     agentCardVisible: container.textContent?.includes("Forge"),
   };
   const assignedCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task"));
-  // The card's ellipsis CardMenu opens a popover with Edit/Delete.
-  const assignedMenu = assignedCard?.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement | null;
-  assignedMenu?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].some((b) => b.textContent?.includes("Edit task")));
-  const assignedEdit = [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement | null;
-  assignedEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // The card is a pure editorial surface — clicking it opens the Task Detail
+  // Inspector, which carries the "Assigned agent:" line. No CardMenu ellipsis
+  // exists on the card anymore.
+  assignedCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  assignedCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   await waitFor(() => container.textContent?.includes("Assigned agent: Forge") ?? false);
   evidence.assignment = {
     cardAgentVisible: Boolean(assignedCard?.textContent?.includes("Forge")),
@@ -164,11 +163,12 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     callCount: fixture.calls.length,
   };
 
-  const editMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  editMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const edit = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  edit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // The card is a pure editorial surface — clicking it opens the Task Detail
+  // Inspector (Edit Task modal), which carries Edit and Delete. No CardMenu
+  // ellipsis exists on the card anymore.
+  const editCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Persisted audit task"));
+  editCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  editCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false));
   await sleep(20);
   const editTitle = container.querySelector('input[type="text"]') as HTMLInputElement;
@@ -177,11 +177,10 @@ test("user acceptance audit exercises the real extension bundle", async () => {
   await waitFor(() => fixture.getTasks().some((t) => t.title === "Edited audit task"));
   evidence.edit = { visible: container.textContent?.includes("Edited audit task"), persisted: fixture.getTasks().some((t) => t.title === "Edited audit task") };
 
-  const deleteMenu = [...container.querySelectorAll('button[aria-label="Card actions"]')][1] as HTMLButtonElement;
-  deleteMenu?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const deleteEdit = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  deleteEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // Re-open the detail inspector by clicking the card again, then delete.
+  const deleteCard = [...container.querySelectorAll<HTMLElement>(".kb-card")].find((card) => card.textContent?.includes("Edited audit task"));
+  deleteCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  deleteCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false));
   const deleteButton = [...container.querySelectorAll("button")].find((button) => button.textContent?.includes("Delete"));
   assert.ok(deleteButton, "delete action exists");
@@ -221,19 +220,18 @@ test("user acceptance audit exercises the real extension bundle", async () => {
 
   clickText(container, "Board");
   // Wait for React to re-render the board view after the view switch. The
-  // CardMenu (ellipsis) button is still on the card, so it is a reliable
-  // board-rendered signal.
-  assert.ok(await waitFor(() => container.querySelectorAll('button[aria-label="Card actions"]').length > 0, 2000), "board view renders with task cards after view switch");
+  // task card (.kb-card) is a reliable board-rendered signal.
+  assert.ok(await waitFor(() => container.querySelectorAll(".kb-card").length > 0, 2000), "board view renders with task cards after view switch");
   // Execution is task-centric: the header no longer carries a global Run AI /
   // Stop AI toggle. The Run / Stop / Retry actions live in the task detail
   // modal (moved off the card). Opening a task's detail modal and clicking Run
   // posts a fresh OpenHands conversation for THAT task only, and the button
-  // flips to Stop AI once the run is live.
-  const auditMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  auditMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const auditEditBtn = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  auditEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // flips to Stop AI once the run is live. The card is a pure editorial
+  // surface — clicking it opens the Task Detail Inspector. No CardMenu
+  // ellipsis exists on the card anymore.
+  const auditCard = container.querySelector(".kb-card") as HTMLElement | null;
+  auditCard?.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  auditCard?.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
   assert.ok(await waitFor(() => Boolean(container.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
   const taskRunBtn = container.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
   taskRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));

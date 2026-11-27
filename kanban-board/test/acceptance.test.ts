@@ -127,36 +127,40 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => container.textContent?.includes("Acceptance created task") ?? false), "created task visible on board");
   assert.ok(fixture.getTasks().some((t) => t.title === "Acceptance created task"), "created task persisted to file");
 
-  // 2. EDIT TASK — the card's ellipsis CardMenu opens a popover with Edit/Delete.
-  const editMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  assert.ok(editMenu, "card menu (ellipsis) present on card");
-  editMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const editMenuItem = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  assert.ok(editMenuItem, "Edit task menu item present in the CardMenu popover");
-  editMenuItem.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "edit modal opens");
+  // 2. EDIT TASK — clicking the card opens the Task Detail Inspector directly.
+  // The card is a pure editorial surface at rest: no ellipsis, no menu.
+  // Edit a pre-existing task (not the one we just created) so the created task
+  // stays available for the drag + persistence steps below.
+  const editCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Design the onboarding flow")) as HTMLElement;
+  assert.ok(editCard, "task card found on board");
+  editCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  editCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens on card click");
   const editTitle = container.querySelector('input[type="text"]') as HTMLInputElement;
   changeInput(editTitle, "Acceptance edited task");
   clickText(container, "Save");
   assert.ok(await waitFor(() => fixture.getTasks().some((t) => t.title === "Acceptance edited task") ?? false), "edited title persisted");
   assert.ok(container.textContent?.includes("Acceptance edited task"), "edited title visible on board");
 
-  // 3. DELETE TASK (CardMenu popover → Delete task)
-  const deleteMenu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  assert.ok(deleteMenu, "card menu (ellipsis) present on card");
-  deleteMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Delete task")));
-  const deleteMenuItem = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Delete task")) as HTMLButtonElement;
-  assert.ok(deleteMenuItem, "Delete task menu item present in the CardMenu popover");
-  deleteMenuItem.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  assert.ok(await waitFor(() => fixture.getTasks().length === initialTasks.length - 1 + 1 - 1 + 1 - 1 || true), "noop");
+  // 3. DELETE TASK — open the Inspector again, click Delete, then Confirm Delete.
+  const deleteCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Acceptance edited task")) as HTMLElement;
+  assert.ok(deleteCard, "edited task card found on board");
+  deleteCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  deleteCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+  assert.ok(await waitFor(() => container.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens for delete");
+  clickText(container, "Delete");
+  // React 18 batches the setConfirmDelete(true) update; the "Confirm Delete"
+  // button only appears after React flushes the re-render. A real user sees the
+  // button appear before clicking it, so wait for it rather than clicking
+  // synchronously (which would query the DOM before the flush).
+  assert.ok(await waitFor(() => Boolean([...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Confirm Delete"))), "Confirm Delete button appears after Delete");
+  clickText(container, "Confirm Delete");
   // after delete, the edited task should be gone from the persisted file
   assert.ok(await waitFor(() => !fixture.getTasks().some((t) => t.title === "Acceptance edited task") ?? false), "deleted task removed from persisted file");
 
   // 4. MOVE TASK between columns (drag)
   const dragCard = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("Acceptance created task")) as HTMLElement;
-  const inProgressColumn = [...container.querySelectorAll("h3")].find((heading) => heading.textContent === "In Progress")?.parentElement?.parentElement as HTMLElement;
+  const inProgressColumn = container.querySelector('[data-drop-status="in_progress"]') as HTMLElement;
   assert.ok(dragCard && inProgressColumn, "drag card and target column found");
   dragCard.dispatchEvent(new window.MouseEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
   dragCard.dispatchEvent(new window.MouseEvent("pointermove", { bubbles: true, clientX: 200, clientY: 200 }));
@@ -189,12 +193,14 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   // clicking Run posts a fresh OpenHands conversation for THAT task only, and
   // the button flips to Stop once the run is live.
   clickText(reload, "Board");
-  const runMenu = reload.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  assert.ok(runMenu, "CardMenu (ellipsis) present on a task card");
-  runMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...reload.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const runEditBtn = [...reload.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  runEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // The card is a pure editorial surface at rest — no ellipsis, no menu.
+  // Clicking the card opens the Task Detail Inspector directly, which carries
+  // the Run / Stop / Retry actions.
+  const runCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")][0] as HTMLElement;
+  assert.ok(runCard, "a task card is present on the board");
+  runCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  runCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+  assert.ok(await waitFor(() => reload.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens on card click");
   assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the task detail modal");
   const taskRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
   taskRunBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
@@ -257,13 +263,13 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   // Close feature 8's detail modal so the board is fully interactive again.
   const closeBtn = reload.querySelector('button[aria-label="Close"]') as HTMLButtonElement;
   closeBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  // Pick a different, idle task's CardMenu (the running task's Delete is locked).
-  const idleMenu = [...reload.querySelectorAll('[data-task-id]:not(.kb-running) button[aria-label="Card actions"]')][0] as HTMLButtonElement;
-  assert.ok(idleMenu, "an idle task's CardMenu is available");
-  idleMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...reload.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const idleEditBtn = [...reload.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  idleEditBtn.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // Pick a different, idle task's card (the running task's Delete is locked).
+  // The card is a pure editorial surface — clicking it opens the Inspector.
+  const idleCard = [...reload.querySelectorAll<HTMLElement>('[data-task-id]:not(.kb-running)')][0] as HTMLElement;
+  assert.ok(idleCard, "an idle task card is available");
+  idleCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  idleCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+  assert.ok(await waitFor(() => reload.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens for the idle task");
   assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Run this task"]')) ?? false, 2000), "Run AI button present in the idle task's detail modal");
   const idleRunBtn = reload.querySelector('button[aria-label="Run this task"]') as HTMLButtonElement;
   const isExecCall = (c: { method: string; path: string }) =>
@@ -286,21 +292,19 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   await sleep(50);
   assert.ok(reload.textContent?.includes("Relay") ?? false, "relay node added to the canvas");
 
-  // 17. AGENT ASSIGNMENT — open the modal, pick an agent from the select, confirm it shows.
-  // Use [data-task-id] (not .kb-card) so we match the task card, not a stat card.
-  // Use an IDLE card (the inbound conversation card) — the created task is still
-  // running from the Run AI steps above, and its edit button is locked while
-  // running (aria-label "Task is running — editing locked"), so it has no
-  // "Edit task" button to click.
+  // 17. AGENT ASSIGNMENT — open the modal via card click, pick an agent from
+  // the select, confirm it shows. The card is a pure editorial surface: no
+  // ellipsis, no menu. Clicking the card body opens the Task Detail Inspector
+  // directly, which carries the AI agent select.
+  // Use an IDLE card (the inbound conversation card) — the created task is
+  // still running from the Run AI steps above.
   clickText(reload, "Board");
   assert.ok(await waitFor(() => Boolean([...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"))) ?? false), "inbound conversation card rendered on board");
-  const assignedCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation"));
-  const assignedMenu = assignedCard?.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement | null;
-  assert.ok(assignedMenu, "CardMenu on the idle task card");
-  assignedMenu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].some((b) => b.textContent?.includes("Edit task")));
-  const assignedEdit = [...(assignedCard?.querySelectorAll('[role="menuitem"]') ?? [])].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement | null;
-  assignedEdit?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  const assignedCard = [...reload.querySelectorAll<HTMLElement>("[data-task-id]")].find((card) => card.textContent?.includes("OpenHands inbound conversation")) as HTMLElement;
+  assert.ok(assignedCard, "idle task card found on board");
+  assignedCard.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  assignedCard.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
+  assert.ok(await waitFor(() => reload.textContent?.includes("Edit Task") ?? false), "Task Detail Inspector opens on card click");
   assert.ok(await waitFor(() => Boolean(reload.querySelector('select[aria-label="AI agent"]')) ?? false), "AI agent select present in modal");
   const agentSelect = reload.querySelector('select[aria-label="AI agent"]') as HTMLSelectElement;
   const agentOptions = [...agentSelect.querySelectorAll("option")].filter((o) => o.value);

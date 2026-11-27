@@ -82,15 +82,15 @@ test("detail modal renders Title Case priority badges with a centered dot in the
   const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
   assert.ok(loaded, "tasks must load and render");
 
-  // Open the detail modal via the card's ellipsis CardMenu: click the menu
-  // button to open the popover, then click the "Edit task" menu item.
-  const menu = container.querySelector('button[aria-label="Card actions"]') as HTMLButtonElement;
-  assert.ok(menu, "CardMenu (ellipsis) button exists on the card");
-  menu.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await waitFor(() => [...container.querySelectorAll('[role="menuitem"]')].some((b) => b.textContent?.includes("Edit task")));
-  const edit = [...container.querySelectorAll('[role="menuitem"]')].find((b) => b.textContent?.includes("Edit task")) as HTMLButtonElement;
-  assert.ok(edit, "Edit task menu item exists in the CardMenu popover");
-  edit.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
+  // Open the detail modal by clicking the card body. The card is a pure
+  // editorial surface — the CardMenu ellipsis is gone. A genuine click
+  // (pointerdown + pointerup with no movement) opens the Task Detail
+  // Inspector, which carries Edit and Delete. This mirrors the proven
+  // click-card flow in probe-delete-flow.test.ts.
+  const card = [...container.querySelectorAll<HTMLElement>("[data-task-id]")].find((c) => c.textContent?.includes("Running task")) as HTMLElement;
+  assert.ok(card, "task card exists on the board");
+  card.dispatchEvent(new window.PointerEvent("pointerdown", { bubbles: true, clientX: 10, clientY: 10 }));
+  card.dispatchEvent(new window.PointerEvent("pointerup", { bubbles: true, clientX: 10, clientY: 10 }));
 
   // The modal must open and render the priority selector.
   const opened = await waitFor(() => container.innerHTML.includes("Priority"));
