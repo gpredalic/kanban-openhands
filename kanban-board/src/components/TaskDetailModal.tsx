@@ -1,11 +1,24 @@
 /**
- * TaskDetailModal — a glass modal for editing a task's title, agent prompt,
- * assignee, tags, and due date, plus a delete action with confirmation.
- * Also displays execution metadata (conversation ID, execution ID, profile).
+ * TaskDetailModal — a premium inspector for a task.
+ *
+ * Not a form. A workspace. The layout follows Apple / Linear / Notion
+ * inspector principles:
+ *
+ *   1. Hero — the task title, large and editable. The focal point.
+ *   2. Status + Progress — what is happening, at a glance.
+ *   3. Current Activity — the visual centerpiece. What the agent is doing.
+ *   4. Agent Summary — a human-readable profile card.
+ *   5. Results — final output or issues, when present.
+ *   6. Edit fields — the form, quiet and secondary.
+ *   7. Advanced Details — collapsed by default. Technical metadata.
+ *   8. History — a timeline, not a list of rows.
+ *
+ * Hierarchy is determined by importance, not by equal-weight boxes.
+ * Whitespace and typography do the work. No glow, no gradients, no blur.
  */
 
 import { useState, useEffect, useMemo } from "react";
-import { X, Trash2, Save, Tag, Calendar, User, Terminal, History, MessageSquare, Gauge, Play, Square, RotateCcw, ChevronDown, ChevronUp, Target, ListChecks, Bot, FileText, AlertCircle, ScrollText } from "lucide-react";
+import { X, Trash2, Save, Tag, Calendar, User, Terminal, History, MessageSquare, Play, Square, RotateCcw, ChevronDown, ChevronUp, Target, ListChecks, Bot, FileText, AlertCircle, ScrollText } from "lucide-react";
 import type { Task, TaskStatus, TaskPriority } from "../types/task";
 import type { Agent, EnrichedTask } from "../types/ai";
 import type { OpenHandsState, OpenHandsExecution } from "../types/openhands";
@@ -173,502 +186,580 @@ export function TaskDetailModal({
     onClose();
   };
 
+  // Execution action visibility.
+  const hasPriorExecution = Boolean(task.conversationId || task.executionId);
+  const showRun = Boolean(onTaskRun) && !running;
+  const showStop = Boolean(onTaskStop) && running;
+  const showRetry = Boolean(onTaskRetry) && hasPriorExecution && !running;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <div
-        className="kb-glass kb-fade-in flex max-h-[90vh] w-[80vw] max-w-[1200px] flex-col overflow-y-auto rounded-2xl p-6 shadow-2xl"
+        className="kb-glass kb-fade-in flex max-h-[92vh] w-[85vw] max-w-[1280px] flex-col overflow-hidden rounded-3xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="mb-5 flex items-start justify-between">
-          <div>
-            <span className="mb-1 inline-block rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-300 ring-1 ring-indigo-400/25">
-              {STATUS_LABELS[task.status]}
-            </span>
-            <h3 className="text-lg font-bold text-white">Edit Task</h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-white/5 hover:text-slate-300"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
+        {/* ── Scrollable content ── */}
+        <div className="flex-1 overflow-y-auto p-8 sm:p-10">
 
-        {/* Fields */}
-        <div className="flex flex-col gap-4">
-          {running && (
-            <div className="flex items-center gap-2 rounded-xl bg-blue-500/10 px-3.5 py-2.5 text-xs font-medium text-blue-300 ring-1 ring-blue-500/20">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-blue-400" />
-              Task is currently running and cannot be edited.
+          {/* ════════════════════════════════════════════════════════════
+              HERO — the task title is the focal point.
+              ════════════════════════════════════════════════════════════ */}
+          <div className="mb-10">
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">
+                Edit Task
+              </span>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+                aria-label="Close"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-          )}
 
-          {/* ─── User-Friendly Execution Sections ─── */}
-          {exec.execution && (
-            <div className="flex flex-col gap-3">
-              {/* Task Goal */}
-              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                  <Target className="h-3.5 w-3.5" /> Task Goal
-                </h4>
-                <p className="text-xs leading-relaxed text-slate-300">
-                  {task.expectedOutput || task.agentPrompt || "No goal defined."}
-                </p>
-              </div>
-
-              {/* Progress */}
-              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <div className="mb-2 flex items-center justify-between">
-                  <h4 className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                    <Gauge className="h-3.5 w-3.5" /> Progress
-                  </h4>
-                  {exec.statusStyle && <Badge style={exec.statusStyle} pulse={exec.isRunning} />}
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
-                  {exec.isRunning ? (
-                    <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
-                  ) : (
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        exec.execution.status === "completed"
-                          ? "bg-emerald-400"
-                          : exec.execution.status === "failed" || exec.execution.status === "cancelled"
-                            ? "bg-rose-400"
-                            : "bg-slate-600"
-                      }`}
-                      style={{ width: `${exec.progress}%` }}
-                    />
-                  )}
-                </div>
-                <div className="mt-1.5 text-[11px] text-slate-500">
-                  {exec.isRunning
-                    ? "Agent is working…"
-                    : exec.execution.status === "completed"
-                      ? "Completed"
-                      : exec.execution.status === "failed"
-                        ? "Failed"
-                        : exec.execution.status === "cancelled"
-                          ? "Cancelled"
-                          : "Waiting to start"}
-                </div>
-              </div>
-
-              {/* What the Agent Is Doing */}
-              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                  <Bot className="h-3.5 w-3.5" /> What the Agent Is Doing
-                </h4>
-                <p className="text-xs leading-relaxed text-slate-300">
-                  {exec.isRunning ? exec.currentStep : exec.execution.status === "completed" ? "Task completed successfully." : "—"}
-                </p>
-              </div>
-
-              {/* Agent Summary */}
-              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                  <MessageSquare className="h-3.5 w-3.5" /> Agent Summary
-                </h4>
-                <p className="line-clamp-4 whitespace-pre-wrap text-xs leading-relaxed text-slate-300">
-                  {exec.latestMessage !== "—" ? exec.latestMessage : "No agent messages yet."}
-                </p>
-              </div>
-
-              {/* Final Result */}
-              {exec.execution.status === "completed" && (
-                <div className="rounded-xl bg-emerald-500/[0.06] p-3.5 ring-1 ring-emerald-500/15">
-                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-emerald-400">
-                    <ListChecks className="h-3.5 w-3.5" /> Final Result
-                  </h4>
-                  <p className="text-xs leading-relaxed text-emerald-200/80">
-                    {task.successCriteria || "Task completed. See agent summary above for details."}
-                  </p>
-                </div>
-              )}
-
-              {/* Issues Encountered */}
-              {exec.error && (
-                <div className="rounded-xl bg-rose-500/[0.06] p-3.5 ring-1 ring-rose-500/15">
-                  <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-rose-400">
-                    <AlertCircle className="h-3.5 w-3.5" /> Issues Encountered
-                  </h4>
-                  <p className="whitespace-pre-wrap text-xs leading-relaxed text-rose-200/80">{exec.error}</p>
-                </div>
-              )}
-
-              {/* Original Prompt */}
-              <div className="rounded-xl bg-white/[0.03] p-3.5 ring-1 ring-white/5">
-                <h4 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                  <FileText className="h-3.5 w-3.5" /> Original Prompt
-                </h4>
-                <p className="line-clamp-3 whitespace-pre-wrap text-xs leading-relaxed text-slate-400">
-                  {task.agentPrompt || "No prompt set."}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Execution actions — Run / Stop / Retry, moved here from the card */}
-          {(() => {
-            const hasPriorExecution = Boolean(task.conversationId || task.executionId);
-            const showRun = Boolean(onTaskRun) && !running;
-            const showStop = Boolean(onTaskStop) && running;
-            const showRetry = Boolean(onTaskRetry) && hasPriorExecution && !running;
-            if (!showRun && !showStop && !showRetry) return null;
-            return (
-              <div className="flex flex-wrap items-center gap-2">
-                {showRun && (
-                  <button
-                    type="button"
-                    onClick={() => onTaskRun?.(task as EnrichedTask)}
-                    disabled={runLoading}
-                    className="flex h-9 items-center gap-1.5 rounded-lg bg-blue-500/15 px-3 text-xs font-semibold text-blue-300 ring-1 ring-blue-400/30 transition-colors hover:bg-blue-500/25 disabled:cursor-not-allowed disabled:opacity-60"
-                    aria-label="Run this task"
-                  >
-                    {runLoading ? (
-                      <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                      </svg>
-                    ) : (
-                      <Play className="h-3.5 w-3.5" strokeWidth={2.5} />
-                    )}
-                    {runLoading ? "Starting…" : "Run"}
-                  </button>
-                )}
-                {showStop && (
-                  <button
-                    type="button"
-                    onClick={() => setConfirmAction("stop")}
-                    disabled={stopLoading}
-                    className="flex h-9 items-center gap-1.5 rounded-lg bg-rose-500/15 px-3 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30 transition-colors hover:bg-rose-500/25 disabled:cursor-not-allowed disabled:opacity-60"
-                    aria-label="Stop this task"
-                  >
-                    {stopLoading ? (
-                      <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                      </svg>
-                    ) : (
-                      <Square className="h-3.5 w-3.5" strokeWidth={2.5} />
-                    )}
-                    {stopLoading ? "Stopping…" : "Stop"}
-                  </button>
-                )}
-                {showRetry && (
-                  <button
-                    type="button"
-                    onClick={() => setConfirmAction("retry")}
-                    className="flex h-9 items-center gap-1.5 rounded-lg bg-violet-500/15 px-3 text-xs font-semibold text-violet-300 ring-1 ring-violet-400/30 transition-colors hover:bg-violet-500/25"
-                    aria-label="Retry execution for this task"
-                    title="Retry execution"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
-                    Retry
-                  </button>
-                )}
-              </div>
-            );
-          })()}
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Title</label>
+            {/* Editable hero title — borderless, large, Nunito Bold. */}
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={running}
-              className="w-full rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full border-0 bg-transparent text-4xl font-bold tracking-tight text-white focus:outline-none focus:ring-0 disabled:cursor-not-allowed disabled:opacity-60 sm:text-5xl"
             />
-          </div>
 
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Agent Prompt</label>
-            <textarea
-              value={agentPrompt}
-              onChange={(e) => setAgentPrompt(e.target.value)}
-              rows={5}
-              placeholder="The actual instruction sent to the AI agent."
-              disabled={running}
-              className="w-full resize-y rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Expected Output</label>
-            <textarea
-              value={expectedOutput}
-              onChange={(e) => setExpectedOutput(e.target.value)}
-              rows={3}
-              placeholder="What should the agent produce?"
-              disabled={running}
-              className="w-full resize-y rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Success Criteria</label>
-            <textarea
-              value={successCriteria}
-              onChange={(e) => setSuccessCriteria(e.target.value)}
-              rows={3}
-              placeholder="How will you know the work is done?"
-              disabled={running}
-              className="w-full resize-y rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-slate-400">
-              <User className="h-3.5 w-3.5" /> Assignee
-            </label>
-            <input
-              type="text"
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-              placeholder="e.g. Jane Doe"
-              disabled={running}
-              className="w-full rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">AI agent</label>
-            <select
-              aria-label="AI agent"
-              value={agentId}
-              onChange={(e) => setAgentId(e.target.value)}
-              disabled={running}
-              className="w-full rounded-xl border border-white/10 bg-slate-900 px-3.5 py-2.5 text-sm text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Unassigned</option>
-              {agents.map((agent) => (
-                <option key={agent.id} value={agent.id}>{agent.name} - {agent.role}</option>
-              ))}
-            </select>
-            {agentId && (
-              <p className="mt-2 text-xs text-indigo-300">
-                Assigned agent: {agents.find((agent) => agent.id === agentId)?.name ?? "Unassigned"}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-400">Priority</label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {(["low", "medium", "high", "critical"] as TaskPriority[]).map((level) => (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => setPriority(level)}
-                  disabled={running}
-                  className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                    priority === level
-                      ? level === "critical"
-                        ? "bg-red-600/20 text-red-300 ring-1 ring-red-500/40"
-                        : level === "high"
-                          ? "bg-rose-500/20 text-rose-300 ring-1 ring-rose-400/40"
-                          : level === "medium"
-                            ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/40"
-                            : "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40"
-                      : "bg-white/5 text-slate-400 hover:bg-white/10"
-                  }`}
-                >
-                  <span className={`h-2 w-2 shrink-0 rounded-full ${PRIORITY_STYLES[level].dot}`} />
-                  {PRIORITY_STYLES[level].label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Advanced Details — collapsed by default. Technical content that
-              developers and power users need, kept out of the main flow. */}
-          <div className="rounded-xl bg-white/[0.02] ring-1 ring-white/5">
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
-              className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"
-              aria-expanded={showAdvanced}
-            >
-              <span className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                <ScrollText className="h-3.5 w-3.5" /> Advanced Details
+            {/* Status + Progress + Actions — a quiet row below the title. */}
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-sm font-semibold text-slate-300 ring-1 ring-white/10">
+                {STATUS_LABELS[task.status]}
               </span>
-              {showAdvanced ? (
-                <ChevronUp className="h-3.5 w-3.5 text-slate-500" />
-              ) : (
-                <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
-              )}
-            </button>
-            {showAdvanced && (
-              <div className="flex flex-col gap-3 border-t border-white/5 px-3.5 py-3">
-                {/* Execution metadata */}
-                {(task.conversationId || task.executionId || task.profileId || exec.execution) && (
-                  <div>
-                    <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
-                      <Terminal className="h-3 w-3" /> Execution Metadata
-                    </h5>
-                    <div className="flex flex-col gap-1 text-[11px]">
-                      {task.conversationId && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-slate-500">Conversation ID</span>
-                          <span className="font-mono text-slate-400">{task.conversationId}</span>
-                        </div>
-                      )}
-                      {task.executionId && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-slate-500">Execution ID</span>
-                          <span className="font-mono text-slate-400">{task.executionId}</span>
-                        </div>
-                      )}
-                      {task.profileId && (
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-slate-500">Profile</span>
-                          <span className="font-mono text-slate-400">{task.profileId}</span>
-                        </div>
-                      )}
-                      {exec.execution && (
-                        <>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-slate-500">Started</span>
-                            <span className="text-slate-400">{fmtTime(exec.execution.startedAt)}</span>
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-slate-500">Last Update</span>
-                            <span className="text-slate-400">{fmtTime(exec.execution.updatedAt)}</span>
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-slate-500">Elapsed</span>
-                            <span className="text-slate-400">{fmtElapsed(exec.execution.startedAt, exec.execution.updatedAt)}</span>
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-slate-500">Tokens (in / out)</span>
-                            <span className="text-slate-400">
-                              {exec.execution.tokensIn} / {exec.execution.tokensOut}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-slate-500">Cost</span>
-                            <span className="text-slate-400">${exec.execution.cost.toFixed(4)}</span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
 
-                {/* History */}
-                <div>
-                  <h5 className="mb-1.5 flex items-center gap-1.5 text-[11px] font-bold text-slate-500">
-                    <History className="h-3 w-3" /> History
-                  </h5>
-                  {exec.events.length === 0 && !exec.execution ? (
-                    <p className="text-[11px] text-slate-600">No activity recorded yet.</p>
-                  ) : (
-                    <div className="flex max-h-48 flex-col gap-1.5 overflow-y-auto">
-                      {exec.execution && (
-                        <div className="flex items-center gap-2 text-[11px]">
-                          {exec.statusStyle && <Badge style={exec.statusStyle} />}
-                          {exec.execution.startedAt && (
-                            <span className="text-slate-500">{new Date(exec.execution.startedAt).toLocaleString()}</span>
-                          )}
-                        </div>
+              {exec.execution && (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Progress</span>
+                  <div className="h-1.5 w-32 overflow-hidden rounded-full bg-white/10">
+                    {exec.isRunning ? (
+                      <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
+                    ) : (
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          exec.execution.status === "completed"
+                            ? "bg-emerald-400"
+                            : exec.execution.status === "failed" || exec.execution.status === "cancelled"
+                              ? "bg-rose-400"
+                              : "bg-slate-600"
+                        }`}
+                        style={{ width: `${exec.progress}%` }}
+                      />
+                    )}
+                  </div>
+                  {exec.statusStyle && <Badge style={exec.statusStyle} pulse={exec.isRunning} />}
+                </div>
+              )}
+
+              {/* Execution actions — Run / Stop / Retry. */}
+              {(showRun || showStop || showRetry) && (
+                <div className="ml-auto flex flex-wrap items-center gap-2">
+                  {showRun && (
+                    <button
+                      type="button"
+                      onClick={() => onTaskRun?.(task as EnrichedTask)}
+                      disabled={runLoading}
+                      className="flex h-9 items-center gap-1.5 rounded-lg bg-blue-500/15 px-3.5 text-sm font-semibold text-blue-300 ring-1 ring-blue-400/30 transition-colors hover:bg-blue-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label="Run this task"
+                    >
+                      {runLoading ? (
+                        <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                        </svg>
+                      ) : (
+                        <Play className="h-3.5 w-3.5" strokeWidth={2.5} />
                       )}
-                      {exec.events.map((event) => (
-                        <div key={event.id} className="flex items-start gap-2 text-[11px]">
-                          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-600" />
-                          <div>
-                            <span className="text-slate-400">{event.title}</span>
-                            {event.detail && (
-                              <span className="ml-1 text-slate-600">{event.detail}</span>
-                            )}
-                            <span className="ml-1 text-slate-700">
-                              {new Date(event.at).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                      {runLoading ? "Starting…" : "Run"}
+                    </button>
+                  )}
+                  {showStop && (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmAction("stop")}
+                      disabled={stopLoading}
+                      className="flex h-9 items-center gap-1.5 rounded-lg bg-rose-500/15 px-3.5 text-sm font-semibold text-rose-300 ring-1 ring-rose-400/30 transition-colors hover:bg-rose-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                      aria-label="Stop this task"
+                    >
+                      {stopLoading ? (
+                        <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                        </svg>
+                      ) : (
+                        <Square className="h-3.5 w-3.5" strokeWidth={2.5} />
+                      )}
+                      {stopLoading ? "Stopping…" : "Stop"}
+                    </button>
+                  )}
+                  {showRetry && (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmAction("retry")}
+                      className="flex h-9 items-center gap-1.5 rounded-lg bg-violet-500/15 px-3.5 text-sm font-semibold text-violet-300 ring-1 ring-violet-400/30 transition-colors hover:bg-violet-500/25"
+                      aria-label="Retry execution for this task"
+                      title="Retry execution"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" strokeWidth={2.5} />
+                      Retry
+                    </button>
                   )}
                 </div>
+              )}
+            </div>
+
+            {running && (
+              <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-500/10 px-4 py-2.5 text-sm font-medium text-blue-300 ring-1 ring-blue-500/20">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-blue-400" />
+                Task is currently running and cannot be edited.
               </div>
             )}
           </div>
 
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-slate-400">
-              <Tag className="h-3.5 w-3.5" /> Tags (comma-separated)
-            </label>
-            <input
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="e.g. backend, api"
-              disabled={running}
-              className="w-full rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
+          {/* ════════════════════════════════════════════════════════════
+              BENTO GRID — importance determines layout.
+              Left (3/5): live content — activity, agent, results.
+              Right (2/5): edit fields, advanced details, history.
+              ════════════════════════════════════════════════════════════ */}
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
 
-          <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-slate-400">
-              <Calendar className="h-3.5 w-3.5" /> Due Date
-            </label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              disabled={running}
-              className="w-full rounded-xl border-0 bg-white/5 px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-50"
-            />
+            {/* ── LEFT: Live content ── */}
+            <div className="flex flex-col gap-8 lg:col-span-3">
+
+              {/* What the Agent Is Doing — the visual centerpiece. */}
+              {exec.execution && (
+                <section>
+                  <h4 className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
+                    <Bot className="h-5 w-5 text-blue-400" strokeWidth={1.75} />
+                    What the Agent Is Doing
+                  </h4>
+                  <div className="rounded-2xl bg-white/[0.03] p-6 ring-1 ring-white/5">
+                    <p className="text-2xl font-bold leading-snug tracking-tight text-white">
+                      {exec.isRunning
+                        ? exec.currentStep
+                        : exec.execution.status === "completed"
+                          ? "Task completed successfully."
+                          : exec.execution.status === "failed"
+                            ? "Execution failed."
+                            : exec.execution.status === "cancelled"
+                              ? "Execution cancelled."
+                              : "Waiting to start."}
+                    </p>
+                    <div className="mt-4 flex items-center gap-3">
+                      <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/10">
+                        {exec.isRunning ? (
+                          <div className="h-full w-1/3 animate-pulse rounded-full bg-blue-400/70" />
+                        ) : (
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              exec.execution.status === "completed"
+                                ? "bg-emerald-400"
+                                : exec.execution.status === "failed" || exec.execution.status === "cancelled"
+                                  ? "bg-rose-400"
+                                  : "bg-slate-600"
+                            }`}
+                            style={{ width: `${exec.progress}%` }}
+                          />
+                        )}
+                      </div>
+                      <span className="text-xs font-semibold text-slate-500">
+                        {exec.isRunning
+                          ? "Agent is working…"
+                          : exec.execution.status === "completed"
+                            ? "Completed"
+                            : exec.execution.status === "failed"
+                              ? "Failed"
+                              : exec.execution.status === "cancelled"
+                                ? "Cancelled"
+                                : "Waiting"}
+                      </span>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {/* Agent Summary — a human-readable profile card. */}
+              {exec.execution && (
+                <section>
+                  <h4 className="mb-4 flex items-center gap-2 text-lg font-bold text-white">
+                    <MessageSquare className="h-5 w-5 text-indigo-400" strokeWidth={1.75} />
+                    Agent Summary
+                  </h4>
+                  <div className="rounded-2xl bg-white/[0.03] p-6 ring-1 ring-white/5">
+                    <p className="text-base leading-relaxed text-slate-300">
+                      {exec.latestMessage !== "—" ? exec.latestMessage : "No agent messages yet."}
+                    </p>
+                  </div>
+                </section>
+              )}
+
+              {/* Final Result — only when completed. */}
+              {exec.execution?.status === "completed" && (
+                <section>
+                  <h4 className="mb-4 flex items-center gap-2 text-lg font-bold text-emerald-400">
+                    <ListChecks className="h-5 w-5" strokeWidth={1.75} />
+                    Final Result
+                  </h4>
+                  <div className="rounded-2xl bg-emerald-500/[0.06] p-6 ring-1 ring-emerald-500/15">
+                    <p className="text-base leading-relaxed text-emerald-200/80">
+                      {task.successCriteria || "Task completed. See agent summary above for details."}
+                    </p>
+                  </div>
+                </section>
+              )}
+
+              {/* Issues Encountered — only when there's an error. */}
+              {exec.error && (
+                <section>
+                  <h4 className="mb-4 flex items-center gap-2 text-lg font-bold text-rose-400">
+                    <AlertCircle className="h-5 w-5" strokeWidth={1.75} />
+                    Issues Encountered
+                  </h4>
+                  <div className="rounded-2xl bg-rose-500/[0.06] p-6 ring-1 ring-rose-500/15">
+                    <p className="whitespace-pre-wrap text-base leading-relaxed text-rose-200/80">{exec.error}</p>
+                  </div>
+                </section>
+              )}
+
+              {/* Original Prompt — quiet, secondary. */}
+              {exec.execution && (
+                <section>
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-500">
+                    <FileText className="h-4 w-4" strokeWidth={1.75} />
+                    Original Prompt
+                  </h4>
+                  <p className="line-clamp-4 whitespace-pre-wrap text-sm leading-relaxed text-slate-400">
+                    {task.agentPrompt || "No prompt set."}
+                  </p>
+                </section>
+              )}
+            </div>
+
+            {/* ── RIGHT: Edit fields + Advanced + History ── */}
+            <div className="flex flex-col gap-6 lg:col-span-2">
+
+              {/* Task Goal — the expected output, shown when execution exists. */}
+              {exec.execution && (
+                <section>
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-500">
+                    <Target className="h-4 w-4" strokeWidth={1.75} />
+                    Task Goal
+                  </h4>
+                  <p className="text-sm leading-relaxed text-slate-300">
+                    {task.expectedOutput || task.agentPrompt || "No goal defined."}
+                  </p>
+                </section>
+              )}
+
+              {/* Agent Prompt */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-400">Agent Prompt</label>
+                <textarea
+                  value={agentPrompt}
+                  onChange={(e) => setAgentPrompt(e.target.value)}
+                  rows={4}
+                  placeholder="The actual instruction sent to the AI agent."
+                  disabled={running}
+                  className="w-full resize-y rounded-xl border-0 bg-white/5 px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
+              {/* Expected Output */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-400">Expected Output</label>
+                <textarea
+                  value={expectedOutput}
+                  onChange={(e) => setExpectedOutput(e.target.value)}
+                  rows={3}
+                  placeholder="What should the agent produce?"
+                  disabled={running}
+                  className="w-full resize-y rounded-xl border-0 bg-white/5 px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
+              {/* Success Criteria */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-400">Success Criteria</label>
+                <textarea
+                  value={successCriteria}
+                  onChange={(e) => setSuccessCriteria(e.target.value)}
+                  rows={3}
+                  placeholder="How will you know the work is done?"
+                  disabled={running}
+                  className="w-full resize-y rounded-xl border-0 bg-white/5 px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
+              {/* Assignee */}
+              <div>
+                <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-400">
+                  <User className="h-3.5 w-3.5" /> Assignee
+                </label>
+                <input
+                  type="text"
+                  value={assignee}
+                  onChange={(e) => setAssignee(e.target.value)}
+                  placeholder="e.g. Jane Doe"
+                  disabled={running}
+                  className="w-full rounded-xl border-0 bg-white/5 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
+              {/* AI agent */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-400">AI agent</label>
+                <select
+                  aria-label="AI agent"
+                  value={agentId}
+                  onChange={(e) => setAgentId(e.target.value)}
+                  disabled={running}
+                  className="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-2.5 text-sm text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">Unassigned</option>
+                  {agents.map((agent) => (
+                    <option key={agent.id} value={agent.id}>{agent.name} - {agent.role}</option>
+                  ))}
+                </select>
+                {agentId && (
+                  <p className="mt-2 text-sm text-indigo-300">
+                    Assigned agent: {agents.find((agent) => agent.id === agentId)?.name ?? "Unassigned"}
+                  </p>
+                )}
+              </div>
+
+              {/* Priority */}
+              <div>
+                <label className="mb-2 block text-sm font-semibold text-slate-400">Priority</label>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {(["low", "medium", "high", "critical"] as TaskPriority[]).map((level) => (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => setPriority(level)}
+                      disabled={running}
+                      className={`flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                        priority === level
+                          ? level === "critical"
+                            ? "bg-red-600/20 text-red-300 ring-1 ring-red-500/40"
+                            : level === "high"
+                              ? "bg-rose-500/20 text-rose-300 ring-1 ring-rose-400/40"
+                              : level === "medium"
+                                ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/40"
+                                : "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40"
+                          : "bg-white/5 text-slate-400 hover:bg-white/10"
+                      }`}
+                    >
+                      <span className={`h-2 w-2 shrink-0 rounded-full ${PRIORITY_STYLES[level].dot}`} />
+                      {PRIORITY_STYLES[level].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-400">
+                  <Tag className="h-3.5 w-3.5" /> Tags
+                </label>
+                <input
+                  type="text"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="e.g. backend, api"
+                  disabled={running}
+                  className="w-full rounded-xl border-0 bg-white/5 px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-slate-400">
+                  <Calendar className="h-3.5 w-3.5" /> Due Date
+                </label>
+                <input
+                  type="date"
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  disabled={running}
+                  className="w-full rounded-xl border-0 bg-white/5 px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 [color-scheme:dark] disabled:cursor-not-allowed disabled:opacity-50"
+                />
+              </div>
+
+              {/* Advanced Details — collapsed by default. */}
+              <div className="rounded-xl bg-white/[0.02] ring-1 ring-white/5">
+                <button
+                  type="button"
+                  onClick={() => setShowAdvanced((v) => !v)}
+                  className="flex w-full items-center justify-between px-4 py-3 text-left"
+                  aria-expanded={showAdvanced}
+                >
+                  <span className="flex items-center gap-2 text-sm font-bold text-slate-400">
+                    <ScrollText className="h-4 w-4" /> Advanced Details
+                  </span>
+                  {showAdvanced ? (
+                    <ChevronUp className="h-4 w-4 text-slate-500" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 text-slate-500" />
+                  )}
+                </button>
+                {showAdvanced && (
+                  <div className="flex flex-col gap-4 border-t border-white/5 px-4 py-4">
+                    {/* Execution metadata */}
+                    {(task.conversationId || task.executionId || task.profileId || exec.execution) && (
+                      <div>
+                        <h5 className="mb-2 flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                          <Terminal className="h-3 w-3" /> Execution Metadata
+                        </h5>
+                        <div className="flex flex-col gap-1.5 text-xs">
+                          {task.conversationId && (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-slate-500">Conversation ID</span>
+                              <span className="font-mono text-slate-400">{task.conversationId}</span>
+                            </div>
+                          )}
+                          {task.executionId && (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-slate-500">Execution ID</span>
+                              <span className="font-mono text-slate-400">{task.executionId}</span>
+                            </div>
+                          )}
+                          {task.profileId && (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-slate-500">Profile</span>
+                              <span className="font-mono text-slate-400">{task.profileId}</span>
+                            </div>
+                          )}
+                          {exec.execution && (
+                            <>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-slate-500">Started</span>
+                                <span className="text-slate-400">{fmtTime(exec.execution.startedAt)}</span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-slate-500">Last Update</span>
+                                <span className="text-slate-400">{fmtTime(exec.execution.updatedAt)}</span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-slate-500">Elapsed</span>
+                                <span className="text-slate-400">{fmtElapsed(exec.execution.startedAt, exec.execution.updatedAt)}</span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-slate-500">Tokens (in / out)</span>
+                                <span className="text-slate-400">
+                                  {exec.execution.tokensIn} / {exec.execution.tokensOut}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-slate-500">Cost</span>
+                                <span className="text-slate-400">${exec.execution.cost.toFixed(4)}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* History — a timeline, not a list of rows. */}
+                    <div>
+                      <h5 className="mb-3 flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                        <History className="h-3 w-3" /> History
+                      </h5>
+                      {exec.events.length === 0 && !exec.execution ? (
+                        <p className="text-xs text-slate-600">No activity recorded yet.</p>
+                      ) : (
+                        <div className="relative flex max-h-56 flex-col gap-0 overflow-y-auto pl-5">
+                          {/* Timeline line */}
+                          <div className="absolute left-[5px] top-1 bottom-1 w-px bg-white/10" />
+                          {exec.execution && (
+                            <div className="relative flex items-start gap-3 py-2">
+                              <span className="absolute -left-5 mt-1 h-2.5 w-2.5 rounded-full bg-blue-400 ring-4 ring-blue-400/20" />
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-white">Execution started</p>
+                                {exec.execution.startedAt && (
+                                  <p className="mt-0.5 text-xs text-slate-500">
+                                    {new Date(exec.execution.startedAt).toLocaleString()}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {exec.events.map((event) => (
+                            <div key={event.id} className="relative flex items-start gap-3 py-2">
+                              <span className="absolute -left-5 mt-1 h-2 w-2 rounded-full bg-slate-600" />
+                              <div className="min-w-0">
+                                <p className="text-sm text-slate-300">{event.title}</p>
+                                {event.detail && (
+                                  <p className="mt-0.5 text-xs text-slate-500">{event.detail}</p>
+                                )}
+                                <p className="mt-0.5 text-xs text-slate-600">
+                                  {new Date(event.at).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="mt-6 flex items-center justify-between">
-          {confirmDelete ? (
-            <div className="flex items-center gap-2">
+        {/* ── Footer actions ── */}
+        <div className="border-t border-white/5 p-6 sm:px-10">
+          <div className="flex items-center justify-between">
+            {confirmDelete ? (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onDelete(task.id);
+                    onClose();
+                  }}
+                  className="rounded-xl bg-rose-500/20 px-4 py-2.5 text-sm font-semibold text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-500/30"
+                >
+                  Confirm Delete
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="rounded-xl px-4 py-2.5 text-sm text-slate-400 hover:bg-white/5"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
               <button
                 type="button"
-                onClick={() => {
-                  onDelete(task.id);
-                  onClose();
-                }}
-                className="rounded-xl bg-rose-500/20 px-3.5 py-2 text-sm font-medium text-rose-300 ring-1 ring-rose-400/30 hover:bg-rose-500/30"
+                onClick={() => setConfirmDelete(true)}
+                disabled={running}
+                className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-rose-400 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+                title={running ? "Stop the task before deleting it." : "Delete task"}
               >
-                Confirm Delete
+                <Trash2 className="h-4 w-4" /> Delete
               </button>
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(false)}
-                className="rounded-xl px-3 py-2 text-sm text-slate-400 hover:bg-white/5"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
+            )}
+
             <button
               type="button"
-              onClick={() => setConfirmDelete(true)}
+              onClick={handleSave}
               disabled={running}
-              className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-rose-400 hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-50"
-              title={running ? "Stop the task before deleting it." : "Delete task"}
+              className="kb-gradient kb-btn-glow flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Trash2 className="h-4 w-4" /> Delete
+              <Save className="h-4 w-4" /> Save
             </button>
-          )}
-
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={running}
-            className="kb-gradient kb-btn-glow flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Save className="h-4 w-4" /> Save
-          </button>
+          </div>
         </div>
       </div>
 
