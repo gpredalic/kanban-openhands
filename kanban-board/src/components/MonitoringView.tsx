@@ -137,20 +137,47 @@ export function MonitoringView({
               </div>
             </div>
 
-            {/* Progress — a visual stepper of the full execution path. */}
+            {/* Progress — a visual stepper of the full execution path.
+                A horizontal line with dots: filled = completed, ring = current,
+                hollow = upcoming. Labels sit below. The line fills proportionally. */}
             <div className="mt-14">
-              <p className="mb-6 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Workflow Structure</p>
+              <p className="mb-8 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-slate-500">Workflow Structure</p>
               {path.length > 0 ? (
-                <div className="flex flex-wrap items-center gap-3">
-                  {path.map((n, i) => (
-                    <span key={n.id} className="flex items-center gap-3">
-                      <span className={`flex items-center gap-2.5 rounded-full px-5 py-2 text-base font-semibold ring-1 ${i === path.length - 1 ? "bg-blue-500/20 text-blue-200 ring-blue-400/40" : "bg-white/5 text-slate-400 ring-white/10"}`}>
-                        <span className={`h-2 w-2 rounded-full ${i === path.length - 1 ? "bg-blue-400" : "bg-slate-600"}`} />
-                        {n.label}
-                      </span>
-                      {i < path.length - 1 && <span className="text-lg text-slate-600">→</span>}
-                    </span>
-                  ))}
+                <div className="relative">
+                  {/* Background line */}
+                  <div className="absolute left-0 right-0 top-[7px] h-px bg-white/10" />
+                  {/* Progress line — fills the full path width. The path only
+                      includes nodes up to the current one, so the line extends
+                      as the workflow progresses. */}
+                  {path.length > 1 && (
+                    <div className="absolute left-0 top-[7px] h-px w-full bg-blue-400/60" />
+                  )}
+                  <div className="relative flex justify-between">
+                    {path.map((n, i) => {
+                      const isLast = i === path.length - 1;
+                      const isCurrent = isLast;
+                      return (
+                        <div key={n.id} className="flex flex-col items-center gap-3">
+                          <span
+                            className={`h-3.5 w-3.5 rounded-full transition-colors ${
+                              isCurrent
+                                ? "bg-blue-400 ring-4 ring-blue-400/20"
+                                : "bg-slate-600"
+                            }`}
+                          />
+                          <span
+                            className={`text-sm ${
+                              isCurrent
+                                ? "font-semibold text-white"
+                                : "font-normal text-slate-500"
+                            }`}
+                          >
+                            {n.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               ) : (
                 <p className="text-xl text-slate-500">No progress yet</p>

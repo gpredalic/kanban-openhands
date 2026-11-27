@@ -198,7 +198,7 @@ function TaskCardInner({ task, isDragging, isOverlay = false, deleting = false, 
         if (moved > 5 || wasDrag) return;
         onEdit?.(task);
       }}
-      className={`kb-glass kb-card kb-fade-in group relative flex min-h-[140px] cursor-grab flex-col rounded-[18px] p-6 active:cursor-grabbing ${
+      className={`kb-glass kb-card kb-fade-in group relative flex min-h-[140px] cursor-grab flex-col rounded-[18px] p-7 active:cursor-grabbing ${
         isOverlay ? "kb-dragging kb-drag-overlay" : isDragging ? "kb-drag-placeholder" : ""
       } ${deleting ? "opacity-60" : ""} ${deleteError ? "kb-delete-failed" : ""} ${deletePhase === "fading" ? "kb-delete-fading" : ""} ${running ? "kb-running" : ""} ${animClass}`}
     >
