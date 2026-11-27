@@ -38,13 +38,9 @@ import { resolveRouting } from "../lib/ai-engine";
  * so the lazy() import resolves synchronously — but React still defers the
  * component's *mount* (its effects and initial state) until it is first
  * rendered inside the Suspense boundary. That is the real win: opening the
- * board no longer pays for the Workflow / Analytics / History / Agents /
- * Monitoring views' setup cost.
+ * board no longer pays for the Workflow / Analytics views' setup cost.
  */
 const WorkflowView = lazy(() => import("./WorkflowView").then((m) => ({ default: m.WorkflowView })));
-const MonitoringView = lazy(() => import("./MonitoringView").then((m) => ({ default: m.MonitoringView })));
-const AgentRoster = lazy(() => import("./AgentRoster").then((m) => ({ default: m.AgentRoster })));
-const ExecutionHistory = lazy(() => import("./ExecutionHistory").then((m) => ({ default: m.ExecutionHistory })));
 const AnalyticsView = lazy(() => import("./AnalyticsView").then((m) => ({ default: m.AnalyticsView })));
 
 /** Shown while a lazy view is resolving — a quiet, non-blocking placeholder. */
@@ -73,9 +69,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
   const { state: aiState, store: aiStore } = useAiState(host);
   const { state: openHandsState, reset: resetOpenHands } = useOpenHandsState(host);
   const [view, setView] = useState<ViewId>("board");
-  // Which workflow the Monitoring view is observing. Defaults to the first
-  // workflow; the user can switch from the Monitoring toolbar.
-  const [monitoringWorkflowId, setMonitoringWorkflowId] = useState<string | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [assignmentAgents, setAssignmentAgents] = useState<Agent[]>([]);
@@ -263,14 +256,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
     });
   };
 
-  // Command Center execution control: start / stop / retry a specific execution
-  // record by id. Task-centric — never a global toggle.
-  const handleOpenHandsCommand = (command: "start" | "stop" | "retry", executionId: string) => {
-    void commandExecution(host, command, { executionId }).catch((error: unknown) => {
-      console.error("[kanban-board] OpenHands command failed:", error);
-    });
-  };
-
   // Refresh the board when the user returns to the Board view so inbound
   // OpenHands conversations (created outside the board) are reflected promptly
   // instead of waiting for the next 15s poll.
@@ -380,20 +365,6 @@ export function KanbanBoard({ host }: KanbanBoardProps) {
                 workflows: aiState.config.workflows.filter((item) => item.id !== workflowId),
               })}
             />
-          ) : view === "monitoring" ? (
-            <MonitoringView
-              workflows={aiState.config.workflows}
-              selectedId={monitoringWorkflowId ?? aiState.config.workflows[0]?.id ?? null}
-              onSelectId={setMonitoringWorkflowId}
-              openHandsState={openHandsState}
-              tasks={enrichedTasks}
-              profiles={assignmentAgents}
-              onCommand={handleOpenHandsCommand}
-            />
-          ) : view === "agents" ? (
-            <AgentRoster host={host} openHandsState={openHandsState} />
-          ) : view === "history" ? (
-            <ExecutionHistory openHandsState={openHandsState} aiState={aiState} profiles={assignmentAgents} onReset={resetOpenHands} />
           ) : (
             <AnalyticsView aiState={aiState} openHandsState={openHandsState} onReset={resetOpenHands} />
           )}

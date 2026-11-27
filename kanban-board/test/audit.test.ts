@@ -212,7 +212,7 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     searchInputPresent: container.querySelector('input[aria-label="Search tasks"]') !== null,
   };
 
-  for (const view of ["Workflow", "Agents", "History", "Analytics"]) {
+  for (const view of ["Workflow", "Analytics"]) {
     clickText(container, view);
     await sleep(50);
     evidence[view] = container.textContent?.replace(/\s+/g, " ").slice(0, 350);
@@ -242,28 +242,6 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     commandPosts: fixture.calls.filter((call) => call.method === "POST" && call.path === "/api/conversations").length,
     visibleExecution: container.textContent?.includes("execution"),
   };
-  clickText(container, "History");
-  await sleep(50);
-  // Clicking Reset History must open a confirmation dialog (a question) before
-  // the reset fires — it must not reset immediately.
-  const resetHistoryBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Clear History"));
-  resetHistoryBtn?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await sleep(20);
-  const historyConfirmDialog = container.querySelector('[role="dialog"][aria-label="Clear execution history?"]');
-  evidence.historyAfterRun = {
-    visible: container.textContent?.includes("Execution History"),
-    completedVisible: container.textContent?.includes("Completed Runs"),
-    runTitleVisible: container.textContent?.includes("Persisted audit task"),
-    resetHistoryButtonPresent: Boolean(resetHistoryBtn),
-    confirmDialogOpens: Boolean(historyConfirmDialog),
-    confirmQuestionShown: historyConfirmDialog?.textContent?.includes("Clear execution history?") ?? false,
-  };
-  // Cancel the confirmation so the reset does not fire.
-  [...(historyConfirmDialog?.querySelectorAll("button") ?? [])].find((b) => b.textContent?.includes("Cancel"))?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
-  await sleep(20);
-  evidence.historyConfirmCancelled = {
-    dialogClosed: container.querySelector('[role="dialog"][aria-label="Clear execution history?"]') === null,
-  };
   clickText(container, "Analytics");
   await sleep(50);
   const resetMetricsBtn = [...container.querySelectorAll("button")].find((b) => b.textContent?.includes("Clear Analytics"));
@@ -289,23 +267,18 @@ test("user acceptance audit exercises the real extension bundle", async () => {
     surfacePresent: container.querySelector('[aria-label="Notification surface"]') !== null,
   };
 
-  // The relay is now a workflow node type (not a separate panel). The
-  // orchestration panel (live executions + knowledge graph) moved to the
-  // dedicated Monitoring view, so the Workflow builder stays a pure node-graph
-  // editor. The node palette still exposes the relay as a first-class node type.
+  // The relay is a workflow node type (not a separate panel). The Workflow
+  // builder is a pure node-graph editor, and the node palette exposes the relay
+  // as a first-class node type.
   clickText(container, "Workflow");
   assert.ok(await waitFor(() => container.textContent?.includes("Add node") ?? false));
   // The relay is a node type in the palette.
   const relayNodeButton = [...container.querySelectorAll("button")].find((b) => b.textContent?.trim() === "Relay");
   relayNodeButton?.dispatchEvent(new window.MouseEvent("click", { bubbles: true }));
   await sleep(50);
-  // The operational sections now live in the Activity view.
-  clickText(container, "Activity");
   evidence.relay = {
     relayNodeTypeInPalette: Boolean(relayNodeButton),
     relayNodeAdded: container.textContent?.includes("Relay") ?? false,
-    activeWorkSection: container.textContent?.includes("Active Work"),
-    workflowStructureSection: container.textContent?.includes("Workflow Structure"),
   };
 
   await fixture.host.agentServer.request({

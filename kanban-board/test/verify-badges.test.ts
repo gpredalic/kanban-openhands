@@ -3,7 +3,7 @@
  *
  * The badge system is the shared <Badge> component in src/lib/badges.tsx. It is
  * the single source of truth for status and priority pills and is rendered by
- * the detail modal, monitoring view, execution history, and create modal.
+ * the detail modal and the create modal.
  *
  * The task card no longer renders badges (status is communicated by the column,
  * priority lives in the detail modal), so this test renders the shared <Badge>

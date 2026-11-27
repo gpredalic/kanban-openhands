@@ -28,14 +28,14 @@ holds credentials.
   `completed`, `failed`, `cancelled`) and priority (`low`, `medium`, `high`,
   `critical`) renders as a colored dot + Title Case label, vertically centered
   via flex. All render sites resolve through the shared `src/lib/badges.tsx`
-  module, so the pattern is identical on cards, the detail modal, the create
-  modal, execution history, and the workflow view, in both light and dark mode.
+  module, so the pattern is identical on the detail modal and the create
+  modal, in both light and dark mode.
 - **OpenHands integration** — board tasks link to OpenHands conversations via
   lowercase-alphanumeric tags (`taskid`, `agentid`, `boardstatus`, …). Inbound
   conversations appear on the board; board actions create/update conversations.
 - **AI orchestration** — Run AI, multi-agent relay, agent assignment, and
   routing rules (see the audit notes for what is fully wired vs. partial).
-- **Views** — Board, Workflow, Activity, Agents, History, Analytics.
+- **Views** — Board, Workflow, Analytics.
 - **Column-move animation** — when a task's status changes and the card moves
   between columns, the card lifts (scale 1.02 + accent glow), glides across the
   board, and settles into its destination column (scale back to 1, shadow
@@ -172,19 +172,18 @@ SESSION_TOKEN="$OPENHANDS_AUTOMATION_API_KEY" PORT=8090 node harness/server.mjs
 
 The extension was audited by exercising the real `extension.js` through the
 headless render harness and the live harness. **No feature is fully broken**,
-but six are **partially working** and keep it short of the enterprise bar:
+but five are **partially working** and keep it short of the enterprise bar:
 
 | Feature | Status |
 |---|---|
 | Create / Edit / Delete / Move Task | WORKS |
 | Persistence after refresh | WORKS |
 | Search | WORKS |
-| Activity, Workflow, Agents views | WORKS |
+| Workflow view | WORKS |
 | OpenHands → Board and Board → OpenHands sync | WORKS |
 | Multi-agent relay | WORKS |
 | **Notifications** | PARTIALLY — local in-memory panel only; no durable feed, read state, or deep links |
 | **Run AI** | PARTIALLY — starts a conversation and shows an active run, but no completed result/output is surfaced |
-| **History View** | PARTIALLY — active runs render; completed history is not durably retained |
 | **Analytics View** | PARTIALLY — renders, but shows `Unavailable` totals when the server reports no metrics |
 | **Agent assignment** | PARTIALLY — persists, but the assigned agent is not reliably shown on cards/detail |
 | **AI routing** | PARTIALLY — can trigger a conversation, but the routing decision is not visible to the user |

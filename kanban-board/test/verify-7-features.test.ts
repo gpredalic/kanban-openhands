@@ -10,7 +10,8 @@
  *   F2  No sliding/swipe actions (only scale hover)
  *   F3  Delete disabled for active (running/queued) tasks
  *   F4  Task execution details visible in the detail modal
- *   F5  Workflow routing (current node, next node, execution path)
+ *   F5  (removed — the workflow routing readout lived in the Activity view,
+ *       which was removed along with Agents and History)
  *   F6  Skeleton loading on initial load
  *   F7  Motion improvements (CSS animations present)
  */
@@ -274,62 +275,6 @@ test("F4: task execution details visible in the detail modal", async () => {
   assert.match(html, /Progress/, "must show Progress");
   assert.match(html, /Original Prompt/, "must show Original Prompt");
   assert.match(html, /Advanced Details/, "must show the Advanced Details collapsed section");
-
-  cleanup();
-  container.remove();
-});
-
-/* ------------------------------------------------------------------ *
- * F5 — Workflow routing (current node, next node, execution path).
- * ------------------------------------------------------------------ */
-test("F5: workflow routing shows current node, next node, and execution path", async () => {
-  // Seed a workflow with a running task node so routing can be derived.
-  const workflow = {
-    id: "wf-1",
-    name: "Test Workflow",
-    description: "A test workflow for routing verification",
-    nodes: [
-      { id: "n-start", type: "start", label: "Start", x: 0, y: 0 },
-      { id: "n-run", type: "task", label: "Running task", x: 200, y: 0, taskId: "t-run" },
-      { id: "n-next", type: "task", label: "Next task", x: 400, y: 0, taskId: "t-queue" },
-      { id: "n-end", type: "end", label: "End", x: 600, y: 0 },
-    ],
-    edges: [
-      { id: "e1", from: "n-start", to: "n-run", condition: "always" },
-      { id: "e2", from: "n-run", to: "n-next", condition: "always" },
-      { id: "e3", from: "n-next", to: "n-end", condition: "always" },
-    ],
-    status: "active",
-  };
-  localStorage.setItem(
-    "kanban-board.ai-config.v1",
-    JSON.stringify({ workflows: [workflow], routingRules: [] }),
-  );
-
-  const { host, trigger } = makeHost();
-  const cleanup = activate(host);
-  const container = trigger();
-  const loaded = await waitFor(() => container.innerHTML.includes("Running task"));
-  assert.ok(loaded, "tasks must load and render");
-
-  // Click the Activity tab — the Current Activity readout now lives in the
-  // dedicated Activity view, not the Workflow builder.
-  const activityTab = Array.from(container.querySelectorAll("button")).find(
-    (b) => b.textContent?.includes("Activity"),
-  );
-  assert.ok(activityTab, "Activity tab must exist");
-  activityTab!.click();
-
-  const routingShown = await waitFor(() => container.innerHTML.includes("Current Activity"));
-  assert.ok(routingShown, "Activity view must show the Current Activity section");
-
-  const html = container.innerHTML;
-  assert.match(html, /Now Working On/, "must show Now Working On");
-  assert.match(html, /Up Next/, "must show Up Next");
-  assert.match(html, /Workflow Structure/, "must show Workflow Structure");
-
-  // The running task node must be the current node.
-  assert.match(html, /Running task/, "current node must be the running task");
 
   cleanup();
   container.remove();

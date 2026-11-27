@@ -207,38 +207,18 @@ test("full user-acceptance sweep: every button and interaction works", async () 
   assert.ok(await waitFor(() => Boolean(reload.querySelector('button[aria-label="Stop this task"]')) ?? false), "Run AI flips the task to Stop AI once running");
   assert.ok(fixture.calls.some((c) => c.method === "POST" && c.path === "/api/conversations"), "Run AI posts a conversation to OpenHands");
 
-  // 9. WORKFLOW BUILDER — the Workflow view is now a pure node-graph builder.
-  // The operational sections (orchestration metrics, live executions, knowledge
-  // graph) moved to the dedicated Monitoring view, so the builder stays clean.
+  // 9. WORKFLOW BUILDER — the Workflow view is a pure node-graph builder.
   // The relay is a first-class workflow node type in the palette.
   clickText(reload, "Workflow");
   assert.ok(await waitFor(() => reload.textContent?.includes("Add node") ?? false), "Workflow view renders the node palette");
   assert.ok(!reload.textContent?.includes("Live executions"), "Workflow builder no longer hosts the orchestration panel");
   assert.ok([...reload.querySelectorAll("button")].some((b) => b.textContent?.trim() === "Relay"), "relay is a workflow node type in the palette");
 
-  // 9b. ACTIVITY VIEW — the operational area. Switching to Activity
-  // surfaces the activity panel with active work and the workflow structure,
-  // plus the engine-driven current activity readout.
-  clickText(reload, "Activity");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Current Activity") ?? false), "Activity view renders the activity panel");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Active Work") ?? false), "activity panel shows active work");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Workflow Structure") ?? false), "activity panel shows the workflow structure");
-
-  // 10. AGENTS VIEW
-  clickText(reload, "Agents");
-  assert.ok(await waitFor(() => reload.textContent?.includes("Agents") ?? false), "Agents view renders");
-
-  // 11. HISTORY VIEW
-  clickText(reload, "History");
-  // The "Clear" button is unique to the History view (the nav tab also says
-  // "History", so asserting on it alone would pass even if the view failed).
-  assert.ok(await waitFor(() => reload.textContent?.includes("Clear") ?? false), "History view renders");
-
-  // 12. ANALYTICS VIEW
+  // 10. ANALYTICS VIEW
   clickText(reload, "Analytics");
   assert.ok(await waitFor(() => reload.textContent?.includes("Analytics") ?? false), "Analytics view renders");
 
-  // 13. OpenHands -> Board sync (inbound conversation appears)
+  // 11. OpenHands -> Board sync (inbound conversation appears)
   await fixture.host.agentServer.request({
     method: "POST",
     path: "/api/conversations",
